@@ -28,7 +28,11 @@ enum Api {
   putCancelQuit = '/sys/user/putCancelQuit',
   updateUserTenantStatus='/sys/tenant/updateUserTenantStatus',
   getUserTenantPageList='/sys/tenant/getUserTenantPageList',
+  bindProjectUser='/elderProjectUser/add',
+  getProjectUserInfo='/elderProjectUser/getProjectUserInfo',
+  getProjectListAll='/elderProject/getProjectListAll',
 }
+
 /**
  * 导出api
  * @param params
@@ -226,4 +230,26 @@ export const getUserTenantPageList = (params) => {
  */
 export const updateUserTenantStatus = (params) => {
   return defHttp.put({ url: Api.updateUserTenantStatus, params }, { joinParamsToUrl: true, isTransformResponse: false });
+};
+
+/**
+ * 绑定项目
+ * @param params
+ */
+export const bindProjectUserMethod = (params) => {
+  return defHttp.post({ url: Api.bindProjectUser, params });
+};
+
+/**
+ * 查询项目绑定信息
+ */
+export const getProjectUserInfoMethod = (params) => {
+  return defHttp.get({ url: Api.getProjectUserInfo, params });
+};
+/**
+ * 查询项目
+ */
+export const getProjectListAllMethod = () => {
+  const params = {type: 1};
+  return defHttp.get({ url: Api.getProjectListAll, params});
 };

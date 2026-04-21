@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+
+import com.joydigit.seniorcaring.mvp.vo.ProjectVo;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jeecg.common.api.vo.Result;
@@ -69,8 +71,9 @@ public class ElderProjectController extends JeecgController<ElderProject, IElder
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
 
-
-        QueryWrapper<ElderProject> queryWrapper = QueryGenerator.initQueryWrapper(elderProject, req.getParameterMap());
+		Map<String, QueryRuleEnum> customRuleMap = new HashMap<>();
+		customRuleMap.put("projectName",QueryRuleEnum.LIKE);
+        QueryWrapper<ElderProject> queryWrapper = QueryGenerator.initQueryWrapper(elderProject, req.getParameterMap(),customRuleMap);
 		Page<ElderProject> page = new Page<ElderProject>(pageNo, pageSize);
 		IPage<ElderProject> pageList = elderProjectService.page(page, queryWrapper);
 		return Result.OK(pageList);
@@ -88,7 +91,6 @@ public class ElderProjectController extends JeecgController<ElderProject, IElder
 	@PostMapping(value = "/add")
 	public Result<String> add(@RequestBody ElderProject elderProject) {
 		elderProjectService.save(elderProject);
-
 		return Result.OK("添加成功！");
 	}
 	
@@ -179,4 +181,8 @@ public class ElderProjectController extends JeecgController<ElderProject, IElder
         return super.importExcel(request, response, ElderProject.class);
     }
 
+	@GetMapping("/getProjectListAll")
+	public Result<List<ProjectVo>> getProjectListAll(@RequestParam(required = false) Integer type){
+		return this.service.getProjectListAll(type);
+	}
 }

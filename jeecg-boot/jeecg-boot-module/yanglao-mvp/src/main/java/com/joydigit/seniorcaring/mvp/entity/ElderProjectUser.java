@@ -40,7 +40,7 @@ public class ElderProjectUser implements Serializable {
 	/**租户ID*/
 	@Excel(name = "租户ID", width = 15)
     @Schema(description = "租户ID")
-    private String tenantId;
+    private Integer tenantId;
 	/**项目ID（逻辑外键）*/
 	@Excel(name = "项目ID（逻辑外键）", width = 15)
     @Schema(description = "项目ID（逻辑外键）")

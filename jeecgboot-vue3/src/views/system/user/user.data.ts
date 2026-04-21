@@ -1,6 +1,6 @@
 import { BasicColumn } from '/@/components/Table';
 import { FormSchema } from '/@/components/Table';
-import { getAllRolesListNoByTenant, getAllTenantList } from './user.api';
+import { getAllRolesListNoByTenant, getAllTenantList,getProjectListAllMethod } from './user.api';
 import { rules } from '/@/utils/helper/validator';
 import { render } from '/@/utils/common/renderUtils';
 export const columns: BasicColumn[] = [
@@ -422,6 +422,34 @@ export const formPasswordSchema: FormSchema[] = [
   },
 ];
 
+export const formBindProjectSchema: FormSchema[] = [
+  {
+    label: '用户账号',
+    field: 'username',
+    component: 'Input',
+    componentProps: { readOnly: true },
+  }, 
+  {
+    label: '用户ID',
+    field: 'userId',
+    ifShow: false,
+    component: 'Input',
+    componentProps: { readOnly: true },
+  }, 
+  {
+    field: 'projectIdList',
+    label: '选择项目',
+    component: 'ApiSelect',
+    helpMessage: ['配置项目'],
+    componentProps: {
+      mode: 'multiple',
+      api: getProjectListAllMethod,
+      labelField: 'projectName',
+      valueField: 'id',
+      immediate: false,
+    },
+  }
+];
 
 
 //租户用户列表

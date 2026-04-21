@@ -12,7 +12,7 @@ export const columns: BasicColumn[] = [
   {
     title: '所属项目',
     align: "center",
-    dataIndex: 'projectId'
+    dataIndex: 'projectName'
   },
   {
     title: '姓名',

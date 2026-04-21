@@ -1,15 +1,19 @@
 package com.joydigit.seniorcaring.mvp.controller;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+
+import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.joydigit.seniorcaring.mvp.enums.DelFlagEnum;
+import com.joydigit.seniorcaring.mvp.vo.ProjectUserVo;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.query.QueryRuleEnum;
@@ -29,6 +33,7 @@ import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 import org.jeecg.common.system.base.controller.JeecgController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -53,130 +58,47 @@ public class ElderProjectUserController extends JeecgController<ElderProjectUser
 	private IElderProjectUserService elderProjectUserService;
 	
 	/**
-	 * 分页列表查询
-	 *
-	 * @param elderProjectUser
-	 * @param pageNo
-	 * @param pageSize
-	 * @param req
-	 * @return
-	 */
-	//@AutoLog(value = "elder_project_user-分页列表查询")
-	@Operation(summary="elder_project_user-分页列表查询")
-	@GetMapping(value = "/list")
-	public Result<IPage<ElderProjectUser>> queryPageList(ElderProjectUser elderProjectUser,
-								   @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
-								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
-								   HttpServletRequest req) {
-
-
-        QueryWrapper<ElderProjectUser> queryWrapper = QueryGenerator.initQueryWrapper(elderProjectUser, req.getParameterMap());
-		Page<ElderProjectUser> page = new Page<ElderProjectUser>(pageNo, pageSize);
-		IPage<ElderProjectUser> pageList = elderProjectUserService.page(page, queryWrapper);
-		return Result.OK(pageList);
-	}
-	
-	/**
 	 *   添加
 	 *
-	 * @param elderProjectUser
+	 * @param projectUserVo
 	 * @return
 	 */
 	@AutoLog(value = "elder_project_user-添加")
 	@Operation(summary="elder_project_user-添加")
-	@RequiresPermissions("elder_project_user:add")
 	@PostMapping(value = "/add")
-	public Result<String> add(@RequestBody ElderProjectUser elderProjectUser) {
-		elderProjectUserService.save(elderProjectUser);
-
+	@Transactional(rollbackFor = Exception.class)
+	public Result<String> add(@RequestBody ProjectUserVo projectUserVo) {
+		if (Objects.isNull(projectUserVo) || StringUtils.isBlank(projectUserVo.getUserId()) || StringUtils.isBlank(projectUserVo.getProjectIds())){
+			return Result.error("参数不能为空");
+		}
+		// 删除历史的
+		elderProjectUserService.
+				remove(Wrappers.lambdaQuery(ElderProjectUser.class).eq(ElderProjectUser::getUserId,projectUserVo.getUserId()));
+		// 添加本次
+		List<ElderProjectUser> list = new ArrayList<>();
+		for (String projectId : projectUserVo.getProjectIds().split(",")) {
+			ElderProjectUser projectUser = new ElderProjectUser();
+			projectUser.setId(IdWorker.getIdStr());
+			projectUser.setProjectId(projectId);
+			projectUser.setUserId(projectUserVo.getUserId());
+			projectUser.setDelFlag(DelFlagEnum.NO.getKey());
+			list.add(projectUser);
+		}
+		elderProjectUserService.saveBatch(list);
 		return Result.OK("添加成功！");
 	}
-	
-	/**
-	 *  编辑
-	 *
-	 * @param elderProjectUser
-	 * @return
-	 */
-	@AutoLog(value = "elder_project_user-编辑")
-	@Operation(summary="elder_project_user-编辑")
-	@RequiresPermissions("elder_project_user:edit")
-	@RequestMapping(value = "/edit", method = {RequestMethod.PUT,RequestMethod.POST})
-	public Result<String> edit(@RequestBody ElderProjectUser elderProjectUser) {
-		elderProjectUserService.updateById(elderProjectUser);
-		return Result.OK("编辑成功!");
-	}
-	
-	/**
-	 *   通过id删除
-	 *
-	 * @param id
-	 * @return
-	 */
-	@AutoLog(value = "elder_project_user-通过id删除")
-	@Operation(summary="elder_project_user-通过id删除")
-	@RequiresPermissions("elder_project_user:delete")
-	@DeleteMapping(value = "/delete")
-	public Result<String> delete(@RequestParam(name="id",required=true) String id) {
-		elderProjectUserService.removeById(id);
-		return Result.OK("删除成功!");
-	}
-	
-	/**
-	 *  批量删除
-	 *
-	 * @param ids
-	 * @return
-	 */
-	@AutoLog(value = "elder_project_user-批量删除")
-	@Operation(summary="elder_project_user-批量删除")
-	@RequiresPermissions("elder_project_user:deleteBatch")
-	@DeleteMapping(value = "/deleteBatch")
-	public Result<String> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
-		this.elderProjectUserService.removeByIds(Arrays.asList(ids.split(",")));
-		return Result.OK("批量删除成功!");
-	}
-	
-	/**
-	 * 通过id查询
-	 *
-	 * @param id
-	 * @return
-	 */
-	//@AutoLog(value = "elder_project_user-通过id查询")
-	@Operation(summary="elder_project_user-通过id查询")
-	@GetMapping(value = "/queryById")
-	public Result<ElderProjectUser> queryById(@RequestParam(name="id",required=true) String id) {
-		ElderProjectUser elderProjectUser = elderProjectUserService.getById(id);
-		if(elderProjectUser==null) {
-			return Result.error("未找到对应数据");
+	 @Operation(summary="查询用户项目配置")
+	@GetMapping("/getProjectUserInfo")
+	public Result<ProjectUserVo> getProjectUserInfo(@RequestParam String userId){
+		ProjectUserVo vo = new ProjectUserVo();
+		vo.setUserId(userId);
+		List<ElderProjectUser> list = elderProjectUserService.list(Wrappers.lambdaQuery(ElderProjectUser.class).eq(ElderProjectUser::getUserId, userId));
+		if (CollectionUtil.isNotEmpty(list)){
+			List<String> projectIds = list.stream().map(ElderProjectUser::getProjectId).collect(Collectors.toList());
+			vo.setProjectIds(String.join(",",projectIds));
 		}
-		return Result.OK(elderProjectUser);
+		return Result.OK(vo);
 	}
 
-    /**
-    * 导出excel
-    *
-    * @param request
-    * @param elderProjectUser
-    */
-    @RequiresPermissions("elder_project_user:exportXls")
-    @RequestMapping(value = "/exportXls")
-    public ModelAndView exportXls(HttpServletRequest request, ElderProjectUser elderProjectUser) {
-        return super.exportXls(request, elderProjectUser, ElderProjectUser.class, "elder_project_user");
-    }
-
-    /**
-      * 通过excel导入数据
-    *
-    * @param request
-    * @param response
-    * @return
-    */
-    @RequiresPermissions("elder_project_user:importExcel")
-    @RequestMapping(value = "/importExcel", method = RequestMethod.POST)
-    public Result<?> importExcel(HttpServletRequest request, HttpServletResponse response) {
-        return super.importExcel(request, response, ElderProjectUser.class);
-    }
 
 }

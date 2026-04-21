@@ -6,7 +6,13 @@
           <a-row>						
 						<a-col :span="24">
 							<a-form-item label="所属项目" v-bind="validateInfos.projectId" id="ElderConsultingForm-projectId" name="projectId">
-								<a-input v-model:value="formData.projectId" placeholder="请输入所属项目ID"  allow-clear ></a-input>
+								<a-select
+                  v-model:value="formData.projectId"
+                  :options="projectList"
+                  :fieldNames="{ label: 'projectName', value: 'id' }"
+                  showSearch
+                  placeholder="请选择所属项目"
+                />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
@@ -72,6 +78,7 @@
   import { useMessage } from '/@/hooks/web/useMessage';
   import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
   import { getDateByPicker, getValueType } from '/@/utils';
+  import { getProjectListAllM } from './../ElderProject.api';  
   import { saveOrUpdate } from '../ElderConsulting.api';
   import { Form } from 'ant-design-vue';
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
@@ -80,13 +87,14 @@
     formData: { type: Object, default: () => ({})},
     formBpm: { type: Boolean, default: true }
   });
+  const projectList = ref([]);
   const formRef = ref();
   const useForm = Form.useForm;
   const emit = defineEmits(['register', 'ok']);
   const formData = reactive<Record<string, any>>({
     id: '',
     tenantId: '',   
-    projectId: '',   
+    projectId: undefined,   
     name: '',   
     gender: '',   
     consultTypeName: '',   
@@ -119,7 +127,9 @@
   //日期个性化选择
   const fieldPickers = reactive({
   });
-
+  onMounted(async () => {
+    projectList.value = await getProjectListAllM();
+  });
   // 表单禁用
   const disabled = computed(()=>{
     if(props.formBpm === true){

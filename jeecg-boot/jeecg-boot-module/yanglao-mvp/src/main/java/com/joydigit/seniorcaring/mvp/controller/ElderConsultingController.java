@@ -10,9 +10,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.query.QueryRuleEnum;
+import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.oConvertUtils;
 import com.joydigit.seniorcaring.mvp.entity.ElderConsulting;
 import com.joydigit.seniorcaring.mvp.service.IElderConsultingService;
@@ -68,16 +70,8 @@ public class ElderConsultingController extends JeecgController<ElderConsulting, 
 								   @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
-
-
-        // 自定义查询规则
-        Map<String, QueryRuleEnum> customeRuleMap = new HashMap<>();
-        // 自定义多选的查询规则为：LIKE_WITH_OR
-        customeRuleMap.put("consultTypeName", QueryRuleEnum.LIKE_WITH_OR);
-        customeRuleMap.put("followStatus", QueryRuleEnum.LIKE_WITH_OR);
-        QueryWrapper<ElderConsulting> queryWrapper = QueryGenerator.initQueryWrapper(elderConsulting, req.getParameterMap(),customeRuleMap);
 		Page<ElderConsulting> page = new Page<ElderConsulting>(pageNo, pageSize);
-		IPage<ElderConsulting> pageList = elderConsultingService.page(page, queryWrapper);
+		IPage<ElderConsulting> pageList = elderConsultingService.pageList(page, elderConsulting);
 		return Result.OK(pageList);
 	}
 	
@@ -92,8 +86,10 @@ public class ElderConsultingController extends JeecgController<ElderConsulting, 
 	@RequiresPermissions("elder_consulting:add")
 	@PostMapping(value = "/add")
 	public Result<String> add(@RequestBody ElderConsulting elderConsulting) {
+		LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+		elderConsulting.setReceptionistId(sysUser.getId());
+		elderConsulting.setReceptionistName(sysUser.getRealname());
 		elderConsultingService.save(elderConsulting);
-
 		return Result.OK("添加成功！");
 	}
 	

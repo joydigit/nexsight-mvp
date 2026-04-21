@@ -40,7 +40,7 @@ public class ElderCustomerVisitingRecord implements Serializable {
 	/**租户ID*/
 	@Excel(name = "租户ID", width = 15)
     @Schema(description = "租户ID")
-    private String tenantId;
+    private Integer tenantId;
 	/**所属项目ID*/
 	@Excel(name = "所属项目ID", width = 15)
     @Schema(description = "所属项目ID")

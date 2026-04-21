@@ -40,7 +40,7 @@ public class ElderBed implements Serializable {
 	/**项目ID*/
 	@Excel(name = "项目ID", width = 15)
     @Schema(description = "项目ID")
-    private String projectId;
+    private Integer projectId;
 	/**房间ID*/
 	@Excel(name = "房间ID", width = 15)
     @Schema(description = "房间ID")

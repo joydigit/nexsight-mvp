@@ -2,4 +2,34 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.joydigit.seniorcaring.mvp.mapper.ElderConsultingMapper">
 
+    <select id="pageList" resultType="com.joydigit.seniorcaring.mvp.entity.ElderConsulting">
+        SELECT
+            c.*,
+            p.project_name
+        FROM
+            elder_consulting c
+                LEFT JOIN elder_project p ON c.project_id = p.id
+        WHERE
+            c.del_flag = 0
+          <if test="elderConsulting.projectId != null and elderConsulting.projectId != ''">
+              AND c.project_id = #{elderConsulting.projectId}
+          </if>
+        <if test="elderConsulting.name != null and elderConsulting.name != ''">
+            AND c.`name` LIKE concat(concat('%',#{elderConsulting.name}),'%')
+        </if>
+        <if test="elderConsulting.consultTypeCode != null and elderConsulting.consultTypeCode != ''">
+            AND c.consult_type_code  = #{elderConsulting.consultTypeCode}
+        </if>
+        <if test="elderConsulting.followStatus != null and elderConsulting.followStatus != ''">
+            AND c.follow_status = #{elderConsulting.followStatus}
+        </if>
+        <if test="elderConsulting.phone != null and elderConsulting.phone != ''">
+            AND c.phone LIKE concat(concat('%',#{elderConsulting.phone}),'%')
+        </if>
+        <if test="elderConsulting.receptionistName != null and elderConsulting.receptionistName != ''">
+            AND c.receptionist_name LIKE concat(concat('%',#{elderConsulting.receptionistName}),'%')
+        </if>
+        order by c.create_time desc
+
+    </select>
 </mapper>

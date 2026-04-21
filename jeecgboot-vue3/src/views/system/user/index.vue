@@ -45,6 +45,8 @@
     <UserRecycleBinModal @register="registerModal" @success="reload" />
     <!-- 离职人员列弹窗 -->
     <UserQuitModal @register="registerQuitModal" @success="reload" />
+    <!-- 绑定项目 -->
+    <BindProjectModal @register="registerBindProjectModal" @success="handleBindSuccess" />
   </div>
 </template>
 
@@ -55,6 +57,7 @@
   import UserDrawer from './UserDrawer.vue';
   import UserRecycleBinModal from './UserRecycleBinModal.vue';
   import PasswordModal from './PasswordModal.vue';
+  import BindProjectModal from './BindProjectModal.vue';
   import JThirdAppButton from '/@/components/jeecg/thirdApp/JThirdAppButton.vue';
   import UserQuitModal from './UserQuitModal.vue';
   import { useDrawer } from '/@/components/Drawer';
@@ -74,6 +77,8 @@
   const [registerModal, { openModal }] = useModal();
   //密码model
   const [registerPasswordModal, { openModal: openPasswordModal }] = useModal();
+
+  const [registerBindProjectModal,{ openModal: openBindProjectModal }] = useModal();
   //代理人model
   const [registerAgentModal, { openModal: openAgentModal }] = useModal();
   //离职代理人model
@@ -145,6 +150,12 @@
     });
   }
   /**
+   * 绑定项目
+   */
+  function handleBindProject(record: Recordable) {    
+    openBindProjectModal(true, record)
+  }
+  /**
    * 删除事件
    */
   async function handleDelete(record) {
@@ -173,6 +184,12 @@
    */
   function handleSuccess() {
     reload();
+  }
+ /**
+   * 成功回调
+   */
+  function handleBindSuccess(){
+
   }
 
   /**
@@ -268,6 +285,10 @@
           title: '确定解冻吗?',
           confirm: handleFrozen.bind(null, record, 1),
         },
+      },
+      {
+        label: '项目权限',
+        onClick: handleBindProject.bind(null, record),
       },
     ];
   }

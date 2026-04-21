@@ -4,6 +4,19 @@
     <div class="jeecg-basic-table-form-container">
       <a-form ref="formRef" @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol">
         <a-row :gutter="24">
+          <a-col :lg="6">
+            <a-form-item name="projectName">
+              <template #label><span title="项目名称">项目名称</span></template>
+              <a-input placeholder="请输入项目名称" v-model:value="queryParam.projectName" allow-clear ></a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :xl="6" :lg="7" :md="8" :sm="24">
+            <span style="float: left; overflow: hidden" class="table-page-search-submitButtons">
+              <a-col :lg="6">
+                <a-button type="primary" preIcon="ant-design:search-outlined" @click="searchQuery">查询</a-button>
+              </a-col>
+            </span>
+          </a-col>
         </a-row>
       </a-form>
     </div>
@@ -12,8 +25,6 @@
       <!--插槽:table标题-->
       <template #tableTitle>
         <a-button type="primary" v-auth="'elder_project:add'"  @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
-        <a-button  type="primary" v-auth="'elder_project:exportXls'" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
-        <j-upload-button  type="primary" v-auth="'elder_project:importExcel'"  preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button>
         <a-dropdown v-if="selectedRowKeys.length > 0">
           <template #overlay>
             <a-menu>
@@ -26,9 +37,7 @@
           <a-button v-auth="'elder_project:deleteBatch'">批量操作
             <Icon icon="mdi:chevron-down"></Icon>
           </a-button>
-        </a-dropdown>
-        <!-- 高级查询 -->
-        <super-query :config="superQueryConfig" @search="handleSuperQuery" />
+        </a-dropdown>       
       </template>
       <!--操作栏-->
       <template #action="{ record }">
@@ -72,6 +81,7 @@
       columns,
       canResize:true,
       useSearchForm: false,
+      showTableSetting: false,
       actionColumn: {
         width: 120,
         fixed: 'right',
@@ -173,7 +183,7 @@
       {
         label: '编辑',
         onClick: handleEdit.bind(null, record),
-        auth: 'com.joydigit.seniorcaring.mvp:elder_project:edit'
+        auth: 'elder_project:edit'
       },
     ];
   }
@@ -193,7 +203,7 @@
           confirm: handleDelete.bind(null, record),
           placement: 'topLeft',
         },
-        auth: 'com.joydigit.seniorcaring.mvp:elder_project:delete'
+        auth: 'elder_project:delete'
       }
     ]
   }

@@ -40,7 +40,7 @@ public class ElderFloor implements Serializable {
 	/**租户ID*/
 	@Excel(name = "租户ID", width = 15)
     @Schema(description = "租户ID")
-    private String tenantId;
+    private Integer tenantId;
 	/**楼栋id*/
 	@Excel(name = "楼栋id", width = 15)
     @Schema(description = "楼栋id")

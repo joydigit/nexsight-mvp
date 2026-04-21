@@ -11,6 +11,7 @@ enum Api {
   deleteBatch = '/elderProject/deleteBatch',
   importExcel = '/elderProject/importExcel',
   exportXls = '/elderProject/exportXls',
+  getProjectListAll ='/elderProject/getProjectListAll'
 }
 
 /**
@@ -70,3 +71,10 @@ export const saveOrUpdate = (params, isUpdate) => {
   let url = isUpdate ? Api.edit : Api.save;
   return defHttp.post({ url: url, params }, { isTransformResponse: false });
 }
+
+/**
+ * 列表接口
+ * @param params
+ */
+export const getProjectListAllM = (params) => defHttp.get({ url: Api.getProjectListAll, params });
+

@@ -40,7 +40,7 @@ public class ElderProject implements Serializable {
 	/**租户ID（SaaS集团隔离）*/
 	@Excel(name = "租户ID（SaaS集团隔离）", width = 15)
     @Schema(description = "租户ID（SaaS集团隔离）")
-    private String tenantId;
+    private Integer tenantId;
 	/**项目编码（如A001，用于账单号前缀）*/
 	@Excel(name = "项目编码（如A001，用于账单号前缀）", width = 15)
     @Schema(description = "项目编码（如A001，用于账单号前缀）")

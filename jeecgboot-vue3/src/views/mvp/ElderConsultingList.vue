@@ -5,6 +5,18 @@
       <a-form ref="formRef" @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol">
         <a-row :gutter="24">
           <a-col :lg="6">
+            <a-form-item name="projectId">
+              <template #label><span title="所属项目">所属项目</span></template>
+              <a-select
+                  v-model:value="queryParam.projectId"
+                  :options="projectList"
+                  :fieldNames="{ label: 'projectName', value: 'id' }"
+                  showSearch
+                  placeholder="请选择所属项目"
+                />
+            </a-form-item>
+          </a-col>
+          <a-col :lg="6">
             <a-form-item name="name">
               <template #label><span title="姓名">姓名</span></template>
               <a-input placeholder="请输入姓名" v-model:value="queryParam.name" allow-clear ></a-input>
@@ -85,7 +97,7 @@
 </template>
 
 <script lang="ts" name="com.joydigit.seniorcaring.mvp-elderConsulting" setup>
-  import { ref, reactive } from 'vue';
+  import { ref, reactive, onMounted } from 'vue';
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { useListPage } from '/@/hooks/system/useListPage';
   import { columns, superQuerySchema } from './ElderConsulting.data';
@@ -94,19 +106,25 @@
   import ElderConsultingModal from './components/ElderConsultingModal.vue'
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
-   import {useModal} from '/@/components/Modal';
+  import {useModal} from '/@/components/Modal';
+  import { getProjectListAllM } from './ElderProject.api';  
   import { getDateByPicker } from '/@/utils';
   import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
 
   const fieldPickers = reactive({
   });
 
+  const projectList = ref([]);
   const formRef = ref();
   const queryParam = reactive<any>({});
   const toggleSearchStatus = ref<boolean>(false);
   const registerModal = ref();
   const userStore = useUserStore();
   const { createMessage } = useMessage();
+
+  onMounted(async () => {
+    projectList.value = await getProjectListAllM();
+  });
   //注册table数据
   const { prefixCls, tableContext, onExportXls, onImportXls } = useListPage({
     tableProps: {

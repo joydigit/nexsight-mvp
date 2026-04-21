@@ -4,10 +4,8 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.math.BigDecimal;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.TableLogic;
+
+import com.baomidou.mybatisplus.annotation.*;
 import org.jeecg.common.aspect.annotation.AutoDict;
 import org.jeecg.common.constant.ProvinceCityArea;
 import org.jeecg.common.util.SpringContextUtils;
@@ -39,11 +37,10 @@ public class ElderConsulting implements Serializable {
     @Schema(description = "主键")
     private String id;
 	/**租户ID*/
-	@Excel(name = "租户ID", width = 15)
     @Schema(description = "租户ID")
-    private String tenantId;
+    private Integer tenantId;
 	/**所属项目ID*/
-	@Excel(name = "所属项目ID", width = 15)
+
     @Schema(description = "所属项目ID")
     private String projectId;
 	/**姓名*/
@@ -51,7 +48,7 @@ public class ElderConsulting implements Serializable {
     @Schema(description = "姓名")
     private String name;
 	/**性别：0-女，1-男，2-未知*/
-	@Excel(name = "性别：0-女，1-男，2-未知", width = 15)
+	@Excel(name = "性别", width = 15)
     @Schema(description = "性别：0-女，1-男，2-未知")
     @Dict(dicCode = "gender_type")
     private String gender;
@@ -65,7 +62,7 @@ public class ElderConsulting implements Serializable {
     @Dict(dicCode = "consult_type")
     private String consultTypeCode;
 	/**跟进状态：0-待跟进，1-已跟进，2-已放弃*/
-	@Excel(name = "跟进状态：0-待跟进，1-已跟进，2-已放弃", width = 15)
+	@Excel(name = "跟进状态", width = 15)
     @Schema(description = "跟进状态：0-待跟进，1-已跟进，2-已放弃")
     @Dict(dicCode = "follow_status")
     private String followStatus;
@@ -121,8 +118,13 @@ public class ElderConsulting implements Serializable {
     @Schema(description = "更新时间")
     private Date updateTime;
 	/**删除状态：0正常，1已删除*/
-	@Excel(name = "删除状态：0正常，1已删除", width = 15)
     @Schema(description = "删除状态：0正常，1已删除")
     @TableLogic
     private Integer delFlag;
+    /**
+     * 项目名称
+     */
+    @Excel(name = "所属项目", width = 15)
+    @TableField(exist = false)
+    private String projectName;
 }

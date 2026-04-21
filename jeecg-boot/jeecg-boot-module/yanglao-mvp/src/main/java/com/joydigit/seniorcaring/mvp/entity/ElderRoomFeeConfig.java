@@ -40,7 +40,7 @@ public class ElderRoomFeeConfig implements Serializable {
 	/**租户ID*/
 	@Excel(name = "租户ID", width = 15)
     @Schema(description = "租户ID")
-    private String tenantId;
+    private Integer tenantId;
 	/**项目ID*/
 	@Excel(name = "项目ID", width = 15)
     @Schema(description = "项目ID")
