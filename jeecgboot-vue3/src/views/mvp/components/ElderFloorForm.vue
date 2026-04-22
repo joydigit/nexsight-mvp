@@ -4,19 +4,27 @@
       <template #detail>
         <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ElderFloorForm">
           <a-row>
-						<a-col :span="24">
-							<a-form-item label="租户ID" v-bind="validateInfos.tenantId" id="ElderFloorForm-tenantId" name="tenantId">
-								<a-input v-model:value="formData.tenantId" placeholder="请输入租户ID"  allow-clear ></a-input>
+            <a-col :span="24">
+							<a-form-item label="所属项目" v-bind="validateInfos.projectId" id="ElderFloorForm-projectId" name="projectId">
+								<a-select
+                  v-model:value="formData.projectId"
+                  :options="projectList"
+                  :fieldNames="{ label: 'projectName', value: 'id' }"
+                  showSearch
+                  placeholder="请选择所属项目"
+                  @change="handleChangeProjectId"
+                />
 							</a-form-item>
-						</a-col>
+						</a-col>				
 						<a-col :span="24">
-							<a-form-item label="楼栋id" v-bind="validateInfos.buildingId" id="ElderFloorForm-buildingId" name="buildingId">
-								<a-input v-model:value="formData.buildingId" placeholder="请输入楼栋id"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="项目ID" v-bind="validateInfos.projectId" id="ElderFloorForm-projectId" name="projectId">
-								<a-input v-model:value="formData.projectId" placeholder="请输入项目ID"  allow-clear ></a-input>
+							<a-form-item label="楼栋" v-bind="validateInfos.buildingId" id="ElderFloorForm-buildingId" name="buildingId">
+								<a-select
+                  v-model:value="formData.buildingId"
+                  :options="buildingList"
+                  :fieldNames="{ label: 'buildingName', value: 'id' }"
+                  showSearch
+                  placeholder="请选择楼栋"
+                />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
@@ -37,39 +45,50 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive, defineExpose, nextTick, defineProps, computed, onMounted } from 'vue';
+  import { ref, reactive, defineExpose, nextTick, defineProps, computed, onMounted, watch } from 'vue';
   import { defHttp } from '/@/utils/http/axios';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { getDateByPicker, getValueType } from '/@/utils';
   import { saveOrUpdate } from '../ElderFloor.api';
   import { Form } from 'ant-design-vue';
+  import {getBuildingListByProjectIdMethod} from '../ElderBuilding.api';
+  import { getProjectListAllM } from '../ElderProject.api'; 
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
   const props = defineProps({
     formDisabled: { type: Boolean, default: false },
     formData: { type: Object, default: () => ({})},
     formBpm: { type: Boolean, default: true }
   });
+  const projectList = ref([]);
+  const buildingList = ref([]);
   const formRef = ref();
   const useForm = Form.useForm;
   const emit = defineEmits(['register', 'ok']);
   const formData = reactive<Record<string, any>>({
     id: '',
     tenantId: '',   
-    buildingId: '',   
-    projectId: '',   
+    buildingId: undefined,   
+    projectId: undefined,   
     floorName: '',   
     sortOrder: undefined,
     delFlag: undefined,
   });
+  onMounted(async () => {
+    projectList.value = await getProjectListAllM();
+  });
+  watch(()=>{
+    if (formData.projectId){
+      handleChangeProjectId(formData.projectId);
+    }
+  })
   const { createMessage } = useMessage();
   const labelCol = ref<any>({ xs: { span: 24 }, sm: { span: 5 } });
   const wrapperCol = ref<any>({ xs: { span: 24 }, sm: { span: 16 } });
   const confirmLoading = ref<boolean>(false);
   //表单验证
   const validatorRules = reactive({
-    tenantId: [{ required: true, message: '请输入租户ID!'},],
-    buildingId: [{ required: true, message: '请输入楼栋id!'},],
-    projectId: [{ required: true, message: '请输入项目ID!'},],
+    buildingId: [{ required: true, message: '请选择楼栋!'},],
+    projectId: [{ required: true, message: '请选择项目!'},],
     floorName: [{ required: true, message: '请输入楼层名称!'},],
   });
   const { resetFields, validate, validateInfos } = useForm(formData, validatorRules, { immediate: false });
@@ -113,7 +132,15 @@
       Object.assign(formData, tmpData);
     });
   }
-
+   // 查询楼栋
+   async function handleChangeProjectId(value){
+    if (value) {
+      const data = await getBuildingListByProjectIdMethod({projectId: value});
+      buildingList.value = data;
+    } else {
+      buildingList.value = [];
+    }
+  }
   /**
    * 提交数据
    */

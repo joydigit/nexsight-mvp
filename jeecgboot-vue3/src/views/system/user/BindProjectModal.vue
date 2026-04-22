@@ -28,6 +28,8 @@
     console.log(projectUsers)
     if (projectUsers && projectUsers.projectIds) {
       data.projectIdList = projectUsers.projectIds.split(',')
+    } else {
+      data.projectIdList = []
     }
     //表单赋值
     await setFieldsValue({ ...data });

@@ -4,6 +4,45 @@
     <div class="jeecg-basic-table-form-container">
       <a-form ref="formRef" @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol">
         <a-row :gutter="24">
+          <a-col :lg="6">
+            <a-form-item name="projectId">
+              <template #label><span title="所属项目">所属项目</span></template>
+              <a-select
+                  v-model:value="queryParam.projectId"
+                  :options="projectList"
+                  :fieldNames="{ label: 'projectName', value: 'id' }"
+                  showSearch
+                  placeholder="请选择所属项目"
+                  @change="handleChangeProjectId"
+                />
+            </a-form-item>
+          </a-col>
+          <a-col :lg="6">
+            <a-form-item name="buildingId">
+              <template #label><span title="楼栋">楼栋</span></template>
+              <a-select
+                  v-model:value="queryParam.buildingId"
+                  :options="buildingList"
+                  :fieldNames="{ label: 'buildingName', value: 'id' }"
+                  showSearch
+                  placeholder="请选择楼栋"
+                />
+            </a-form-item>
+          </a-col>
+          <a-col :lg="6">
+            <a-form-item name="floorName">
+              <template #label><span title="楼层名称">楼层名称</span></template>
+              <a-input placeholder="请输入楼层名称" v-model:value="queryParam.floorName" allow-clear ></a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :xl="6" :lg="7" :md="8" :sm="24">
+            <span style="float: left; overflow: hidden" class="table-page-search-submitButtons">
+              <a-col :lg="6">
+                <a-button type="primary" preIcon="ant-design:search-outlined" @click="searchQuery">查询</a-button>
+                <a-button type="primary" preIcon="ant-design:reload-outlined" @click="searchReset" style="margin-left: 8px">重置</a-button>                
+              </a-col>
+            </span>
+          </a-col>
         </a-row>
       </a-form>
     </div>
@@ -12,8 +51,6 @@
       <!--插槽:table标题-->
       <template #tableTitle>
         <a-button type="primary" v-auth="'elder_floor:add'"  @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
-        <a-button  type="primary" v-auth="'elder_floor:exportXls'" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
-        <j-upload-button  type="primary" v-auth="'elder_floor:importExcel'"  preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button>
         <a-dropdown v-if="selectedRowKeys.length > 0">
           <template #overlay>
             <a-menu>
@@ -27,8 +64,6 @@
             <Icon icon="mdi:chevron-down"></Icon>
           </a-button>
         </a-dropdown>
-        <!-- 高级查询 -->
-        <super-query :config="superQueryConfig" @search="handleSuperQuery" />
       </template>
       <!--操作栏-->
       <template #action="{ record }">
@@ -43,18 +78,21 @@
 </template>
 
 <script lang="ts" name="com.joydigit.seniorcaring.mvp-elderFloor" setup>
-  import { ref, reactive } from 'vue';
+  import { ref, reactive,onMounted } from 'vue';
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { useListPage } from '/@/hooks/system/useListPage';
   import { columns, superQuerySchema } from './ElderFloor.data';
   import { list, deleteOne, batchDelete, getImportUrl, getExportUrl } from './ElderFloor.api';
+  import {getBuildingListByProjectIdMethod} from './ElderBuilding.api';
   import { downloadFile } from '/@/utils/common/renderUtils';
   import ElderFloorModal from './components/ElderFloorModal.vue'
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
    import {useModal} from '/@/components/Modal';
   import { getDateByPicker } from '/@/utils';
-
+  import { getProjectListAllM } from './ElderProject.api'; 
+  const projectList = ref([]);
+  const buildingList = ref([]);
   const fieldPickers = reactive({
   });
 
@@ -64,6 +102,9 @@
   const registerModal = ref();
   const userStore = useUserStore();
   const { createMessage } = useMessage();
+  onMounted(async () => {
+    projectList.value = await getProjectListAllM();
+  });
   //注册table数据
   const { prefixCls, tableContext, onExportXls, onImportXls } = useListPage({
     tableProps: {
@@ -72,6 +113,7 @@
       columns,
       canResize:true,
       useSearchForm: false,
+      showTableSetting: false,
       actionColumn: {
         width: 120,
         fixed: 'right',
@@ -173,7 +215,7 @@
       {
         label: '编辑',
         onClick: handleEdit.bind(null, record),
-        auth: 'com.joydigit.seniorcaring.mvp:elder_floor:edit'
+        auth: 'elder_floor:edit'
       },
     ];
   }
@@ -193,7 +235,7 @@
           confirm: handleDelete.bind(null, record),
           placement: 'topLeft',
         },
-        auth: 'com.joydigit.seniorcaring.mvp:elder_floor:delete'
+        auth: 'elder_floor:delete'
       }
     ]
   }
@@ -214,8 +256,15 @@
     //刷新数据
     reload();
   }
-  
-
+  // 查询楼栋
+  async function handleChangeProjectId(value){
+    if (value) {
+      const data = await getBuildingListByProjectIdMethod({projectId: value});
+      buildingList.value = data;
+    } else {
+      buildingList.value = [];
+    }
+  }
 
 
 

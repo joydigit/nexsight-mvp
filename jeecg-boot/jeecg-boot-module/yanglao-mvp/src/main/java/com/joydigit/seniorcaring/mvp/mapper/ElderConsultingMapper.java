@@ -18,4 +18,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 public interface ElderConsultingMapper extends BaseMapper<ElderConsulting> {
 
     IPage<ElderConsulting> pageList(Page<ElderConsulting> page, @Param("elderConsulting") ElderConsulting elderConsulting);
+    List<ElderConsulting> getList(@Param("elderConsulting") ElderConsulting elderConsulting,@Param("selectionList") List<String> selectionList);
 }

@@ -86,7 +86,7 @@ public class ElderConsultingFollowRecord implements Serializable {
     @Schema(description = "更新时间")
     private Date updateTime;
 	/**删除状态：0正常，1已删除*/
-	@Excel(name = "删除状态：0正常，1已删除", width = 15)
+	@Excel(name = "删除状态", width = 15)
     @Schema(description = "删除状态：0正常，1已删除")
     @TableLogic
     private Integer delFlag;

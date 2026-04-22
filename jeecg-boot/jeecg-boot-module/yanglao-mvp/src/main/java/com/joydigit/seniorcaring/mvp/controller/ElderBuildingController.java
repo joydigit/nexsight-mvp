@@ -69,13 +69,17 @@ public class ElderBuildingController extends JeecgController<ElderBuilding, IEld
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
 
-
-        QueryWrapper<ElderBuilding> queryWrapper = QueryGenerator.initQueryWrapper(elderBuilding, req.getParameterMap());
 		Page<ElderBuilding> page = new Page<ElderBuilding>(pageNo, pageSize);
-		IPage<ElderBuilding> pageList = elderBuildingService.page(page, queryWrapper);
+		IPage<ElderBuilding> pageList = elderBuildingService.pageList(page, elderBuilding);
 		return Result.OK(pageList);
 	}
-	
+
+	 @Operation(summary="elder_building-根据项目id查询楼栋")
+	 @GetMapping(value = "/getBuildingListByProjectId")
+	 public Result<List<ElderBuilding>> getBuildingListByProjectId(@RequestParam String projectId){
+		 List<ElderBuilding> list = elderBuildingService.getBuildingListByProjectId(projectId);
+		 return Result.OK(list);
+	 }
 	/**
 	 *   添加
 	 *

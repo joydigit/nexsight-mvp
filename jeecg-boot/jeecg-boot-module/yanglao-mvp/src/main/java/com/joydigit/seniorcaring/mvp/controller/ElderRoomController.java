@@ -69,13 +69,16 @@ public class ElderRoomController extends JeecgController<ElderRoom, IElderRoomSe
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
 
-
-        QueryWrapper<ElderRoom> queryWrapper = QueryGenerator.initQueryWrapper(elderRoom, req.getParameterMap());
 		Page<ElderRoom> page = new Page<ElderRoom>(pageNo, pageSize);
-		IPage<ElderRoom> pageList = elderRoomService.page(page, queryWrapper);
+		IPage<ElderRoom> pageList = elderRoomService.pageList(page, elderRoom);
 		return Result.OK(pageList);
 	}
-	
+	@Operation(summary="elder_room-查询楼层下的房间")
+	@GetMapping("/getRoomListByFloorId")
+	public Result<List<ElderRoom>> getRoomListByFloorId(@RequestParam String floorId){
+		 List<ElderRoom> list = elderRoomService.getRoomListByFloorId(floorId);
+		 return Result.OK(list);
+	 }
 	/**
 	 *   添加
 	 *

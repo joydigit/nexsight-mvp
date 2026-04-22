@@ -6,19 +6,14 @@ import { getWeekMonthQuarterYear } from '/@/utils';
 //列表数据
 export const columns: BasicColumn[] = [
   {
-    title: '租户ID',
+    title: '项目',
     align: "center",
-    dataIndex: 'tenantId'
+    dataIndex: 'projectName'
   },
   {
-    title: '楼栋id',
+    title: '楼栋',
     align: "center",
-    dataIndex: 'buildingId'
-  },
-  {
-    title: '项目ID',
-    align: "center",
-    dataIndex: 'projectId'
+    dataIndex: 'buildingName'
   },
   {
     title: '楼层名称',

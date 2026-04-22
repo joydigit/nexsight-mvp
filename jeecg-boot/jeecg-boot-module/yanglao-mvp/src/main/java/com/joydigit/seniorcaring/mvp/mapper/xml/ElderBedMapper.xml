@@ -2,4 +2,45 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.joydigit.seniorcaring.mvp.mapper.ElderBedMapper">
 
+    <select id="pageList" resultType="com.joydigit.seniorcaring.mvp.entity.ElderBed">
+        SELECT
+            eb.*,
+            p.project_name,
+            b.building_name,
+            f.floor_name,
+            r.room_no,
+            r.floor_id,
+            r.building_id
+        FROM
+            elder_bed eb
+                LEFT JOIN elder_room r on r.id = eb.room_id
+                LEFT JOIN elder_floor f ON f.id = r.floor_id
+                LEFT JOIN elder_project p ON eb.project_id = p.id
+                LEFT JOIN elder_building b ON b.id = r.building_id
+        WHERE
+            eb.del_flag = 0
+        <if test="data.projectIds != null and data.projectIds.size() > 0">
+            AND  eb.project_id IN (
+            <foreach item="id" collection="data.projectIds" separator=",">
+                #{id}
+            </foreach>
+            )
+        </if>
+        <if test="data.projectId != null and data.projectId != ''">
+            AND eb.project_id = #{data.projectId}
+        </if>
+        <if test="data.buildingId != null and data.buildingId != ''">
+            AND r.building_id = #{data.buildingId}
+        </if>
+        <if test="data.floorId != null and data.floorId != ''">
+            AND r.floor_id = #{data.floorId}
+        </if>
+        <if test="data.roomId != null and data.roomId != ''">
+            AND eb.room_id = #{data.roomId}
+        </if>
+        <if test="data.bedNo != null and data.bedNo != ''">
+            AND eb.bed_no LIKE concat(concat('%',#{data.bedNo}),'%')
+        </if>
+        order by eb.create_time desc
+    </select>
 </mapper>

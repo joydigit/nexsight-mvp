@@ -16,4 +16,6 @@ import java.util.List;
 public interface IElderProjectService extends IService<ElderProject> {
 
     Result<List<ProjectVo>> getProjectListAll(Integer type);
+
+    List<String> getProjectIdByUserId();
 }

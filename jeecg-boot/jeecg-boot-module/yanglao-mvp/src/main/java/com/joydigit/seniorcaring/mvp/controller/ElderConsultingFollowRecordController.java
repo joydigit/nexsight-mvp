@@ -69,7 +69,6 @@ public class ElderConsultingFollowRecordController extends JeecgController<Elder
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
 
-
         QueryWrapper<ElderConsultingFollowRecord> queryWrapper = QueryGenerator.initQueryWrapper(elderConsultingFollowRecord, req.getParameterMap());
 		Page<ElderConsultingFollowRecord> page = new Page<ElderConsultingFollowRecord>(pageNo, pageSize);
 		IPage<ElderConsultingFollowRecord> pageList = elderConsultingFollowRecordService.page(page, queryWrapper);
@@ -88,7 +87,6 @@ public class ElderConsultingFollowRecordController extends JeecgController<Elder
 	@PostMapping(value = "/add")
 	public Result<String> add(@RequestBody ElderConsultingFollowRecord elderConsultingFollowRecord) {
 		elderConsultingFollowRecordService.save(elderConsultingFollowRecord);
-
 		return Result.OK("添加成功！");
 	}
 	

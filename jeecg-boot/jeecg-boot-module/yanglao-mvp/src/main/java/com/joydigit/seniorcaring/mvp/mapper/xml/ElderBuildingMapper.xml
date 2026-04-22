@@ -2,4 +2,28 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.joydigit.seniorcaring.mvp.mapper.ElderBuildingMapper">
 
+    <select id="pageList" resultType="com.joydigit.seniorcaring.mvp.entity.ElderBuilding">
+        SELECT
+            b.*,
+            p.project_name
+        FROM
+            elder_building b
+            LEFT JOIN elder_project p ON b.project_id = p.id
+        WHERE
+            b.del_flag = 0
+        <if test="data.projectIds != null and data.projectIds.size() > 0">
+            AND  b.project_id IN (
+            <foreach item="id" collection="data.projectIds" separator=",">
+                #{id}
+            </foreach>
+            )
+        </if>
+        <if test="data.projectId != null and data.projectId != ''">
+            AND b.project_id = #{data.projectId}
+        </if>
+        <if test="data.buildingName != null and data.buildingName != ''">
+            AND b.building_name LIKE concat(concat('%',#{data.buildingName}),'%')
+        </if>
+        order by b.create_time desc
+    </select>
 </mapper>

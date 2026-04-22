@@ -2,4 +2,34 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.joydigit.seniorcaring.mvp.mapper.ElderFloorMapper">
 
+    <select id="pageList" resultType="com.joydigit.seniorcaring.mvp.entity.ElderFloor">
+        SELECT
+        f.*,
+        p.project_name,
+        b.building_name
+        FROM
+        elder_floor f
+        LEFT JOIN elder_project p ON f.project_id = p.id
+        LEFT JOIN elder_building b ON b.id = f.building_id
+        WHERE
+        f.del_flag = 0
+        <if test="data.projectIds != null and data.projectIds.size() > 0">
+            AND  f.project_id IN (
+            <foreach item="id" collection="data.projectIds" separator=",">
+                #{id}
+            </foreach>
+            )
+        </if>
+        <if test="data.projectId != null and data.projectId != ''">
+            AND f.project_id = #{data.projectId}
+        </if>
+        <if test="data.buildingId != null and data.buildingId != ''">
+            AND f.building_id = #{data.buildingId}
+        </if>
+        <if test="data.floorName != null and data.floorName != ''">
+            AND f.floor_name LIKE concat(concat('%',#{data.floorName}),'%')
+        </if>
+        order by f.create_time desc
+    </select>
+
 </mapper>

@@ -68,23 +68,26 @@ public class ElderProjectUserController extends JeecgController<ElderProjectUser
 	@PostMapping(value = "/add")
 	@Transactional(rollbackFor = Exception.class)
 	public Result<String> add(@RequestBody ProjectUserVo projectUserVo) {
-		if (Objects.isNull(projectUserVo) || StringUtils.isBlank(projectUserVo.getUserId()) || StringUtils.isBlank(projectUserVo.getProjectIds())){
+		if (Objects.isNull(projectUserVo) || StringUtils.isBlank(projectUserVo.getUserId())){
 			return Result.error("参数不能为空");
 		}
 		// 删除历史的
 		elderProjectUserService.
 				remove(Wrappers.lambdaQuery(ElderProjectUser.class).eq(ElderProjectUser::getUserId,projectUserVo.getUserId()));
 		// 添加本次
-		List<ElderProjectUser> list = new ArrayList<>();
-		for (String projectId : projectUserVo.getProjectIds().split(",")) {
-			ElderProjectUser projectUser = new ElderProjectUser();
-			projectUser.setId(IdWorker.getIdStr());
-			projectUser.setProjectId(projectId);
-			projectUser.setUserId(projectUserVo.getUserId());
-			projectUser.setDelFlag(DelFlagEnum.NO.getKey());
-			list.add(projectUser);
+		String[] projectIdArr = projectUserVo.getProjectIds().split(",");
+		if (Objects.nonNull(projectIdArr) && projectIdArr.length > 0) {
+			List<ElderProjectUser> list = new ArrayList<>();
+			for (String projectId : projectIdArr) {
+				ElderProjectUser projectUser = new ElderProjectUser();
+				projectUser.setId(IdWorker.getIdStr());
+				projectUser.setProjectId(projectId);
+				projectUser.setUserId(projectUserVo.getUserId());
+				projectUser.setDelFlag(DelFlagEnum.NO.getKey());
+				list.add(projectUser);
+			}
+			elderProjectUserService.saveBatch(list);
 		}
-		elderProjectUserService.saveBatch(list);
 		return Result.OK("添加成功！");
 	}
 	 @Operation(summary="查询用户项目配置")

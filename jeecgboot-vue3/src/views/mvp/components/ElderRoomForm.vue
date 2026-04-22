@@ -5,38 +5,48 @@
         <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ElderRoomForm">
           <a-row>
 						<a-col :span="24">
-							<a-form-item label="租户ID" v-bind="validateInfos.tenantId" id="ElderRoomForm-tenantId" name="tenantId">
-								<a-input v-model:value="formData.tenantId" placeholder="请输入租户ID"  allow-clear ></a-input>
+							<a-form-item label="项目" v-bind="validateInfos.projectId" id="ElderRoomForm-projectId" name="projectId">
+								<a-select
+                  v-model:value="formData.projectId"
+                  :options="projectList"
+                  :fieldNames="{ label: 'projectName', value: 'id' }"
+                  showSearch
+                  placeholder="请选择所属项目"
+                  @change="handleChangeProjectId"
+                />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="项目ID" v-bind="validateInfos.projectId" id="ElderRoomForm-projectId" name="projectId">
-								<a-input v-model:value="formData.projectId" placeholder="请输入项目ID"  allow-clear ></a-input>
+							<a-form-item label="楼栋" v-bind="validateInfos.buildingId" id="ElderRoomForm-buildingId" name="buildingId">
+								<a-select
+                  v-model:value="formData.buildingId"
+                  :options="buildingList"
+                  :fieldNames="{ label: 'buildingName', value: 'id' }"
+                  showSearch
+                  placeholder="请选择楼栋"
+                  @change="handleChangeBuilding"
+                />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="楼栋ID" v-bind="validateInfos.buildingId" id="ElderRoomForm-buildingId" name="buildingId">
-								<a-input v-model:value="formData.buildingId" placeholder="请输入楼栋ID"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="楼层id" v-bind="validateInfos.floorId" id="ElderRoomForm-floorId" name="floorId">
-								<a-input v-model:value="formData.floorId" placeholder="请输入楼层id"  allow-clear ></a-input>
+							<a-form-item label="楼层" v-bind="validateInfos.floorId" id="ElderRoomForm-floorId" name="floorId">
+								<a-select
+                  v-model:value="formData.floorId"
+                  :options="floorList"
+                  :fieldNames="{ label: 'floorName', value: 'id' }"
+                  showSearch
+                  placeholder="请选择楼层"
+                />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
 							<a-form-item label="房号" v-bind="validateInfos.roomNo" id="ElderRoomForm-roomNo" name="roomNo">
 								<a-input v-model:value="formData.roomNo" placeholder="请输入房号"  allow-clear ></a-input>
 							</a-form-item>
-						</a-col>
+						</a-col>					
 						<a-col :span="24">
-							<a-form-item label="房型名称" v-bind="validateInfos.roomTypeName" id="ElderRoomForm-roomTypeName" name="roomTypeName">
-								<a-input v-model:value="formData.roomTypeName" placeholder="请输入房型名称"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="房型：SINGLE单人间/DOUBLE双人间/MULTI多人间/SUITE套房" v-bind="validateInfos.roomType" id="ElderRoomForm-roomType" name="roomType">
-								<a-input v-model:value="formData.roomType" placeholder="请输入房型：SINGLE单人间/DOUBLE双人间/MULTI多人间/SUITE套房"  allow-clear ></a-input>
+							<a-form-item label="房型" v-bind="validateInfos.roomType" id="ElderRoomForm-roomType" name="roomType">
+								<JDictSelectTag type="select" v-model:value="formData.roomType" dictCode="room_type" placeholder="请选择状态" />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
@@ -45,13 +55,13 @@
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="状态：0-空闲，1-预订，2-入住，3-维修，4-停用" v-bind="validateInfos.status" id="ElderRoomForm-status" name="status">
-								<a-input v-model:value="formData.status" placeholder="请输入状态：0-空闲，1-预订，2-入住，3-维修，4-停用"  allow-clear ></a-input>
+							<a-form-item label="状态" v-bind="validateInfos.status" id="ElderRoomForm-status" name="status">
+                <JDictSelectTag type="select" v-model:value="formData.status" dictCode="room_status" placeholder="请选择状态" />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="备注（如装修说明）" v-bind="validateInfos.remark" id="ElderRoomForm-remark" name="remark">
-								<a-input v-model:value="formData.remark" placeholder="请输入备注（如装修说明）"  allow-clear ></a-input>
+							<a-form-item label="备注" v-bind="validateInfos.remark" id="ElderRoomForm-remark" name="remark">
+								<a-textarea v-model:value="formData.remark" placeholder="请输入备注"  allow-clear />
 							</a-form-item>
 						</a-col>
           </a-row>
@@ -62,32 +72,39 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive, defineExpose, nextTick, defineProps, computed, onMounted } from 'vue';
+  import { ref, reactive, defineExpose, nextTick, defineProps, computed, onMounted, watch } from 'vue';
   import { defHttp } from '/@/utils/http/axios';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { getDateByPicker, getValueType } from '/@/utils';
   import { saveOrUpdate } from '../ElderRoom.api';
+  import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
   import { Form } from 'ant-design-vue';
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
+  import {getBuildingListByProjectIdMethod} from '../ElderBuilding.api';
+  import { getProjectListAllM } from '../ElderProject.api'; 
+  import {getFloorListByBuildingIdMethod} from '../ElderFloor.api';
   const props = defineProps({
     formDisabled: { type: Boolean, default: false },
     formData: { type: Object, default: () => ({})},
     formBpm: { type: Boolean, default: true }
   });
+  const projectList = ref([]);
+  const buildingList = ref([]);
+  const floorList = ref([]);
   const formRef = ref();
   const useForm = Form.useForm;
   const emit = defineEmits(['register', 'ok']);
   const formData = reactive<Record<string, any>>({
     id: '',
     tenantId: '',   
-    projectId: '',   
-    buildingId: '',   
-    floorId: '',   
+    projectId: undefined,  
+    buildingId: undefined,   
+    floorId: undefined,   
     roomNo: '',   
     roomTypeName: '',   
     roomType: '',   
     area: '',   
-    status: '',   
+    status: '0',   
     remark: '',   
     delFlag: undefined,
   });
@@ -95,14 +112,42 @@
   const labelCol = ref<any>({ xs: { span: 24 }, sm: { span: 5 } });
   const wrapperCol = ref<any>({ xs: { span: 24 }, sm: { span: 16 } });
   const confirmLoading = ref<boolean>(false);
+
+  onMounted(async () => {
+    projectList.value = await getProjectListAllM();
+  });
+  watch(()=>{
+    if (formData.projectId){
+      handleChangeProjectId(formData.projectId);
+    }
+    if (formData.buildingId) {
+      handleChangeBuilding(formData.buildingId);
+    }
+  })
+   // 查询楼栋
+   async function handleChangeProjectId(value){
+    if (value) {
+      const data = await getBuildingListByProjectIdMethod({projectId: value});
+      buildingList.value = data;
+    } else {
+      buildingList.value = [];
+    }
+  }
+  async function handleChangeBuilding(value){
+    if (value) {
+      const data = await getFloorListByBuildingIdMethod({buildingId: value});
+      floorList.value = data;
+    } else {
+      floorList.value = [];
+    }
+  }
   //表单验证
   const validatorRules = reactive({
-    tenantId: [{ required: true, message: '请输入租户ID!'},],
-    projectId: [{ required: true, message: '请输入项目ID!'},],
-    buildingId: [{ required: true, message: '请输入楼栋ID!'},],
-    floorId: [{ required: true, message: '请输入楼层id!'},],
+    projectId: [{ required: true, message: '请选择项目!'},],
+    buildingId: [{ required: true, message: '请选择楼栋!'},],
+    floorId: [{ required: true, message: '请选择楼层!'},],
     roomNo: [{ required: true, message: '请输入房号!'},],
-    roomType: [{ required: true, message: '请输入房型：SINGLE单人间/DOUBLE双人间/MULTI多人间/SUITE套房!'},],
+    roomType: [{ required: true, message: '请选择房型!'},],
   });
   const { resetFields, validate, validateInfos } = useForm(formData, validatorRules, { immediate: false });
   //日期个性化选择

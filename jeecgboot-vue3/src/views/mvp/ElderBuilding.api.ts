@@ -11,6 +11,7 @@ enum Api {
   deleteBatch = '/elderBuilding/deleteBatch',
   importExcel = '/elderBuilding/importExcel',
   exportXls = '/elderBuilding/exportXls',
+  getBuildingListByProjectId = '/elderBuilding/getBuildingListByProjectId'
 }
 
 /**
@@ -30,6 +31,11 @@ export const getImportUrl = Api.importExcel;
  */
 export const list = (params) => defHttp.get({ url: Api.list, params });
 
+/**
+ * 列表接口
+ * @param params
+ */
+export const getBuildingListByProjectIdMethod = (params) => defHttp.get({ url: Api.getBuildingListByProjectId, params });
 /**
  * 删除单个
  * @param params

@@ -11,6 +11,7 @@ enum Api {
   deleteBatch = '/elderRoom/deleteBatch',
   importExcel = '/elderRoom/importExcel',
   exportXls = '/elderRoom/exportXls',
+  getRoomListByFloorId = '/elderRoom/getRoomListByFloorId'
 }
 
 /**
@@ -29,6 +30,12 @@ export const getImportUrl = Api.importExcel;
  * @param params
  */
 export const list = (params) => defHttp.get({ url: Api.list, params });
+
+/**
+ * 列表接口
+ * @param params
+ */
+export const getRoomListByFloorIdMethod = (params) => defHttp.get({ url: Api.getRoomListByFloorId, params });
 
 /**
  * 删除单个

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.math.BigDecimal;
+import java.util.List;
 
 import com.baomidou.mybatisplus.annotation.*;
 import org.jeecg.common.aspect.annotation.AutoDict;
@@ -40,30 +41,28 @@ public class ElderConsulting implements Serializable {
     @Schema(description = "租户ID")
     private Integer tenantId;
 	/**所属项目ID*/
-
     @Schema(description = "所属项目ID")
     private String projectId;
 	/**姓名*/
-	@Excel(name = "姓名", width = 15)
+	@Excel(name = "姓名", width = 15,orderNum="2")
     @Schema(description = "姓名")
     private String name;
 	/**性别：0-女，1-男，2-未知*/
-	@Excel(name = "性别", width = 15)
-    @Schema(description = "性别：0-女，1-男，2-未知")
+	@Excel(name = "性别", width = 15,dicCode = "gender_type",orderNum="3")
+    @Schema(description = "性别")
     @Dict(dicCode = "gender_type")
     private String gender;
 	/**咨询类型名称*/
-	@Excel(name = "咨询类型名称", width = 15)
     @Schema(description = "咨询类型名称")
     private String consultTypeName;
 	/**咨询类型编码*/
-	@Excel(name = "咨询类型编码", width = 15)
+	@Excel(name = "咨询类型", width = 15,dicCode = "consult_type",orderNum="4")
     @Schema(description = "咨询类型编码")
     @Dict(dicCode = "consult_type")
     private String consultTypeCode;
 	/**跟进状态：0-待跟进，1-已跟进，2-已放弃*/
-	@Excel(name = "跟进状态", width = 15)
-    @Schema(description = "跟进状态：0-待跟进，1-已跟进，2-已放弃")
+	@Excel(name = "跟进状态", width = 15,dicCode = "follow_status",orderNum="5")
+    @Schema(description = "跟进状态")
     @Dict(dicCode = "follow_status")
     private String followStatus;
 	/**身份证号*/
@@ -71,7 +70,7 @@ public class ElderConsulting implements Serializable {
     @Schema(description = "身份证号")
     private String idCard;
 	/**证件类型*/
-	@Excel(name = "证件类型", width = 15)
+	@Excel(name = "证件类型", width = 15,dicCode = "id_card_type")
     @Schema(description = "证件类型")
     @Dict(dicCode = "id_card_type")
     private String idCardType;
@@ -80,7 +79,7 @@ public class ElderConsulting implements Serializable {
     @Schema(description = "地址")
     private String address;
 	/**联系电话*/
-	@Excel(name = "联系电话", width = 15)
+	@Excel(name = "联系电话", width = 15,orderNum="6")
     @Schema(description = "联系电话")
     private String phone;
 	/**出生日期*/
@@ -90,15 +89,13 @@ public class ElderConsulting implements Serializable {
     @Schema(description = "出生日期")
     private Date birthDate;
 	/**接待人名称*/
-	@Excel(name = "接待人名称", width = 15)
+	@Excel(name = "接待人名称", width = 15,orderNum="7")
     @Schema(description = "接待人名称")
     private String receptionistName;
 	/**接待人id*/
-	@Excel(name = "接待人id", width = 15)
     @Schema(description = "接待人id")
     private String receptionistId;
 	/**备注*/
-	@Excel(name = "备注", width = 15)
     @Schema(description = "备注")
     private String remark;
 	/**创建人*/
@@ -124,7 +121,9 @@ public class ElderConsulting implements Serializable {
     /**
      * 项目名称
      */
-    @Excel(name = "所属项目", width = 15)
+    @Excel(name = "所属项目", width = 15,orderNum="1")
     @TableField(exist = false)
     private String projectName;
+    @TableField(exist = false)
+    private List<String> projectIds;
 }

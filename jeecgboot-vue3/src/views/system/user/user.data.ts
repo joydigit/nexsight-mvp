@@ -427,7 +427,10 @@ export const formBindProjectSchema: FormSchema[] = [
     label: '用户账号',
     field: 'username',
     component: 'Input',
-    componentProps: { readOnly: true },
+    componentProps: { 
+      readOnly: true,
+      disabled: true
+    },
   }, 
   {
     label: '用户ID',

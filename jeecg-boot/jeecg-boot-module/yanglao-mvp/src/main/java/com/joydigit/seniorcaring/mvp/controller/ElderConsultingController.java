@@ -1,9 +1,6 @@
 package com.joydigit.seniorcaring.mvp.controller;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -24,6 +21,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
+import org.jeecg.config.JeecgBaseConfig;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -53,7 +51,8 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 public class ElderConsultingController extends JeecgController<ElderConsulting, IElderConsultingService> {
 	@Autowired
 	private IElderConsultingService elderConsultingService;
-	
+	@Autowired
+	private JeecgBaseConfig jeecgBaseConfig;
 	/**
 	 * 分页列表查询
 	 *
@@ -164,7 +163,24 @@ public class ElderConsultingController extends JeecgController<ElderConsulting, 
     @RequiresPermissions("elder_consulting:exportXls")
     @RequestMapping(value = "/exportXls")
     public ModelAndView exportXls(HttpServletRequest request, ElderConsulting elderConsulting) {
-        return super.exportXls(request, elderConsulting, ElderConsulting.class, "elder_consulting");
+		LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+		// 过滤选中数据
+		String selections = request.getParameter("selections");
+		List<String> selectionList = Arrays.asList(selections.split(","));
+		List<ElderConsulting> exportList = elderConsultingService.getList(elderConsulting,selectionList);
+		// Step.3 AutoPoi 导出Excel
+		ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
+		//此处设置的filename无效 ,前端会重更新设置一下
+		String title = "咨询接待";
+		mv.addObject(NormalExcelConstants.FILE_NAME, title);
+		mv.addObject(NormalExcelConstants.CLASS, ElderConsulting.class);
+		//update-begin--Author:liusq  Date:20210126 for：图片导出报错，ImageBasePath未设置--------------------
+		ExportParams exportParams=new ExportParams(title + "报表", "导出人:" + sysUser.getRealname(), title);
+		exportParams.setImageBasePath(jeecgBaseConfig.getPath().getUpload());
+		//update-end--Author:liusq  Date:20210126 for：图片导出报错，ImageBasePath未设置----------------------
+		mv.addObject(NormalExcelConstants.PARAMS,exportParams);
+		mv.addObject(NormalExcelConstants.DATA_LIST, exportList);
+		return mv;
     }
 
     /**

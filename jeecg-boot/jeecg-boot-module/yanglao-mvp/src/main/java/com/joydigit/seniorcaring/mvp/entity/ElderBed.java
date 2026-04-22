@@ -1,9 +1,6 @@
 package com.joydigit.seniorcaring.mvp.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -14,6 +11,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @Description: elder_bed
@@ -36,11 +34,11 @@ public class ElderBed implements Serializable {
 	/**租户ID*/
 	@Excel(name = "租户ID", width = 15)
     @Schema(description = "租户ID")
-    private String tenantId;
+    private Integer tenantId;
 	/**项目ID*/
 	@Excel(name = "项目ID", width = 15)
     @Schema(description = "项目ID")
-    private Integer projectId;
+    private String projectId;
 	/**房间ID*/
 	@Excel(name = "房间ID", width = 15)
     @Schema(description = "房间ID")
@@ -74,4 +72,27 @@ public class ElderBed implements Serializable {
     @Schema(description = "删除状态：0正常，1已删除")
     @TableLogic
     private Integer delFlag;
+
+    /**
+     * 项目名称
+     */
+    @TableField(exist = false)
+    private String projectName;
+
+    @TableField(exist = false)
+    private String buildingName;
+
+    @TableField(exist = false)
+    private String floorName;
+    @TableField(exist = false)
+    private String buildingId;
+
+    @TableField(exist = false)
+    private String floorId;
+
+    @TableField(exist = false)
+    private String roomNo;
+
+    @TableField(exist = false)
+    private List<String> projectIds;
 }

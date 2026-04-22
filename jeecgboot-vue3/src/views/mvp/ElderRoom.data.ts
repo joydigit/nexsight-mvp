@@ -6,39 +6,32 @@ import { getWeekMonthQuarterYear } from '/@/utils';
 //列表数据
 export const columns: BasicColumn[] = [
   {
-    title: '租户ID',
+    title: '项目',
     align: "center",
-    dataIndex: 'tenantId'
+    dataIndex: 'projectName'
   },
   {
-    title: '项目ID',
+    title: '楼栋',
     align: "center",
-    dataIndex: 'projectId'
+    dataIndex: 'buildingName'
   },
   {
-    title: '楼栋ID',
+    title: '楼层',
     align: "center",
-    dataIndex: 'buildingId'
-  },
-  {
-    title: '楼层id',
-    align: "center",
-    dataIndex: 'floorId'
+    dataIndex: 'floorName'
   },
   {
     title: '房号',
     align: "center",
     dataIndex: 'roomNo'
-  },
+  },  
   {
-    title: '房型名称',
+    title: '房型',
     align: "center",
-    dataIndex: 'roomTypeName'
-  },
-  {
-    title: '房型：SINGLE单人间/DOUBLE双人间/MULTI多人间/SUITE套房',
-    align: "center",
-    dataIndex: 'roomType'
+    dataIndex: 'roomType',
+    customRender: ({ text }) => {
+      return render.renderDict(text, 'room_type');
+    },
   },
   {
     title: '面积（平方米）',
@@ -46,12 +39,15 @@ export const columns: BasicColumn[] = [
     dataIndex: 'area'
   },
   {
-    title: '状态：0-空闲，1-预订，2-入住，3-维修，4-停用',
+    title: '状态',
     align: "center",
-    dataIndex: 'status'
+    dataIndex: 'status',
+    customRender: ({ text }) => {
+      return render.renderDict(text, 'room_status');
+    },
   },
   {
-    title: '备注（如装修说明）',
+    title: '备注',
     align: "center",
     dataIndex: 'remark'
   },

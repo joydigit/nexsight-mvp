@@ -1,13 +1,13 @@
 package com.joydigit.seniorcaring.mvp.controller;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+
+import com.joydigit.seniorcaring.mvp.entity.ElderRoom;
+import com.joydigit.seniorcaring.mvp.service.IElderRoomService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jeecg.common.api.vo.Result;
@@ -51,6 +51,8 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 public class ElderBedController extends JeecgController<ElderBed, IElderBedService> {
 	@Autowired
 	private IElderBedService elderBedService;
+	@Autowired
+	private IElderRoomService elderRoomService;
 	
 	/**
 	 * 分页列表查询
@@ -69,10 +71,8 @@ public class ElderBedController extends JeecgController<ElderBed, IElderBedServi
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
 
-
-        QueryWrapper<ElderBed> queryWrapper = QueryGenerator.initQueryWrapper(elderBed, req.getParameterMap());
 		Page<ElderBed> page = new Page<ElderBed>(pageNo, pageSize);
-		IPage<ElderBed> pageList = elderBedService.page(page, queryWrapper);
+		IPage<ElderBed> pageList = elderBedService.pageList(page, elderBed);
 		return Result.OK(pageList);
 	}
 	
@@ -150,6 +150,11 @@ public class ElderBedController extends JeecgController<ElderBed, IElderBedServi
 		ElderBed elderBed = elderBedService.getById(id);
 		if(elderBed==null) {
 			return Result.error("未找到对应数据");
+		}
+		ElderRoom room = elderRoomService.getById(elderBed.getRoomId());
+		if (Objects.nonNull(room)){
+			elderBed.setBuildingId(room.getBuildingId());
+			elderBed.setFloorId(room.getFloorId());
 		}
 		return Result.OK(elderBed);
 	}

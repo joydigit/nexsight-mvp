@@ -1,7 +1,11 @@
 package com.joydigit.seniorcaring.mvp.service;
 
-import com.joydigit.seniorcaring.mvp.entity.ElderRoom;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.joydigit.seniorcaring.mvp.entity.ElderRoom;
+
+import java.util.List;
 
 /**
  * @Description: elder_room
@@ -11,4 +15,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IElderRoomService extends IService<ElderRoom> {
 
+    IPage<ElderRoom> pageList(Page<ElderRoom> page, ElderRoom elderRoom);
+    List<ElderRoom> getRoomListByFloorId(String floorId);
 }

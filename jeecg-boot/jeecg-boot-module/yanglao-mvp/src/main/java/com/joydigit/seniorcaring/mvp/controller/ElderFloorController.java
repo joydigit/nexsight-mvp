@@ -69,13 +69,14 @@ public class ElderFloorController extends JeecgController<ElderFloor, IElderFloo
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
 
-
-        QueryWrapper<ElderFloor> queryWrapper = QueryGenerator.initQueryWrapper(elderFloor, req.getParameterMap());
 		Page<ElderFloor> page = new Page<ElderFloor>(pageNo, pageSize);
-		IPage<ElderFloor> pageList = elderFloorService.page(page, queryWrapper);
+		IPage<ElderFloor> pageList = elderFloorService.pageList(page, elderFloor);
 		return Result.OK(pageList);
 	}
-	
+	@GetMapping("/getFloorListByBuildingId")
+	 public Result<List<ElderFloor>> getFloorListByBuildingId(@RequestParam String buildingId){
+		return Result.OK(elderFloorService.getFloorListByBuildingId(buildingId));
+	 }
 	/**
 	 *   添加
 	 *

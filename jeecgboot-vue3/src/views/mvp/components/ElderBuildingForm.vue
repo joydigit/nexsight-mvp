@@ -5,23 +5,24 @@
         <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ElderBuildingForm">
           <a-row>
 						<a-col :span="24">
-							<a-form-item label="租户ID" v-bind="validateInfos.tenantId" id="ElderBuildingForm-tenantId" name="tenantId">
-								<a-input v-model:value="formData.tenantId" placeholder="请输入租户ID"  allow-clear ></a-input>
+							<a-form-item label="所属项目" v-bind="validateInfos.projectId" id="ElderBuildingForm-projectId" name="projectId">
+                <a-select
+                  v-model:value="formData.projectId"
+                  :options="projectList"
+                  :fieldNames="{ label: 'projectName', value: 'id' }"
+                  showSearch
+                  placeholder="请选择所属项目"
+                />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="项目ID（逻辑外键）" v-bind="validateInfos.projectId" id="ElderBuildingForm-projectId" name="projectId">
-								<a-input v-model:value="formData.projectId" placeholder="请输入项目ID（逻辑外键）"  allow-clear ></a-input>
+							<a-form-item label="楼栋名称" v-bind="validateInfos.buildingName" id="ElderBuildingForm-buildingName" name="buildingName">
+								<a-input v-model:value="formData.buildingName" placeholder="请输入楼栋名称"  allow-clear ></a-input>
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="楼栋名称（如A栋、1号楼）" v-bind="validateInfos.buildingName" id="ElderBuildingForm-buildingName" name="buildingName">
-								<a-input v-model:value="formData.buildingName" placeholder="请输入楼栋名称（如A栋、1号楼）"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="排序号（展示顺序）" v-bind="validateInfos.sortOrder" id="ElderBuildingForm-sortOrder" name="sortOrder">
-								<a-input-number v-model:value="formData.sortOrder" placeholder="请输入排序号（展示顺序）" style="width: 100%" />
+							<a-form-item label="排序号" v-bind="validateInfos.sortOrder" id="ElderBuildingForm-sortOrder" name="sortOrder">
+								<a-input-number v-model:value="formData.sortOrder" placeholder="请输入排序号" style="width: 100%" />
 							</a-form-item>
 						</a-col>
           </a-row>
@@ -37,6 +38,7 @@
   import { useMessage } from '/@/hooks/web/useMessage';
   import { getDateByPicker, getValueType } from '/@/utils';
   import { saveOrUpdate } from '../ElderBuilding.api';
+  import { getProjectListAllM } from './../ElderProject.api';
   import { Form } from 'ant-design-vue';
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
   const props = defineProps({
@@ -44,13 +46,14 @@
     formData: { type: Object, default: () => ({})},
     formBpm: { type: Boolean, default: true }
   });
+  const projectList = ref([]);
   const formRef = ref();
   const useForm = Form.useForm;
   const emit = defineEmits(['register', 'ok']);
   const formData = reactive<Record<string, any>>({
     id: '',
     tenantId: '',   
-    projectId: '',   
+    projectId: undefined,  
     buildingName: '',   
     sortOrder: undefined,
     delFlag: undefined,
@@ -61,15 +64,17 @@
   const confirmLoading = ref<boolean>(false);
   //表单验证
   const validatorRules = reactive({
-    tenantId: [{ required: true, message: '请输入租户ID!'},],
-    projectId: [{ required: true, message: '请输入项目ID（逻辑外键）!'},],
-    buildingName: [{ required: true, message: '请输入楼栋名称（如A栋、1号楼）!'},],
+    projectId: [{ required: true, message: '请选择项目!'},],
+    buildingName: [{ required: true, message: '请输入楼栋名称!'},],
   });
   const { resetFields, validate, validateInfos } = useForm(formData, validatorRules, { immediate: false });
   //日期个性化选择
   const fieldPickers = reactive({
   });
 
+  onMounted(async () => {
+    projectList.value = await getProjectListAllM();
+  });
   // 表单禁用
   const disabled = computed(()=>{
     if(props.formBpm === true){
