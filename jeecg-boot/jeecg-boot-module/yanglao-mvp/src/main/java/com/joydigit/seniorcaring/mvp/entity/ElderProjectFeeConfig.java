@@ -4,10 +4,9 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.math.BigDecimal;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.TableLogic;
+import java.util.List;
+
+import com.baomidou.mybatisplus.annotation.*;
 import org.jeecg.common.constant.ProvinceCityArea;
 import org.jeecg.common.util.SpringContextUtils;
 import lombok.Data;
@@ -45,14 +44,14 @@ public class ElderProjectFeeConfig implements Serializable {
 	@Excel(name = "项目ID", width = 15)
     @Schema(description = "项目ID")
     private String projectId;
-	/**费用类型名称*/
-	@Excel(name = "费用类型名称", width = 15)
-    @Schema(description = "费用类型名称")
-    private String paymentTypeName;
 	/**费用类型编码*/
-	@Excel(name = "费用类型编码", width = 15)
+	@Excel(name = "费用类型", width = 15)
     @Schema(description = "费用类型编码")
     private String paymentTypeCode;
+    /**房间类型*/
+    @Excel(name = "房间类型", width = 15)
+    @Schema(description = "房间类型")
+    private String roomType;
 	/**单价（元）*/
 	@Excel(name = "单价（元）", width = 15)
     @Schema(description = "单价（元）")
@@ -61,10 +60,6 @@ public class ElderProjectFeeConfig implements Serializable {
 	@Excel(name = "单位编码", width = 15)
     @Schema(description = "单位编码")
     private String unitCode;
-	/**单位名称*/
-	@Excel(name = "单位名称", width = 15)
-    @Schema(description = "单位名称")
-    private String unitName;
 	/**状态：0-失效，1-有效*/
 	@Excel(name = "状态：0-失效，1-有效", width = 15)
     @Schema(description = "状态：0-失效，1-有效")
@@ -90,4 +85,12 @@ public class ElderProjectFeeConfig implements Serializable {
     @Schema(description = "删除状态：0正常，1已删除")
     @TableLogic
     private Integer delFlag;
+    /**
+     * 项目名称
+     */
+    @TableField(exist = false)
+    private String projectName;
+
+    @TableField(exist = false)
+    private List<String> projectIds;
 }

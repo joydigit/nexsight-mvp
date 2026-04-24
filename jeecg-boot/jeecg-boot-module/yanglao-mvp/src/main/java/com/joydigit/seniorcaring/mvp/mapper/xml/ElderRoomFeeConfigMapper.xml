@@ -2,4 +2,36 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.joydigit.seniorcaring.mvp.mapper.ElderRoomFeeConfigMapper">
 
+    <select id="pageList" resultType="com.joydigit.seniorcaring.mvp.entity.ElderRoomFeeConfig">
+        SELECT
+            rfc.*,
+            b.bed_no as bedNo,
+            r.room_no as roomNo,
+            f.floor_name as floorName,
+            bu.building_name as buildingName,
+            p.project_name as projectName
+        FROM
+            elder_room_fee_config rfc
+                LEFT JOIN elder_bed b ON FIND_IN_SET( b.id, rfc.item_id )
+                LEFT JOIN elder_room r ON FIND_IN_SET( r.id, rfc.item_id )
+                LEFT JOIN elder_floor f ON FIND_IN_SET( f.id, rfc.item_id )
+                LEFT JOIN elder_building bu ON FIND_IN_SET( bu.id, rfc.item_id )
+                LEFT JOIN elder_project p on p.id = rfc.project_id
+        WHERE
+            rfc.del_flag = 0
+        <if test="data.projectIds != null and data.projectIds.size() > 0">
+            AND  rfc.project_id IN (
+            <foreach item="id" collection="data.projectIds" separator=",">
+                #{id}
+            </foreach>
+            )
+        </if>
+        <if test="data.projectId != null and data.projectId != ''">
+            AND rfc.project_id = #{data.projectId}
+        </if>
+        <if test="data.roomNo != null and data.roomNo != ''">
+            AND r.room_no LIKE concat(concat('%',#{data.roomNo}),'%')
+        </if>
+        order by rfc.create_time desc
+    </select>
 </mapper>

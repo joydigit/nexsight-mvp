@@ -2,4 +2,28 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.joydigit.seniorcaring.mvp.mapper.ElderProjectFeeConfigMapper">
 
+    <select id="pageList" resultType="com.joydigit.seniorcaring.mvp.entity.ElderProjectFeeConfig">
+        SELECT
+        pfc.*,
+        p.project_name
+        FROM
+        elder_project_fee_config pfc
+        LEFT JOIN elder_project p ON pfc.project_id = p.id
+        WHERE
+        pfc.del_flag = 0
+        <if test="data.projectIds != null and data.projectIds.size() > 0">
+            AND  pfc.project_id IN (
+            <foreach item="id" collection="data.projectIds" separator=",">
+                #{id}
+            </foreach>
+            )
+        </if>
+        <if test="data.projectId != null and data.projectId != ''">
+            AND pfc.project_id = #{data.projectId}
+        </if>
+        <if test="data.paymentTypeCode != null and data.paymentTypeCode != ''">
+            AND pfc.payment_type_code = #{data.paymentTypeCode}
+        </if>
+        order by pfc.create_time desc
+    </select>
 </mapper>

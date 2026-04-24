@@ -69,10 +69,8 @@ public class ElderProjectFeeConfigController extends JeecgController<ElderProjec
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
 
-
-        QueryWrapper<ElderProjectFeeConfig> queryWrapper = QueryGenerator.initQueryWrapper(elderProjectFeeConfig, req.getParameterMap());
 		Page<ElderProjectFeeConfig> page = new Page<ElderProjectFeeConfig>(pageNo, pageSize);
-		IPage<ElderProjectFeeConfig> pageList = elderProjectFeeConfigService.page(page, queryWrapper);
+		IPage<ElderProjectFeeConfig> pageList = elderProjectFeeConfigService.pageList(page, elderProjectFeeConfig);
 		return Result.OK(pageList);
 	}
 	

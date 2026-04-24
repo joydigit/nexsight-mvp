@@ -1,7 +1,9 @@
 package com.joydigit.seniorcaring.mvp.service;
 
-import com.joydigit.seniorcaring.mvp.entity.ElderProjectFeeConfig;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.joydigit.seniorcaring.mvp.entity.ElderProjectFeeConfig;
 
 /**
  * @Description: elder_project_fee_config
@@ -11,4 +13,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IElderProjectFeeConfigService extends IService<ElderProjectFeeConfig> {
 
+    IPage<ElderProjectFeeConfig> pageList(Page<ElderProjectFeeConfig> page, ElderProjectFeeConfig elderProjectFeeConfig);
 }

@@ -6,24 +6,25 @@ import { getWeekMonthQuarterYear } from '/@/utils';
 //列表数据
 export const columns: BasicColumn[] = [
   {
-    title: '租户ID',
+    title: '项目',
     align: "center",
-    dataIndex: 'tenantId'
+    dataIndex: 'projectName'
   },
   {
-    title: '项目ID',
+    title: '费用类型',
     align: "center",
-    dataIndex: 'projectId'
+    dataIndex: 'paymentTypeCode',
+    customRender: ({ text }) => {
+      return render.renderDict(text, 'payment_type');
+    },
   },
   {
-    title: '费用类型名称',
+    title: '房间类型',
     align: "center",
-    dataIndex: 'paymentTypeName'
-  },
-  {
-    title: '费用类型编码',
-    align: "center",
-    dataIndex: 'paymentTypeCode'
+    dataIndex: 'roomType',
+    customRender: ({ text }) => {
+      return render.renderDict(text, 'room_type');
+    },
   },
   {
     title: '单价（元）',
@@ -31,19 +32,20 @@ export const columns: BasicColumn[] = [
     dataIndex: 'price'
   },
   {
-    title: '单位编码',
+    title: '单位',
     align: "center",
-    dataIndex: 'unitCode'
-  },
+    dataIndex: 'unitCode',
+    customRender: ({ text }) => {
+      return render.renderDict(text, 'fee_unit');
+    },
+  },  
   {
-    title: '单位名称',
+    title: '状态',
     align: "center",
-    dataIndex: 'unitName'
-  },
-  {
-    title: '状态：0-失效，1-有效',
-    align: "center",
-    dataIndex: 'status'
+    dataIndex: 'status',
+    customRender: ({ text }) => {
+      return render.renderDict(text, 'fee_status');
+    },
   },
 ];
 

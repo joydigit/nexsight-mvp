@@ -3,25 +3,31 @@
     <JFormContainer :disabled="disabled">
       <template #detail>
         <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ElderRoomFeeConfigForm">
-          <a-row>
+          <a-row>						
 						<a-col :span="24">
-							<a-form-item label="租户ID" v-bind="validateInfos.tenantId" id="ElderRoomFeeConfigForm-tenantId" name="tenantId">
-								<a-input v-model:value="formData.tenantId" placeholder="请输入租户ID"  allow-clear ></a-input>
+							<a-form-item label="项目" v-bind="validateInfos.projectId" id="ElderRoomFeeConfigForm-projectId" name="projectId">
+								<a-select
+                  v-model:value="formData.projectId"
+                  :options="projectList"
+                  :fieldNames="{ label: 'projectName', value: 'id' }"
+                  showSearch
+                  placeholder="请选择所属项目"
+                />
 							</a-form-item>
 						</a-col>
-						<a-col :span="24">
-							<a-form-item label="项目ID" v-bind="validateInfos.projectId" id="ElderRoomFeeConfigForm-projectId" name="projectId">
-								<a-input v-model:value="formData.projectId" placeholder="请输入项目ID"  allow-clear ></a-input>
+            <a-col :span="24">
+							<a-form-item label="房费类型" v-bind="validateInfos.itemType" id="ElderRoomFeeConfigForm-itemType" name="itemType">
+								<JDictSelectTag type="select" v-model:value="formData.itemType" dictCode="room_fee_type" placeholder="请选择房费类型" @change="changeItemType"/>
 							</a-form-item>
 						</a-col>
-						<a-col :span="24">
-							<a-form-item label="房间id/床位id" v-bind="validateInfos.itemId" id="ElderRoomFeeConfigForm-itemId" name="itemId">
-								<a-input v-model:value="formData.itemId" placeholder="请输入房间id/床位id"  allow-clear ></a-input>
+						<a-col :span="24" v-if="formData.itemType == '1'">
+							<a-form-item label="房间" v-bind="validateInfos.itemId" id="ElderRoomFeeConfigForm-itemId" name="itemId">
+                <Cascader :value="formData.itemIdArr" :options="roomList"  placeholder="请选择" @change="changeItem"/>
 							</a-form-item>
 						</a-col>
-						<a-col :span="24">
-							<a-form-item label="费用项类型 1 房间 2 床位" v-bind="validateInfos.itemType" id="ElderRoomFeeConfigForm-itemType" name="itemType">
-								<a-input v-model:value="formData.itemType" placeholder="请输入费用项类型 1 房间 2 床位"  allow-clear ></a-input>
+            <a-col :span="24" v-if="formData.itemType == '2'">
+							<a-form-item label="床位" v-bind="validateInfos.itemId" id="ElderRoomFeeConfigForm-itemId" name="itemId">
+                <Cascader :value="formData.itemIdArr" :options="roomList"  placeholder="请选择" @change="changeItem"/>
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
@@ -31,7 +37,7 @@
 						</a-col>
 						<a-col :span="24">
 							<a-form-item label="备注" v-bind="validateInfos.remark" id="ElderRoomFeeConfigForm-remark" name="remark">
-								<a-input v-model:value="formData.remark" placeholder="请输入备注"  allow-clear ></a-input>
+								<a-textarea v-model:value="formData.remark" placeholder="请输入备注"  allow-clear ></a-textarea>
 							</a-form-item>
 						</a-col>
           </a-row>
@@ -42,27 +48,34 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive, defineExpose, nextTick, defineProps, computed, onMounted } from 'vue';
+  import { ref, reactive, defineExpose, nextTick, defineProps, computed, onMounted,watch } from 'vue';
   import { defHttp } from '/@/utils/http/axios';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { getDateByPicker, getValueType } from '/@/utils';
   import { saveOrUpdate } from '../ElderRoomFeeConfig.api';
+  import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
   import { Form } from 'ant-design-vue';
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
+  import { getProjectListAllM } from '../ElderProject.api'; 
+  import {getRoomCascaderListMethod} from '../ElderRoom.api';
+  import { Cascader } from 'ant-design-vue';
   const props = defineProps({
     formDisabled: { type: Boolean, default: false },
     formData: { type: Object, default: () => ({})},
     formBpm: { type: Boolean, default: true }
   });
+  const projectList = ref([]);
+  const roomList = ref([]);
   const formRef = ref();
   const useForm = Form.useForm;
   const emit = defineEmits(['register', 'ok']);
   const formData = reactive<Record<string, any>>({
     id: '',
     tenantId: '',   
-    projectId: '',   
-    itemId: '',   
-    itemType: '',   
+    projectId: undefined,   
+    itemId: undefined,   
+    itemIdArr: undefined,  
+    itemType: undefined,   
     price: undefined,
     remark: '',   
     delFlag: undefined,
@@ -71,12 +84,20 @@
   const labelCol = ref<any>({ xs: { span: 24 }, sm: { span: 5 } });
   const wrapperCol = ref<any>({ xs: { span: 24 }, sm: { span: 16 } });
   const confirmLoading = ref<boolean>(false);
+  onMounted(async () => {
+    projectList.value = await getProjectListAllM();
+  });
+  watch(()=>{
+    if (formData.itemId){
+      formData.itemIdArr = formData.itemId.split(',');
+      changeItemType(formData.itemType,formData.projectId)
+    }
+  })
   //表单验证
   const validatorRules = reactive({
-    tenantId: [{ required: true, message: '请输入租户ID!'},],
-    projectId: [{ required: true, message: '请输入项目ID!'},],
-    itemId: [{ required: true, message: '请输入房间id/床位id!'},],
-    itemType: [{ required: true, message: '请输入费用项类型 1 房间 2 床位!'},],
+    projectId: [{ required: true, message: '请选择项目!'},],
+    itemId: [{ required: true, message: '请选择!'},],
+    itemType: [{ required: true, message: '请选择房费类型!'},],
     price: [{ required: true, message: '请输入费用!'},],
   });
   const { resetFields, validate, validateInfos } = useForm(formData, validatorRules, { immediate: false });
@@ -84,6 +105,19 @@
   const fieldPickers = reactive({
   });
 
+  async function changeItem(value){
+    if (value){
+      formData.itemId = value.join();
+    } else {
+      formData.itemId = '';
+    }
+  }
+
+  async function changeItemType(value){
+    if (formData.projectId) {
+      roomList.value = await getRoomCascaderListMethod({type: value,projectId:formData.projectId})
+    }
+  }
   // 表单禁用
   const disabled = computed(()=>{
     if(props.formBpm === true){

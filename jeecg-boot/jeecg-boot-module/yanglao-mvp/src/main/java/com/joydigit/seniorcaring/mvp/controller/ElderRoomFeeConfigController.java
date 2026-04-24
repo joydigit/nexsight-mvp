@@ -69,10 +69,8 @@ public class ElderRoomFeeConfigController extends JeecgController<ElderRoomFeeCo
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
 
-
-        QueryWrapper<ElderRoomFeeConfig> queryWrapper = QueryGenerator.initQueryWrapper(elderRoomFeeConfig, req.getParameterMap());
 		Page<ElderRoomFeeConfig> page = new Page<ElderRoomFeeConfig>(pageNo, pageSize);
-		IPage<ElderRoomFeeConfig> pageList = elderRoomFeeConfigService.page(page, queryWrapper);
+		IPage<ElderRoomFeeConfig> pageList = elderRoomFeeConfigService.pageList(page, elderRoomFeeConfig);
 		return Result.OK(pageList);
 	}
 	

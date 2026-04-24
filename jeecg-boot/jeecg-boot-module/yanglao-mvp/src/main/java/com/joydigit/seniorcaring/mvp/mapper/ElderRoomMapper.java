@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.joydigit.seniorcaring.mvp.vo.RoomSelectVo;
 import org.apache.ibatis.annotations.Param;
 import com.joydigit.seniorcaring.mvp.entity.ElderRoom;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -17,4 +18,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 public interface ElderRoomMapper extends BaseMapper<ElderRoom> {
 
     IPage<ElderRoom> pageList(Page<ElderRoom> page, @Param("data") ElderRoom elderRoom);
+
+    List<RoomSelectVo> getRoomSelectByProjectId(@Param("projectId")  String projectId);
+    List<RoomSelectVo> getBedSelectByProjectId(@Param("projectId")  String projectId);
 }

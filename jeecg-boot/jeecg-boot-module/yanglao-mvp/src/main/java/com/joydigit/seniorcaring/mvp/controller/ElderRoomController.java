@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+
+import com.joydigit.seniorcaring.mvp.vo.RoomCascaderVo;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jeecg.common.api.vo.Result;
@@ -78,6 +80,13 @@ public class ElderRoomController extends JeecgController<ElderRoom, IElderRoomSe
 	public Result<List<ElderRoom>> getRoomListByFloorId(@RequestParam String floorId){
 		 List<ElderRoom> list = elderRoomService.getRoomListByFloorId(floorId);
 		 return Result.OK(list);
+	 }
+
+	 @Operation(summary="elder_room-查询楼层下的房间或床位")
+	 @GetMapping("/getRoomCascaderList")
+	 public Result<List<RoomCascaderVo>> getRoomCascaderList(@RequestParam String type,@RequestParam String projectId){
+		 List<RoomCascaderVo> roomCascaderList = elderRoomService.getRoomCascaderList(type, projectId);
+		 return Result.OK(roomCascaderList);
 	 }
 	/**
 	 *   添加

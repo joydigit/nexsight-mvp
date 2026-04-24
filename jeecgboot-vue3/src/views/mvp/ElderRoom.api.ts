@@ -11,7 +11,8 @@ enum Api {
   deleteBatch = '/elderRoom/deleteBatch',
   importExcel = '/elderRoom/importExcel',
   exportXls = '/elderRoom/exportXls',
-  getRoomListByFloorId = '/elderRoom/getRoomListByFloorId'
+  getRoomListByFloorId = '/elderRoom/getRoomListByFloorId',
+  getRoomCascaderList ='/elderRoom/getRoomCascaderList',
 }
 
 /**
@@ -36,6 +37,11 @@ export const list = (params) => defHttp.get({ url: Api.list, params });
  * @param params
  */
 export const getRoomListByFloorIdMethod = (params) => defHttp.get({ url: Api.getRoomListByFloorId, params });
+/**
+ * 列表接口
+ * @param params
+ */
+export const getRoomCascaderListMethod = (params) => defHttp.get({ url: Api.getRoomCascaderList, params });
 
 /**
  * 删除单个

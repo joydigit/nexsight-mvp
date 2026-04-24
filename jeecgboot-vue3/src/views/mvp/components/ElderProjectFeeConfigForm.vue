@@ -5,23 +5,24 @@
         <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ElderProjectFeeConfigForm">
           <a-row>
 						<a-col :span="24">
-							<a-form-item label="租户ID" v-bind="validateInfos.tenantId" id="ElderProjectFeeConfigForm-tenantId" name="tenantId">
-								<a-input v-model:value="formData.tenantId" placeholder="请输入租户ID"  allow-clear ></a-input>
+							<a-form-item label="项目" v-bind="validateInfos.projectId" id="ElderProjectFeeConfigForm-projectId" name="projectId">
+								<a-select
+                  v-model:value="formData.projectId"
+                  :options="projectList"
+                  :fieldNames="{ label: 'projectName', value: 'id' }"
+                  showSearch
+                  placeholder="请选择所属项目"
+                />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="项目ID" v-bind="validateInfos.projectId" id="ElderProjectFeeConfigForm-projectId" name="projectId">
-								<a-input v-model:value="formData.projectId" placeholder="请输入项目ID"  allow-clear ></a-input>
+							<a-form-item label="费用类型" v-bind="validateInfos.paymentTypeCode" id="ElderProjectFeeConfigForm-paymentTypeCode" name="paymentTypeCode">
+								<JDictSelectTag type="select" v-model:value="formData.paymentTypeCode" dictCode="payment_type" placeholder="请选择费用类型"  @change="handleChangePaymentTypeCode"/>
 							</a-form-item>
 						</a-col>
-						<a-col :span="24">
-							<a-form-item label="费用类型名称" v-bind="validateInfos.paymentTypeName" id="ElderProjectFeeConfigForm-paymentTypeName" name="paymentTypeName">
-								<a-input v-model:value="formData.paymentTypeName" placeholder="请输入费用类型名称"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="费用类型编码" v-bind="validateInfos.paymentTypeCode" id="ElderProjectFeeConfigForm-paymentTypeCode" name="paymentTypeCode">
-								<a-input v-model:value="formData.paymentTypeCode" placeholder="请输入费用类型编码"  allow-clear ></a-input>
+            <a-col :span="24" v-if="formData.paymentTypeCode == '6'">
+							<a-form-item label="房间类型" v-bind="validateInfos.roomType" id="ElderProjectFeeConfigForm-roomType" name="roomType">
+								<JDictSelectTag type="select" v-model:value="formData.roomType" dictCode="room_type" placeholder="请选择房间类型" />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
@@ -30,18 +31,13 @@
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="单位编码" v-bind="validateInfos.unitCode" id="ElderProjectFeeConfigForm-unitCode" name="unitCode">
-								<a-input v-model:value="formData.unitCode" placeholder="请输入单位编码"  allow-clear ></a-input>
+							<a-form-item label="单位" v-bind="validateInfos.unitCode" id="ElderProjectFeeConfigForm-unitCode" name="unitCode">
+								<JDictSelectTag type="select" v-model:value="formData.unitCode" dictCode="fee_unit" placeholder="请选择单位" />
 							</a-form-item>
-						</a-col>
+						</a-col>					
 						<a-col :span="24">
-							<a-form-item label="单位名称" v-bind="validateInfos.unitName" id="ElderProjectFeeConfigForm-unitName" name="unitName">
-								<a-input v-model:value="formData.unitName" placeholder="请输入单位名称"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="状态：0-失效，1-有效" v-bind="validateInfos.status" id="ElderProjectFeeConfigForm-status" name="status">
-								<a-input v-model:value="formData.status" placeholder="请输入状态：0-失效，1-有效"  allow-clear ></a-input>
+							<a-form-item label="状态" v-bind="validateInfos.status" id="ElderProjectFeeConfigForm-status" name="status">
+								<JDictSelectTag type="select" v-model:value="formData.status" dictCode="fee_status" placeholder="请选择状态" />
 							</a-form-item>
 						</a-col>
           </a-row>
@@ -52,46 +48,55 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive, defineExpose, nextTick, defineProps, computed, onMounted } from 'vue';
+  import { ref, reactive, defineExpose, nextTick, defineProps, computed, onMounted,watch } from 'vue';
   import { defHttp } from '/@/utils/http/axios';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { getDateByPicker, getValueType } from '/@/utils';
+  import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
   import { saveOrUpdate } from '../ElderProjectFeeConfig.api';
   import { Form } from 'ant-design-vue';
+  import { getProjectListAllM } from '../ElderProject.api'; 
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
   const props = defineProps({
     formDisabled: { type: Boolean, default: false },
     formData: { type: Object, default: () => ({})},
     formBpm: { type: Boolean, default: true }
   });
+  const projectList = ref([]);
   const formRef = ref();
   const useForm = Form.useForm;
   const emit = defineEmits(['register', 'ok']);
   const formData = reactive<Record<string, any>>({
     id: '',
     tenantId: '',   
-    projectId: '',   
-    paymentTypeName: '',   
-    paymentTypeCode: '',   
+    projectId: undefined,   
+    paymentTypeCode: undefined, 
+    roomType: undefined,  
     price: undefined,
-    unitCode: '',   
-    unitName: '',   
-    status: '',   
+    unitCode: undefined,   
+    status: '0',   
     delFlag: undefined,
   });
   const { createMessage } = useMessage();
   const labelCol = ref<any>({ xs: { span: 24 }, sm: { span: 5 } });
   const wrapperCol = ref<any>({ xs: { span: 24 }, sm: { span: 16 } });
   const confirmLoading = ref<boolean>(false);
+  onMounted(async () => {
+    projectList.value = await getProjectListAllM();
+  });
+  watch(()=>{
+    if (formData.paymentTypeCode){
+      handleChangePaymentTypeCode(formData.paymentTypeCode)
+    }
+  })
   //表单验证
   const validatorRules = reactive({
-    tenantId: [{ required: true, message: '请输入租户ID!'},],
-    projectId: [{ required: true, message: '请输入项目ID!'},],
-    paymentTypeName: [{ required: true, message: '请输入费用类型名称!'},],
-    paymentTypeCode: [{ required: true, message: '请输入费用类型编码!'},],
+    projectId: [{ required: true, message: '请选择项目!'},],
+    paymentTypeCode: [{ required: true, message: '请选择费用类型!'},],
     price: [{ required: true, message: '请输入单价（元）!'},],
-    unitCode: [{ required: true, message: '请输入单位编码!'},],
-    unitName: [{ required: true, message: '请输入单位名称!'},],
+    unitCode: [{ required: true, message: '请选择单位!'},],
+    status: [{ required: true, message: '请选择状态!'},],
+    roomType: [{ required: false, message: '请选择房间类型!'},],
   });
   const { resetFields, validate, validateInfos } = useForm(formData, validatorRules, { immediate: false });
   //日期个性化选择
@@ -110,7 +115,13 @@
     return props.formDisabled;
   });
 
-  
+  function handleChangePaymentTypeCode(value){
+    if (value == '6'){
+      validatorRules.roomType = [{ required: true, message: '请选择房间类型!'},]
+    } else {
+      validatorRules.roomType = [{ required: false, message: '请选择房间类型!'},]
+    }
+  }
   /**
    * 新增
    */
