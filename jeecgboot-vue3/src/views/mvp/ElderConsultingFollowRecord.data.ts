@@ -6,39 +6,35 @@ import { getWeekMonthQuarterYear } from '/@/utils';
 //列表数据
 export const columns: BasicColumn[] = [
   {
-    title: '租户ID',
-    align: "center",
-    dataIndex: 'tenantId'
-  },
-  {
-    title: '所属项目ID',
-    align: "center",
-    dataIndex: 'projectId'
-  },
-  {
-    title: '接待人名称id',
-    align: "center",
-    dataIndex: 'receptionistId'
-  },
-  {
     title: '接待人名称',
     align: "center",
     dataIndex: 'receptionistName'
   },
   {
-    title: '回访类型编码',
+    title: '回访类型',
     align: "center",
-    dataIndex: 'followTypeCode'
+    dataIndex: 'followTypeCode',
+    customRender: ({ text }) => {
+      return render.renderDict(text, 'follow_type');
+    },
   },
   {
-    title: '回访类型名称',
+    title: '线索客户',
     align: "center",
-    dataIndex: 'followTypeName'
+    dataIndex: 'consultingName'
   },
   {
-    title: '线索客户id',
+    title: '跟进状态',
     align: "center",
-    dataIndex: 'consultingId'
+    dataIndex: 'followStatus',
+    customRender: ({ text }) => {
+      return render.renderDict(text, 'follow_status');
+    },
+  },
+  {
+    title: '跟进时间',
+    align: "center",
+    dataIndex: 'followTime',
   },
   {
     title: '备注',

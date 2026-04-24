@@ -5,43 +5,33 @@
         <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ElderConsultingFollowRecordForm">
           <a-row>
 						<a-col :span="24">
-							<a-form-item label="租户ID" v-bind="validateInfos.tenantId" id="ElderConsultingFollowRecordForm-tenantId" name="tenantId">
-								<a-input v-model:value="formData.tenantId" placeholder="请输入租户ID"  allow-clear ></a-input>
+							<a-form-item label="线索客户" v-bind="validateInfos.consultingName" id="ElderConsultingFollowRecordForm-consultingName" name="consultingName">
+								<a-input v-model:value="formData.consultingName" disabled ></a-input>
+							</a-form-item>
+						</a-col>						
+						<a-col :span="24">
+							<a-form-item label="接待人" v-bind="validateInfos.receptionistId" id="ElderConsultingFollowRecordForm-receptionistName" name="receptionistId">
+                <JSelectUser v-model:value="formData.receptionistId" rowKey="id" placeholder="请选择用户" :isRadioSelection="true"></JSelectUser>
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="所属项目ID" v-bind="validateInfos.projectId" id="ElderConsultingFollowRecordForm-projectId" name="projectId">
-								<a-input v-model:value="formData.projectId" placeholder="请输入所属项目ID"  allow-clear ></a-input>
+							<a-form-item label="回访类型" v-bind="validateInfos.followTypeCode" id="ElderConsultingFollowRecordForm-followTypeCode" name="followTypeCode">
+								<JDictSelectTag type="select" v-model:value="formData.followTypeCode" dictCode="follow_type" placeholder="请选择回访类型" />
 							</a-form-item>
 						</a-col>
-						<a-col :span="24">
-							<a-form-item label="接待人名称id" v-bind="validateInfos.receptionistId" id="ElderConsultingFollowRecordForm-receptionistId" name="receptionistId">
-								<a-input v-model:value="formData.receptionistId" placeholder="请输入接待人名称id"  allow-clear ></a-input>
+            <a-col :span="24">
+							<a-form-item label="跟进状态" v-bind="validateInfos.followStatus" id="ElderConsultingFollowRecordForm-followStatus" name="followStatus">
+                <JDictSelectTag type="select" v-model:value="formData.followStatus" dictCode="follow_status" placeholder="请选择跟进状态" />
 							</a-form-item>
 						</a-col>
-						<a-col :span="24">
-							<a-form-item label="接待人名称" v-bind="validateInfos.receptionistName" id="ElderConsultingFollowRecordForm-receptionistName" name="receptionistName">
-								<a-input v-model:value="formData.receptionistName" placeholder="请输入接待人名称"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="回访类型编码" v-bind="validateInfos.followTypeCode" id="ElderConsultingFollowRecordForm-followTypeCode" name="followTypeCode">
-								<a-input v-model:value="formData.followTypeCode" placeholder="请输入回访类型编码"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="回访类型名称" v-bind="validateInfos.followTypeName" id="ElderConsultingFollowRecordForm-followTypeName" name="followTypeName">
-								<a-input v-model:value="formData.followTypeName" placeholder="请输入回访类型名称"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="线索客户id" v-bind="validateInfos.consultingId" id="ElderConsultingFollowRecordForm-consultingId" name="consultingId">
-								<a-input v-model:value="formData.consultingId" placeholder="请输入线索客户id"  allow-clear ></a-input>
+            <a-col :span="24">
+							<a-form-item label="跟进时间" v-bind="validateInfos.followTime" id="ElderConsultingFollowRecordForm-followTime" name="followTime">
+								<DatePicker :showTime="true" placeholder="请选择跟进时间"  v-model:value="formData.followTime" value-format="YYYY-MM-DD HH:mm:ss "  style="width: 100%"  allow-clear />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
 							<a-form-item label="备注" v-bind="validateInfos.remark" id="ElderConsultingFollowRecordForm-remark" name="remark">
-								<a-input v-model:value="formData.remark" placeholder="请输入备注"  allow-clear ></a-input>
+								<a-textarea v-model:value="formData.remark" placeholder="请输入备注"  allow-clear ></a-textarea>
 							</a-form-item>
 						</a-col>
           </a-row>
@@ -58,11 +48,18 @@
   import { getDateByPicker, getValueType } from '/@/utils';
   import { saveOrUpdate } from '../ElderConsultingFollowRecord.api';
   import { Form } from 'ant-design-vue';
+  import JSelectUser from '/@/components/Form/src/jeecg/components/JSelectUser.vue';
+  import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
+  import { useUserStore } from '/@/store/modules/user';
+  import {DatePicker} from 'ant-design-vue'
+  const userStore = useUserStore();
+  const userId = ref<Nullable<number | string>>(0);
   const props = defineProps({
     formDisabled: { type: Boolean, default: false },
     formData: { type: Object, default: () => ({})},
-    formBpm: { type: Boolean, default: true }
+    formBpm: { type: Boolean, default: true },
+    consulting: { type: Object, default: () => ({})},
   });
   const formRef = ref();
   const useForm = Form.useForm;
@@ -74,8 +71,11 @@
     receptionistId: '',   
     receptionistName: '',   
     followTypeCode: '',   
-    followTypeName: '',   
-    consultingId: '',   
+    followTypeName: '', 
+    followStatus: undefined,  
+    consultingId: '',  
+    consultingName: '', 
+    followTime: undefined,
     remark: '',   
     delFlag: undefined,
   });
@@ -85,14 +85,19 @@
   const confirmLoading = ref<boolean>(false);
   //表单验证
   const validatorRules = reactive({
-    tenantId: [{ required: true, message: '请输入租户ID!'},],
-    projectId: [{ required: true, message: '请输入所属项目ID!'},],
+    followTypeCode: [{ required: true, message: '请选择回访类型!'},],
+    followStatus:  [{ required: true, message: '请选择跟进状态!'},],
+    followTime: [{ required: true, message: '请选择跟进时间!'},],
   });
   const { resetFields, validate, validateInfos } = useForm(formData, validatorRules, { immediate: false });
   //日期个性化选择
   const fieldPickers = reactive({
   });
-
+  onMounted(() => {
+    // 记录当前的UserId
+    userId.value = userStore.getUserInfo?.id;
+    console.log('Mounted', userId.value);
+  });
   // 表单禁用
   const disabled = computed(()=>{
     if(props.formBpm === true){
@@ -110,7 +115,7 @@
    * 新增
    */
   function add() {
-    edit({});
+    edit({consultingId: props.consulting.id,consultingName: props.consulting.name,receptionistId: userId.value});
   }
 
   /**

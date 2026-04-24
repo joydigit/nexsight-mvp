@@ -92,6 +92,17 @@
     </BasicTable>
     <!-- 表单区域 -->
     <ElderConsultingModal ref="registerModal" @success="handleSuccess"></ElderConsultingModal>
+    <!-- 跟踪记录弹框 -->
+    <JModal
+      title="跟踪记录"
+      :width="1200"
+      :visible="followVisible"
+      @cancel="followVisible = false"
+      :destroyOnClose="true"
+    >
+      <template #footer></template>
+      <ElderConsultingFollowRecordList :consulting="currentConsulting" />
+    </JModal>
   </div>
 </template>
 
@@ -106,9 +117,11 @@
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
   import {useModal} from '/@/components/Modal';
-  import { getProjectListAllM } from './ElderProject.api';  
+  import { getProjectListAllM } from './ElderProject.api';
   import { getDateByPicker } from '/@/utils';
   import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
+  import JModal from '/@/components/Modal/src/JModal/JModal.vue';
+  import ElderConsultingFollowRecordList from './ElderConsultingFollowRecordList.vue';
 
   const fieldPickers = reactive({
   });
@@ -120,6 +133,8 @@
   const registerModal = ref();
   const userStore = useUserStore();
   const { createMessage } = useMessage();
+  const followVisible = ref(false);
+  const currentConsulting = ref({});
 
   onMounted(async () => {
     projectList.value = await getProjectListAllM();
@@ -206,6 +221,14 @@
   }
    
   /**
+   * 跟踪记录
+   */
+  function handleFollowRecord(record: Recordable) {
+    currentConsulting.value = record;
+    followVisible.value = true;
+  }
+
+  /**
    * 删除事件
    */
   async function handleDelete(record) {
@@ -244,6 +267,11 @@
    */
   function getDropDownAction(record) {
     return [
+      {
+        label: '跟踪记录',
+        onClick: handleFollowRecord.bind(null, record),
+        auth: 'elder_FollowRecord:list'
+      },
       {
         label: '详情',
         onClick: handleDetail.bind(null, record),

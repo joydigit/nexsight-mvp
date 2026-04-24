@@ -1,6 +1,6 @@
 <template>
-  <j-modal :title="title" maxHeight="500px" :width="800" :visible="visible" @ok="handleOk" :okButtonProps="{ class: { 'jee-hidden': disableSubmit } }" @cancel="handleCancel" cancelText="关闭">
-    <ElderConsultingFollowRecordForm ref="registerForm" @ok="submitCallback" :formDisabled="disableSubmit" :formBpm="false"></ElderConsultingFollowRecordForm>
+  <j-modal :title="title" :maxHeight="500" :width="800" :visible="visible" @ok="handleOk" :okButtonProps="{ class: { 'jee-hidden': disableSubmit } }" @cancel="handleCancel" cancelText="关闭">
+    <ElderConsultingFollowRecordForm ref="registerForm" @ok="submitCallback" :formDisabled="disableSubmit" :consulting="consulting" :formBpm="false"></ElderConsultingFollowRecordForm>
    <template #footer>
      <a-button @click="handleCancel">取消</a-button>
      <a-button :class="{ 'jee-hidden': disableSubmit }" type="primary" @click="handleOk">确认</a-button>
@@ -20,7 +20,9 @@
   const disableSubmit = ref<boolean>(false);
   const registerForm = ref();
   const emit = defineEmits(['register', 'success']);
-
+  const props = defineProps({
+    consulting: { type: Object, default: () => ({})},
+  });
   /**
    * 新增
    */

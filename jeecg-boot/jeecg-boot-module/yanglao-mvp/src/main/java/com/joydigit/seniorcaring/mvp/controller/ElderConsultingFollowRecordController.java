@@ -8,11 +8,16 @@ import java.util.stream.Collectors;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+
+import com.joydigit.seniorcaring.mvp.entity.ElderConsulting;
+import com.joydigit.seniorcaring.mvp.service.IElderConsultingService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.system.api.ISysBaseAPI;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.query.QueryRuleEnum;
+import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.oConvertUtils;
 import com.joydigit.seniorcaring.mvp.entity.ElderConsultingFollowRecord;
 import com.joydigit.seniorcaring.mvp.service.IElderConsultingFollowRecordService;
@@ -29,6 +34,7 @@ import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 import org.jeecg.common.system.base.controller.JeecgController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -51,7 +57,10 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 public class ElderConsultingFollowRecordController extends JeecgController<ElderConsultingFollowRecord, IElderConsultingFollowRecordService> {
 	@Autowired
 	private IElderConsultingFollowRecordService elderConsultingFollowRecordService;
-	
+	@Autowired
+	private IElderConsultingService elderConsultingService;
+	@Autowired
+	private ISysBaseAPI sysBaseAPI;
 	/**
 	 * 分页列表查询
 	 *
@@ -69,9 +78,8 @@ public class ElderConsultingFollowRecordController extends JeecgController<Elder
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
 
-        QueryWrapper<ElderConsultingFollowRecord> queryWrapper = QueryGenerator.initQueryWrapper(elderConsultingFollowRecord, req.getParameterMap());
 		Page<ElderConsultingFollowRecord> page = new Page<ElderConsultingFollowRecord>(pageNo, pageSize);
-		IPage<ElderConsultingFollowRecord> pageList = elderConsultingFollowRecordService.page(page, queryWrapper);
+		IPage<ElderConsultingFollowRecord> pageList = elderConsultingFollowRecordService.pageList(page, elderConsultingFollowRecord);
 		return Result.OK(pageList);
 	}
 	
@@ -85,8 +93,15 @@ public class ElderConsultingFollowRecordController extends JeecgController<Elder
 	@Operation(summary="elder_consulting_follow_record-添加")
 	@RequiresPermissions("elder_consulting_follow_record:add")
 	@PostMapping(value = "/add")
+	@Transactional(rollbackFor = Exception.class)
 	public Result<String> add(@RequestBody ElderConsultingFollowRecord elderConsultingFollowRecord) {
+		LoginUser user = sysBaseAPI.getUserById(elderConsultingFollowRecord.getReceptionistId());
+		elderConsultingFollowRecord.setReceptionistName(user.getRealname());
 		elderConsultingFollowRecordService.save(elderConsultingFollowRecord);
+		ElderConsulting consulting = new ElderConsulting();
+		consulting.setFollowStatus(elderConsultingFollowRecord.getFollowStatus());
+		consulting.setId(elderConsultingFollowRecord.getId());
+		elderConsultingService.updateById(consulting);
 		return Result.OK("添加成功！");
 	}
 	
@@ -101,7 +116,13 @@ public class ElderConsultingFollowRecordController extends JeecgController<Elder
 	@RequiresPermissions("elder_consulting_follow_record:edit")
 	@RequestMapping(value = "/edit", method = {RequestMethod.PUT,RequestMethod.POST})
 	public Result<String> edit(@RequestBody ElderConsultingFollowRecord elderConsultingFollowRecord) {
+		LoginUser user = sysBaseAPI.getUserById(elderConsultingFollowRecord.getReceptionistId());
+		elderConsultingFollowRecord.setReceptionistName(user.getRealname());
 		elderConsultingFollowRecordService.updateById(elderConsultingFollowRecord);
+		ElderConsulting consulting = new ElderConsulting();
+		consulting.setFollowStatus(elderConsultingFollowRecord.getFollowStatus());
+		consulting.setId(elderConsultingFollowRecord.getId());
+		elderConsultingService.updateById(consulting);
 		return Result.OK("编辑成功!");
 	}
 	

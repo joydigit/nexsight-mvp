@@ -4,10 +4,8 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.math.BigDecimal;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.TableLogic;
+
+import com.baomidou.mybatisplus.annotation.*;
 import org.jeecg.common.constant.ProvinceCityArea;
 import org.jeecg.common.util.SpringContextUtils;
 import lombok.Data;
@@ -57,10 +55,6 @@ public class ElderConsultingFollowRecord implements Serializable {
 	@Excel(name = "回访类型编码", width = 15)
     @Schema(description = "回访类型编码")
     private String followTypeCode;
-	/**回访类型名称*/
-	@Excel(name = "回访类型名称", width = 15)
-    @Schema(description = "回访类型名称")
-    private String followTypeName;
 	/**线索客户id*/
 	@Excel(name = "线索客户id", width = 15)
     @Schema(description = "线索客户id")
@@ -77,6 +71,11 @@ public class ElderConsultingFollowRecord implements Serializable {
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @Schema(description = "创建时间")
     private Date createTime;
+	/**回访时间*/
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @Schema(description = "回访时间")
+    private Date followTime;
 	/**更新人*/
     @Schema(description = "更新人")
     private String updateBy;
@@ -90,4 +89,11 @@ public class ElderConsultingFollowRecord implements Serializable {
     @Schema(description = "删除状态：0正常，1已删除")
     @TableLogic
     private Integer delFlag;
+    /**
+     * 跟进状态
+     */
+    private String followStatus;
+
+    @TableField(exist = false)
+    private String consultingName;
 }

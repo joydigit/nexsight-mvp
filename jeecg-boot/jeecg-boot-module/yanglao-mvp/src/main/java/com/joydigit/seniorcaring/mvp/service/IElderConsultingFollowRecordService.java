@@ -1,7 +1,9 @@
 package com.joydigit.seniorcaring.mvp.service;
 
-import com.joydigit.seniorcaring.mvp.entity.ElderConsultingFollowRecord;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.joydigit.seniorcaring.mvp.entity.ElderConsultingFollowRecord;
 
 /**
  * @Description: elder_consulting_follow_record
@@ -11,4 +13,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IElderConsultingFollowRecordService extends IService<ElderConsultingFollowRecord> {
 
+    IPage<ElderConsultingFollowRecord> pageList(Page<ElderConsultingFollowRecord> page, ElderConsultingFollowRecord elderConsultingFollowRecord);
 }

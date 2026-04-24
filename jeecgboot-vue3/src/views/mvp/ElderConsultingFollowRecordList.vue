@@ -4,16 +4,28 @@
     <div class="jeecg-basic-table-form-container">
       <a-form ref="formRef" @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol">
         <a-row :gutter="24">
+          <a-col :lg="6">
+            <a-form-item name="receptionistName">
+              <template #label><span title="接待人">接待人</span></template>
+              <a-input placeholder="请输入接待人" v-model:value="queryParam.receptionistName" allow-clear ></a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :xl="6" :lg="7" :md="8" :sm="24">
+            <span style="float: left; overflow: hidden" class="table-page-search-submitButtons">
+              <a-col :lg="6">
+                <a-button type="primary" preIcon="ant-design:search-outlined" @click="searchQuery">查询</a-button>
+                <a-button type="primary" preIcon="ant-design:reload-outlined" @click="searchReset" style="margin-left: 8px">重置</a-button>
+              </a-col>
+            </span>
+          </a-col>
         </a-row>
       </a-form>
     </div>
     <!--引用表格-->
-    <BasicTable @register="registerTable" :rowSelection="rowSelection">
+    <BasicTable @register="registerTableFollow" :rowSelection="rowSelection">
       <!--插槽:table标题-->
       <template #tableTitle>
         <a-button type="primary" v-auth="'elder_consulting_follow_record:add'"  @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
-        <a-button  type="primary" v-auth="'elder_consulting_follow_record:exportXls'" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
-        <j-upload-button  type="primary" v-auth="'elder_consulting_follow_record:importExcel'"  preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button>
         <a-dropdown v-if="selectedRowKeys.length > 0">
           <template #overlay>
             <a-menu>
@@ -26,9 +38,7 @@
           <a-button v-auth="'elder_consulting_follow_record:deleteBatch'">批量操作
             <Icon icon="mdi:chevron-down"></Icon>
           </a-button>
-        </a-dropdown>
-        <!-- 高级查询 -->
-        <super-query :config="superQueryConfig" @search="handleSuperQuery" />
+        </a-dropdown>    
       </template>
       <!--操作栏-->
       <template #action="{ record }">
@@ -38,12 +48,12 @@
       </template>
     </BasicTable>
     <!-- 表单区域 -->
-    <ElderConsultingFollowRecordModal ref="registerModal" @success="handleSuccess"></ElderConsultingFollowRecordModal>
+    <ElderConsultingFollowRecordModal ref="registerModal" :consulting="consulting" @success="handleSuccess"></ElderConsultingFollowRecordModal>
   </div>
 </template>
 
 <script lang="ts" name="com.joydigit.seniorcaring.mvp-elderConsultingFollowRecord" setup>
-  import { ref, reactive } from 'vue';
+  import { ref, reactive, watch,nextTick } from 'vue';
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { useListPage } from '/@/hooks/system/useListPage';
   import { columns, superQuerySchema } from './ElderConsultingFollowRecord.data';
@@ -55,6 +65,10 @@
    import {useModal} from '/@/components/Modal';
   import { getDateByPicker } from '/@/utils';
 
+  const props = defineProps({
+    consulting: { type: Object, default: () => ({})},
+  });
+
   const fieldPickers = reactive({
   });
 
@@ -64,6 +78,7 @@
   const registerModal = ref();
   const userStore = useUserStore();
   const { createMessage } = useMessage();
+  
   //注册table数据
   const { prefixCls, tableContext, onExportXls, onImportXls } = useListPage({
     tableProps: {
@@ -72,6 +87,7 @@
       columns,
       canResize:true,
       useSearchForm: false,
+      showTableSetting: false,
       actionColumn: {
         width: 120,
         fixed: 'right',
@@ -95,7 +111,17 @@
 	    success: handleSuccess
 	  },
   });
-  const [registerTable, { reload, collapseAll, updateTableDataRecord, findTableDataRecord, getDataSource }, { rowSelection, selectedRowKeys }] = tableContext;
+  const [registerTableFollow, { reload, collapseAll, updateTableDataRecord, findTableDataRecord, getDataSource }, { rowSelection, selectedRowKeys }] = tableContext;
+
+  watch(() => props.consulting, (val) => {
+    if (val) {
+      nextTick(() => {
+        queryParam.consultingId = val.id;
+        searchQuery();
+      });
+    }
+  }, { immediate: true });
+
   const labelCol = reactive({
     xs:24,
     sm:4,
@@ -173,7 +199,7 @@
       {
         label: '编辑',
         onClick: handleEdit.bind(null, record),
-        auth: 'com.joydigit.seniorcaring.mvp:elder_consulting_follow_record:edit'
+        auth: 'elder_consulting_follow_record:edit'
       },
     ];
   }
@@ -193,7 +219,7 @@
           confirm: handleDelete.bind(null, record),
           placement: 'topLeft',
         },
-        auth: 'com.joydigit.seniorcaring.mvp:elder_consulting_follow_record:delete'
+        auth: 'elder_consulting_follow_record:delete'
       }
     ]
   }
