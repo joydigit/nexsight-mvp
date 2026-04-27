@@ -100,7 +100,7 @@ public class ElderConsultingFollowRecordController extends JeecgController<Elder
 		elderConsultingFollowRecordService.save(elderConsultingFollowRecord);
 		ElderConsulting consulting = new ElderConsulting();
 		consulting.setFollowStatus(elderConsultingFollowRecord.getFollowStatus());
-		consulting.setId(elderConsultingFollowRecord.getId());
+		consulting.setId(elderConsultingFollowRecord.getConsultingId());
 		elderConsultingService.updateById(consulting);
 		return Result.OK("添加成功！");
 	}
@@ -121,7 +121,7 @@ public class ElderConsultingFollowRecordController extends JeecgController<Elder
 		elderConsultingFollowRecordService.updateById(elderConsultingFollowRecord);
 		ElderConsulting consulting = new ElderConsulting();
 		consulting.setFollowStatus(elderConsultingFollowRecord.getFollowStatus());
-		consulting.setId(elderConsultingFollowRecord.getId());
+		consulting.setId(elderConsultingFollowRecord.getConsultingId());
 		elderConsultingService.updateById(consulting);
 		return Result.OK("编辑成功!");
 	}

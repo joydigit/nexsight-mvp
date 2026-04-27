@@ -97,7 +97,7 @@
       title="跟踪记录"
       :width="1200"
       :visible="followVisible"
-      @cancel="followVisible = false"
+      @cancel="cancelFollow"
       :destroyOnClose="true"
     >
       <template #footer></template>
@@ -242,6 +242,9 @@
     await batchDelete({ ids: selectedRowKeys.value }, handleSuccess);
   }
    
+  function cancelFollow() {
+    handleSuccess();
+  }
   /**
    * 成功回调
    */
