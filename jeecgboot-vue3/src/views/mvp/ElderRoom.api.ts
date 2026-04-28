@@ -13,6 +13,7 @@ enum Api {
   exportXls = '/elderRoom/exportXls',
   getRoomListByFloorId = '/elderRoom/getRoomListByFloorId',
   getRoomCascaderList ='/elderRoom/getRoomCascaderList',
+  getRoomStatusPageList = '/elderRoom/getRoomStatusPageList'
 }
 
 /**
@@ -31,6 +32,12 @@ export const getImportUrl = Api.importExcel;
  * @param params
  */
 export const list = (params) => defHttp.get({ url: Api.list, params });
+
+/**
+ * 列表接口
+ * @param params
+ */
+export const getRoomStatusPageListMethod = (params) => defHttp.get({ url: Api.getRoomStatusPageList, params });
 
 /**
  * 列表接口

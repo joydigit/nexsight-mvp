@@ -53,10 +53,6 @@ public class ElderCustomerAccount implements Serializable {
 	@Excel(name = "账户类型编码", width = 15)
     @Schema(description = "账户类型编码")
     private String accountTypeCode;
-	/**账户类型名称*/
-	@Excel(name = "账户类型名称", width = 15)
-    @Schema(description = "账户类型名称")
-    private String accountTypeName;
 	/**账户金额*/
 	@Excel(name = "账户金额", width = 15)
     @Schema(description = "账户金额")

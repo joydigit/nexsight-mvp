@@ -43,4 +43,41 @@
         </if>
         order by eb.create_time desc
     </select>
+
+    <select id="getBedStatusListByParams" resultType="com.joydigit.seniorcaring.mvp.vo.BedStatusVo">
+        SELECT
+            tt.*,c.`name` as customerName
+        FROM
+        (
+        SELECT
+            be.id as bedId,
+            be.bed_no as bedNo,
+            be.`status`,
+            be.room_id as roomId,
+            IFNULL( cc.customer_id, rr.customer_id ) as customerId,
+            IFNULL(fc.price,pfc.price) as price
+        FROM
+            elder_bed be
+            LEFT JOIN elder_room_reserve rr ON rr.bed_id = be.id
+            AND rr.STATUS = '1'
+            LEFT JOIN elder_customer_checkin cc ON cc.bed_id = be.id
+            AND cc.STATUS = '1'
+            LEFT JOIN elder_room_fee_config fc on fc.item_id = be.id AND fc.item_type = '2'
+            LEFT JOIN elder_project_fee_config pfc on pfc.project_id = be.project_id AND pfc.payment_type_code = '1'
+        WHERE
+            be.del_flag = 0
+        ) tt
+            LEFT JOIN elder_customer c ON tt.customerId = c.id
+        WHERE 1=1
+        <if test="roomIds != null and roomIds.size() > 0">
+            and tt.roomId  IN (
+            <foreach item="id" collection="roomIds" separator=",">
+                #{id}
+            </foreach>
+            )
+        </if>
+        <if test="customerName != null and customerName != ''">
+          AND c.`name` LIKE concat(concat('%',#{customerName}),'%')
+        </if>
+    </select>
 </mapper>

@@ -5,19 +5,19 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.joydigit.seniorcaring.mvp.entity.ElderRoom;
+import com.joydigit.seniorcaring.mvp.mapper.ElderBedMapper;
 import com.joydigit.seniorcaring.mvp.mapper.ElderRoomMapper;
 import com.joydigit.seniorcaring.mvp.service.IElderProjectService;
 import com.joydigit.seniorcaring.mvp.service.IElderRoomService;
-import com.joydigit.seniorcaring.mvp.vo.RoomCascaderVo;
-import com.joydigit.seniorcaring.mvp.vo.RoomSelectVo;
+import com.joydigit.seniorcaring.mvp.vo.*;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -31,6 +31,8 @@ public class ElderRoomServiceImpl extends ServiceImpl<ElderRoomMapper, ElderRoom
 
     @Autowired
     private IElderProjectService elderProjectService;
+    @Autowired
+    private ElderBedMapper elderBedMapper;
     @Override
     public IPage<ElderRoom> pageList(Page<ElderRoom> page, ElderRoom elderRoom) {
         List<String> projectIds = elderProjectService.getProjectIdByUserId();
@@ -59,6 +61,62 @@ public class ElderRoomServiceImpl extends ServiceImpl<ElderRoomMapper, ElderRoom
             setRoomCascader(roomSelectVoList, list,type);
         }
         return list;
+    }
+
+    @Override
+    public IPage<FloorDataVo> getRoomStatusPageList(Integer pageNo, Integer pageSize, RoomStatusQueryVo roomStatusQueryVo) {
+        Page<FloorDataVo> pageList = new Page<FloorDataVo>(pageNo, pageSize);
+        if (Objects.isNull(roomStatusQueryVo)){
+            roomStatusQueryVo = new RoomStatusQueryVo();
+        }
+        List<String> projectIds = elderProjectService.getProjectIdByUserId();
+        roomStatusQueryVo.setProjectIds(projectIds);
+        if (CollectionUtil.isEmpty(projectIds)){
+            pageList.setRecords(new ArrayList<>());
+            return pageList;
+        }
+        if (Objects.nonNull(roomStatusQueryVo) && StringUtils.isNotBlank(roomStatusQueryVo.getCustomerName())){
+            List<BedStatusVo> bedStatusVos = elderBedMapper.getBedStatusListByParams(null, roomStatusQueryVo.getCustomerName());
+            if (CollectionUtil.isNotEmpty(bedStatusVos)){
+                roomStatusQueryVo.setRoomIds(bedStatusVos.stream().map(BedStatusVo::getRoomId).distinct().collect(Collectors.toList()));
+            } else {
+                pageList.setRecords(new ArrayList<>());
+                return pageList;
+            }
+        }
+        Page<RoomStatusVo> page = new Page<>(pageNo, pageSize);
+        List<RoomStatusVo> roomStatusVoList = this.baseMapper.getRoomStatusListByParams(page, roomStatusQueryVo);
+        List<FloorDataVo> list = new ArrayList<>();
+        if (CollectionUtil.isNotEmpty(roomStatusVoList)){
+            List<String> roomIds = roomStatusVoList.stream().map(RoomStatusVo::getRoomId).distinct().collect(Collectors.toList());
+            List<BedStatusVo> bedStatusVos = elderBedMapper.getBedStatusListByParams(roomIds, null);
+            Map<String, List<BedStatusVo>> bedMap = new HashMap<>();
+            if (CollectionUtil.isNotEmpty(bedStatusVos)){
+                bedMap = bedStatusVos.stream().collect(Collectors.groupingBy(BedStatusVo::getRoomId));
+            }
+            Map<String, List<RoomStatusVo>> roomMap = roomStatusVoList.stream().collect(Collectors.groupingBy(RoomStatusVo::getFloorId));
+            for (String floorId : roomMap.keySet()) {
+                List<RoomStatusVo> roomStatusVos = roomMap.get(floorId);
+                FloorDataVo floorDataVo = new FloorDataVo();
+                BeanUtils.copyProperties(roomStatusVos.get(0),floorDataVo);
+                List<RoomDataVo> rooms = roomStatusVos.stream().map(s -> {
+                    RoomDataVo ro = new RoomDataVo();
+                    BeanUtils.copyProperties(s, ro);
+                    return ro;
+                }).collect(Collectors.toList());
+                for (RoomDataVo roomDataVo : rooms) {
+                    List<BedStatusVo> statusVoList = bedMap.get(roomDataVo.getRoomId());
+                    if (CollectionUtil.isNotEmpty(statusVoList)){
+                        roomDataVo.setBeds(statusVoList);
+                    }
+                }
+                floorDataVo.setRooms(rooms);
+                list.add(floorDataVo);
+            }
+        }
+        pageList.setRecords(list);
+        pageList.setTotal(page.getTotal());
+        return pageList;
     }
 
     private static void setRoomCascader(List<RoomSelectVo> roomSelectVoList, List<RoomCascaderVo> list,String type) {

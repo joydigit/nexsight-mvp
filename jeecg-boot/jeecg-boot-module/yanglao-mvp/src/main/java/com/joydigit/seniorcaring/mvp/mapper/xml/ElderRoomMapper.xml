@@ -75,4 +75,60 @@
             be.del_flag = 0
           AND be.project_id = #{projectId}
     </select>
+
+    <select id="getRoomStatusListByParams" resultType="com.joydigit.seniorcaring.mvp.vo.RoomStatusVo">
+        SELECT
+            ro.id AS roomId,
+            ro.area,
+            ro.room_no as roomNo,
+            ro.room_type as roomType,
+            ro.`status`,
+            ro.project_id as projectId,
+            p.project_name as projectName,
+            ro.floor_id as floorId,
+            f.floor_name as floorName,
+            ro.building_id as buildingId,
+            b.building_name as buildingName
+        FROM
+            elder_room ro
+                LEFT JOIN elder_project p ON p.id = ro.project_id
+                LEFT JOIN elder_floor f ON f.id = ro.floor_id
+                LEFT JOIN elder_building b ON b.id = ro.building_id
+        WHERE
+            ro.del_flag = 0
+            <if test="data.roomStatus != null and data.roomStatus != ''">
+                and ro.`status` = #{data.roomStatus}
+            </if>
+            <if test="data.roomNo != null and data.roomNo != ''">
+                and ro.room_no like concat(concat('%',#{data.roomNo}),'%')
+            </if>
+            <if test="data.roomStatus != null and data.roomStatus != ''">
+                and ro.`status` = #{data.roomStatus}
+            </if>
+            <if test="data.projectIds != null and data.projectIds.size() > 0">
+                AND  ro.project_id IN (
+                <foreach item="id" collection="data.projectIds" separator=",">
+                    #{id}
+                </foreach>
+                )
+            </if>
+            <if test="data.roomIds != null and data.roomIds.size() > 0">
+                AND  ro.id IN (
+                <foreach item="id" collection="data.roomIds" separator=",">
+                    #{id}
+                </foreach>
+                )
+            </if>
+            <if test="data.projectId != null and data.projectId != ''">
+                AND ro.project_id = #{data.projectId}
+            </if>
+            <if test="data.buildingId != null and data.buildingId != ''">
+                AND ro.building_id = #{data.buildingId}
+            </if>
+            <if test="data.floorId != null and data.floorId != ''">
+                AND ro.floor_id = #{data.floorId}
+            </if>
+        ORDER BY
+            ro.building_id DESC
+    </select>
 </mapper>

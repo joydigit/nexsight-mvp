@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.joydigit.seniorcaring.mvp.entity.ElderRoom;
+import com.joydigit.seniorcaring.mvp.vo.FloorDataVo;
 import com.joydigit.seniorcaring.mvp.vo.RoomCascaderVo;
+import com.joydigit.seniorcaring.mvp.vo.RoomStatusQueryVo;
 
 import java.util.List;
 
@@ -20,4 +22,6 @@ public interface IElderRoomService extends IService<ElderRoom> {
     List<ElderRoom> getRoomListByFloorId(String floorId);
 
     List<RoomCascaderVo> getRoomCascaderList(String type,String projectId);
+
+    IPage<FloorDataVo> getRoomStatusPageList(Integer pageNo, Integer pageSize, RoomStatusQueryVo roomStatusQueryVo);
 }
