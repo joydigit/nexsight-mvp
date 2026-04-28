@@ -83,4 +83,11 @@
         </if>
         order by c.create_time desc
     </select>
+
+    <select id="getElderConsultingAllList" resultType="com.joydigit.seniorcaring.mvp.vo.ElderConsultingVo">
+        SELECT id,`name`
+        FROM elder_consulting
+        WHERE del_flag = 0 AND project_id = #{projectId}
+        ORDER BY create_time DESC
+    </select>
 </mapper>

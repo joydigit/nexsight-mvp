@@ -67,6 +67,14 @@
     </div>
     <!--楼层分组-->
     <div class="floor-groups">
+      <!-- 空状态 -->
+      <div v-if="!floorDataList || floorDataList.length === 0" class="empty-state">
+        <div class="empty-icon">
+          <Icon icon="ant-design:home-outlined" />
+        </div>
+        <div class="empty-title">暂无房间数据</div>
+        <div class="empty-desc">请调整查询条件或添加房间信息</div>
+      </div>
       <div v-for="floor in floorDataList" :key="floor.floorId" class="floor-section">
         <div class="floor-header">
           <div class="floor-title">{{ floor.projectName }}-{{floor.buildingName}}-{{ floor.floorName }}</div>
@@ -116,13 +124,7 @@
               <template v-else-if="room.statusText === 'reserved' && room.beds">
                 <a-button size="small" type="primary" @click.stop="handleCheckIn(room)">入住</a-button>
                 <a-button size="small" @click.stop="handleCancelReserve(room)">取消预定</a-button>
-              </template>
-              <template v-else-if="room.statusText === 'maintenance'">
-                <a-button size="small" type="primary" @click.stop="handleFinishMaintenance(room)">取消维修</a-button>
-              </template>
-              <template v-else-if="room.statusText === 'cleaning'">
-                <a-button size="small" type="primary" @click.stop="handleFinishCleaning(room)">取消停用</a-button>
-              </template>
+              </template>             
             </div>
             <div class="room-card-footer">
               <span class="area" v-if="room.area">{{ room.area }}㎡</span>
@@ -213,7 +215,7 @@ const floorDataList = ref([]);
 
 
 function handleRoomClick(room: any) {
-  console.log('点击房间:', room);
+  // console.log('点击房间:', room);
 }
 
 // 操作按钮
@@ -226,12 +228,6 @@ function handleReserve(room: any) {
 
 function handleCancelReserve(room: any) {
   console.log('取消预定:', room.roomNo);
-}
-function handleFinishMaintenance(room: any) {
-  console.log('完成维修:', room.roomNo);
-}
-function handleFinishCleaning(room: any) {
-  console.log('完成清扫:', room.roomNo);
 }
 
 function handlePageChange() {
@@ -489,6 +485,36 @@ function searchReset() {
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+
+  .empty-icon {
+    font-size: 64px;
+    color: #d9d9d9;
+    margin-bottom: 16px;
+  }
+
+  .empty-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #595959;
+    margin-bottom: 8px;
+  }
+
+  .empty-desc {
+    font-size: 14px;
+    color: #8c8c8c;
+  }
 }
 
 .floor-section {

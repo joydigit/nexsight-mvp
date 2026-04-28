@@ -3,15 +3,29 @@
     <JFormContainer :disabled="disabled">
       <template #detail>
         <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ElderCustomerForm">
-          <a-row>
+          <a-row>						
 						<a-col :span="24">
-							<a-form-item label="租户ID" v-bind="validateInfos.tenantId" id="ElderCustomerForm-tenantId" name="tenantId">
-								<a-input v-model:value="formData.tenantId" placeholder="请输入租户ID"  allow-clear ></a-input>
+							<a-form-item label="所属项目" v-bind="validateInfos.projectId" id="ElderCustomerForm-projectId" name="projectId">
+								<a-select
+                  v-model:value="formData.projectId"
+                  :options="projectList"
+                  :fieldNames="{ label: 'projectName', value: 'id' }"
+                  showSearch
+                  placeholder="请选择所属项目"
+                  @change="handleChangeProjectId"
+                />
 							</a-form-item>
 						</a-col>
-						<a-col :span="24">
-							<a-form-item label="所属项目ID" v-bind="validateInfos.projectId" id="ElderCustomerForm-projectId" name="projectId">
-								<j-dict-select-tag v-model:value="formData.projectId" dictCode="" placeholder="请选择所属项目ID"  allow-clear />
+            <a-col :span="24">
+							<a-form-item label="咨询接待" v-bind="validateInfos.consultingId" id="ElderCustomerForm-consultingId" name="consultingId">
+                <a-select
+                  v-model:value="formData.consultingId"
+                  :options="consultingList"
+                  :fieldNames="{ label: 'name', value: 'id' }"
+                  showSearch
+                  placeholder="请选择咨询接待"
+                  @change="handleChangeConsulting"
+                />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
@@ -20,23 +34,18 @@
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="性别：0-女，1-男，2-未知" v-bind="validateInfos.gender" id="ElderCustomerForm-gender" name="gender">
-								<a-input v-model:value="formData.gender" placeholder="请输入性别：0-女，1-男，2-未知"  allow-clear ></a-input>
+							<a-form-item label="性别" v-bind="validateInfos.gender" id="ElderCustomerForm-gender" name="gender">
+								<JDictSelectTag type="select" v-model:value="formData.gender" dictCode="gender_type" placeholder="请选择性别" />
 							</a-form-item>
 						</a-col>
-						<a-col :span="24">
-							<a-form-item label="身份证号" v-bind="validateInfos.idCard" id="ElderCustomerForm-idCard" name="idCard">
-								<a-input v-model:value="formData.idCard" placeholder="请输入身份证号"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
+            <a-col :span="24">
 							<a-form-item label="证件类型" v-bind="validateInfos.idCardType" id="ElderCustomerForm-idCardType" name="idCardType">
-								<a-input v-model:value="formData.idCardType" placeholder="请输入证件类型"  allow-clear ></a-input>
+								<JDictSelectTag type="select" v-model:value="formData.idCardType" dictCode="id_card_type" placeholder="请选择证件类型" />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="地址" v-bind="validateInfos.address" id="ElderCustomerForm-address" name="address">
-								<a-input v-model:value="formData.address" placeholder="请输入地址"  allow-clear ></a-input>
+							<a-form-item label="证件号" v-bind="validateInfos.idCard" id="ElderCustomerForm-idCard" name="idCard">
+								<a-input v-model:value="formData.idCard" placeholder="请输入证件号"  allow-clear ></a-input>
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
@@ -44,14 +53,19 @@
 								<a-input v-model:value="formData.phone" placeholder="请输入联系电话"  allow-clear ></a-input>
 							</a-form-item>
 						</a-col>
-						<a-col :span="24">
+            <a-col :span="24">
 							<a-form-item label="出生日期" v-bind="validateInfos.birthDate" id="ElderCustomerForm-birthDate" name="birthDate">
 								<a-date-picker placeholder="请选择出生日期"  v-model:value="formData.birthDate" value-format="YYYY-MM-DD"  style="width: 100%"  allow-clear />
 							</a-form-item>
 						</a-col>
+            <a-col :span="24">
+							<a-form-item label="地址" v-bind="validateInfos.address" id="ElderCustomerForm-address" name="address">
+								<a-input v-model:value="formData.address" placeholder="请输入地址"  allow-clear ></a-input>
+							</a-form-item>
+						</a-col>
 						<a-col :span="24">
 							<a-form-item label="备注" v-bind="validateInfos.remark" id="ElderCustomerForm-remark" name="remark">
-								<a-input v-model:value="formData.remark" placeholder="请输入备注"  allow-clear ></a-input>
+								<a-textarea v-model:value="formData.remark" placeholder="请输入备注"  allow-clear ></a-textarea>
 							</a-form-item>
 						</a-col>
           </a-row>
@@ -62,26 +76,32 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive, defineExpose, nextTick, defineProps, computed, onMounted } from 'vue';
+  import { ref, reactive, defineExpose, nextTick, defineProps, computed, onMounted, watch } from 'vue';
   import { defHttp } from '/@/utils/http/axios';
   import { useMessage } from '/@/hooks/web/useMessage';
+  import { getProjectListAllM } from './../ElderProject.api'; 
   import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
   import { getDateByPicker, getValueType } from '/@/utils';
   import { saveOrUpdate } from '../ElderCustomer.api';
   import { Form } from 'ant-design-vue';
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
+  import { getElderConsultingAllListMethod,queryByIdMethod } from './../ElderConsulting.api';
+
   const props = defineProps({
     formDisabled: { type: Boolean, default: false },
     formData: { type: Object, default: () => ({})},
     formBpm: { type: Boolean, default: true }
   });
+  const projectList = ref([]);
+  const consultingList = ref([]);
   const formRef = ref();
   const useForm = Form.useForm;
   const emit = defineEmits(['register', 'ok']);
   const formData = reactive<Record<string, any>>({
     id: '',
-    tenantId: '',   
-    projectId: '',   
+    tenantId: '',  
+    consultingId: undefined, 
+    projectId: undefined,   
     name: '',   
     gender: '',   
     idCard: '',   
@@ -96,12 +116,45 @@
   const labelCol = ref<any>({ xs: { span: 24 }, sm: { span: 5 } });
   const wrapperCol = ref<any>({ xs: { span: 24 }, sm: { span: 16 } });
   const confirmLoading = ref<boolean>(false);
+  onMounted(async () => {
+    projectList.value = await getProjectListAllM();
+  });
+  watch(()=>{
+    if (formData.projectId){
+      handleChangeProjectId(formData.projectId);
+    }
+  })
+   // 查询楼栋
+  async function handleChangeProjectId(value){
+    if (value) {
+      const data = await getElderConsultingAllListMethod({projectId: value});
+      consultingList.value = data;
+    } else {
+      consultingList.value = [];
+    }
+  }
+  async function handleChangeConsulting(value) {
+    const conInfo = await queryByIdMethod({id: value});
+    const tmpData = {
+      name: conInfo.name,
+      gender: conInfo.gender,
+      idCard: conInfo.idCard,
+      idCardType: conInfo.idCardType,
+      address: conInfo.address,
+      phone: conInfo.phone,
+      birthDate: conInfo.birthDate
+    };    
+    //赋值
+    Object.assign(formData, tmpData);
+  }
   //表单验证
   const validatorRules = reactive({
-    tenantId: [{ required: true, message: '请输入租户ID!'},],
-    projectId: [{ required: true, message: '请输入所属项目ID!'},],
+    projectId: [{ required: true, message: '请选择所属项目!'},],
     name: [{ required: true, message: '请输入姓名!'},],
-    gender: [{ required: true, message: '请输入性别：0-女，1-男，2-未知!'},],
+    gender: [{ required: true, message: '请选择性别'},],
+    idCardType:  [{ required: true, message: '请选择证件类型!'},],
+    idCard:  [{ required: true, message: '请输入证件号!'},],
+    phone:  [{ required: true, message: '请输入手机号!'},],
   });
   const { resetFields, validate, validateInfos } = useForm(formData, validatorRules, { immediate: false });
   //日期个性化选择

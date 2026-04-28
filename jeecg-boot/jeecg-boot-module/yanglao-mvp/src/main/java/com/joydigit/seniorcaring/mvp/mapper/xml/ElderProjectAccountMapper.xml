@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.joydigit.seniorcaring.mvp.mapper.ElderProjectAccountMapper">
+
+    <select id="pageList" resultType="com.joydigit.seniorcaring.mvp.entity.ElderProjectAccount">
+        SELECT
+            pa.*,
+            p.project_name
+        FROM
+            elder_project_account pa
+            LEFT JOIN elder_project p ON pa.project_id = p.id
+        WHERE
+            pa.del_flag = 0
+        <if test="data.projectIds != null and data.projectIds.size() > 0">
+            AND  pa.project_id IN (
+            <foreach item="id" collection="data.projectIds" separator=",">
+                #{id}
+            </foreach>
+            )
+        </if>
+        <if test="data.projectId != null and data.projectId != ''">
+            AND pa.project_id = #{data.projectId}
+        </if>
+        <if test="data.accountTypeCode != null and data.accountTypeCode != ''">
+            AND pa.account_type_code = #{data.accountTypeCode}
+        </if>
+        order by pa.create_time desc
+    </select>
+</mapper>

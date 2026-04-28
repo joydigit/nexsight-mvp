@@ -4,15 +4,13 @@ import { useMessage } from "/@/hooks/web/useMessage";
 const { createConfirm } = useMessage();
 
 enum Api {
-  list = '/elderConsulting/list',
-  save='/elderConsulting/add',
-  edit='/elderConsulting/edit',
-  deleteOne = '/elderConsulting/delete',
-  deleteBatch = '/elderConsulting/deleteBatch',
-  importExcel = '/elderConsulting/importExcel',
-  exportXls = '/elderConsulting/exportXls',
-  getElderConsultingAllList = '/elderConsulting/getElderConsultingAllList',
-  queryById = '/elderConsulting/queryById'
+  list = '/com/joydigit/seniorcaring/mvp/elderRoomReserve/list',
+  save='/com/joydigit/seniorcaring/mvp/elderRoomReserve/add',
+  edit='/com/joydigit/seniorcaring/mvp/elderRoomReserve/edit',
+  deleteOne = '/com/joydigit/seniorcaring/mvp/elderRoomReserve/delete',
+  deleteBatch = '/com/joydigit/seniorcaring/mvp/elderRoomReserve/deleteBatch',
+  importExcel = '/com/joydigit/seniorcaring/mvp/elderRoomReserve/importExcel',
+  exportXls = '/com/joydigit/seniorcaring/mvp/elderRoomReserve/exportXls',
 }
 
 /**
@@ -31,15 +29,6 @@ export const getImportUrl = Api.importExcel;
  * @param params
  */
 export const list = (params) => defHttp.get({ url: Api.list, params });
-
-/**
- * 列表接口
- * @param params
- */
-export const getElderConsultingAllListMethod = (params) => defHttp.get({ url: Api.getElderConsultingAllList, params });
-
-
-export const queryByIdMethod = (params) => defHttp.get({ url: Api.queryById, params });
 
 /**
  * 删除单个

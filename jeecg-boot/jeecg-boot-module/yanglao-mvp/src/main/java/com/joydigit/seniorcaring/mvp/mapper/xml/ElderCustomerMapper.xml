@@ -2,4 +2,43 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.joydigit.seniorcaring.mvp.mapper.ElderCustomerMapper">
 
+    <select id="pageList" resultType="com.joydigit.seniorcaring.mvp.entity.ElderCustomer">
+        SELECT
+            c.*,
+            p.project_name
+        FROM
+            elder_customer c
+            LEFT JOIN elder_project p ON p.id = c.project_id
+        WHERE
+            c.del_flag = 0
+            <if test="data.projectIds != null and data.projectIds.size() > 0">
+                AND  c.project_id IN (
+                <foreach item="id" collection="data.projectIds" separator=",">
+                    #{id}
+                </foreach>
+                )
+            </if>
+            <if test="data.projectId != null and data.projectId != ''">
+                AND c.project_id = #{data.projectId}
+            </if>
+            <if test="data.name != null and data.name != ''">
+                AND c.`name` LIKE concat(concat('%',#{data.name}),'%')
+            </if>
+            <if test="data.phone != null and data.phone != ''">
+                AND c.phone LIKE concat(concat('%',#{data.phone}),'%')
+            </if>
+            <if test="data.reserveStatus != null and data.reserveStatus != ''">
+                AND c.id IN ( SELECT DISTINCT r.customer_id FROM elder_room_reserve r WHERE r.`status` = #{data.reserveStatus} )
+            </if>
+            <if test="data.checkinStatus != null and data.checkinStatus != ''">
+                AND c.id IN (
+                SELECT DISTINCT
+                cc.customer_id
+                FROM
+                elder_customer_checkin cc
+                WHERE
+                cc.`status` = #{data.checkinStatus})
+            </if>
+        ORDER BY c.create_time DESC
+    </select>
 </mapper>

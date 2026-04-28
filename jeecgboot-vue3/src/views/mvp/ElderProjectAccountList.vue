@@ -6,7 +6,7 @@
         <a-row :gutter="24">
           <a-col :lg="6">
             <a-form-item name="projectId">
-              <template #label><span title="所属项目">所属项目</span></template>
+              <template #label><span title="项目id">项目</span></template>
               <a-select
                   v-model:value="queryParam.projectId"
                   :options="projectList"
@@ -17,27 +17,9 @@
             </a-form-item>
           </a-col>
           <a-col :lg="6">
-            <a-form-item name="name">
-              <template #label><span title="姓名">姓名</span></template>
-              <a-input placeholder="请输入姓名" v-model:value="queryParam.name" allow-clear ></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :lg="6">
-            <a-form-item name="phone">
-              <template #label><span title="联系电话">联系电话</span></template>
-              <a-input placeholder="请输入联系电话" v-model:value="queryParam.phone" allow-clear ></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :lg="6">
-            <a-form-item name="checkinStatus">
-              <template #label><span title="入住状态">入住状态</span></template>
-              <JDictSelectTag type="select" v-model:value="queryParam.checkinStatus" dictCode="checkin_status" placeholder="请选择入住状态" />
-            </a-form-item>
-          </a-col>
-          <a-col :lg="6">
-            <a-form-item name="reserveStatus">
-              <template #label><span title="预定状态">预定状态</span></template>
-              <JDictSelectTag type="select" v-model:value="queryParam.reserveStatus" dictCode="reserve_status" placeholder="请选择预定状态" />
+            <a-form-item name="accountTypeCode">
+              <template #label><span title="账户类型">账户类型</span></template>
+              <j-dict-select-tag v-model:value="queryParam.accountTypeCode" dictCode="account_type" placeholder="请选择账户类型"  allow-clear />
             </a-form-item>
           </a-col>
           <a-col :xl="6" :lg="7" :md="8" :sm="24">
@@ -55,7 +37,7 @@
     <BasicTable @register="registerTable" :rowSelection="rowSelection">
       <!--插槽:table标题-->
       <template #tableTitle>
-        <a-button type="primary" v-auth="'elder_customer:add'"  @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
+        <a-button type="primary" v-auth="'elder_project_account:add'"  @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
         <a-dropdown v-if="selectedRowKeys.length > 0">
           <template #overlay>
             <a-menu>
@@ -65,10 +47,10 @@
               </a-menu-item>
             </a-menu>
           </template>
-          <a-button v-auth="'elder_customer:deleteBatch'">批量操作
+          <a-button v-auth="'elder_project_account:deleteBatch'">批量操作
             <Icon icon="mdi:chevron-down"></Icon>
           </a-button>
-        </a-dropdown>
+        </a-dropdown>        
       </template>
       <!--操作栏-->
       <template #action="{ record }">
@@ -78,23 +60,23 @@
       </template>
     </BasicTable>
     <!-- 表单区域 -->
-    <ElderCustomerModal ref="registerModal" @success="handleSuccess"></ElderCustomerModal>
+    <ElderProjectAccountModal ref="registerModal" @success="handleSuccess"></ElderProjectAccountModal>
   </div>
 </template>
 
-<script lang="ts" name="com.joydigit.seniorcaring.mvp-elderCustomer" setup>
+<script lang="ts" name="com.joydigit.seniorcaring.mvp-elderProjectAccount" setup>
   import { ref, reactive, onMounted } from 'vue';
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { useListPage } from '/@/hooks/system/useListPage';
-  import { columns, superQuerySchema } from './ElderCustomer.data';
-  import { list, deleteOne, batchDelete, getImportUrl, getExportUrl } from './ElderCustomer.api';
+  import { columns, superQuerySchema } from './ElderProjectAccount.data';
+  import { list, deleteOne, batchDelete, getImportUrl, getExportUrl } from './ElderProjectAccount.api';
   import { downloadFile } from '/@/utils/common/renderUtils';
-  import ElderCustomerModal from './components/ElderCustomerModal.vue'
+  import ElderProjectAccountModal from './components/ElderProjectAccountModal.vue'
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
   import {useModal} from '/@/components/Modal';
-  import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
   import { getDateByPicker } from '/@/utils';
+  import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
   import { getProjectListAllM } from './ElderProject.api'; 
   const projectList = ref([]);
   const fieldPickers = reactive({
@@ -112,7 +94,7 @@
   //注册table数据
   const { prefixCls, tableContext, onExportXls, onImportXls } = useListPage({
     tableProps: {
-      title: 'elder_customer',
+      title: '项目账户配置',
       api: list,
       columns,
       canResize:true,
@@ -132,7 +114,7 @@
       },
     },
     exportConfig: {
-      name: "elder_customer",
+      name: "项目账户配置",
       url: getExportUrl,
       params: queryParam,
     },
@@ -219,7 +201,7 @@
       {
         label: '编辑',
         onClick: handleEdit.bind(null, record),
-        auth: 'elder_customer:edit'
+        auth: 'elder_project_account:edit'
       },
     ];
   }
@@ -239,7 +221,7 @@
           confirm: handleDelete.bind(null, record),
           placement: 'topLeft',
         },
-        auth: 'elder_customer:delete'
+        auth: 'elder_project_account:delete'
       }
     ]
   }

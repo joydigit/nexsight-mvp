@@ -68,15 +68,8 @@ public class ElderCustomerController extends JeecgController<ElderCustomer, IEld
 								   @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
-
-
-        // 自定义查询规则
-        Map<String, QueryRuleEnum> customeRuleMap = new HashMap<>();
-        // 自定义多选的查询规则为：LIKE_WITH_OR
-        customeRuleMap.put("projectId", QueryRuleEnum.LIKE_WITH_OR);
-        QueryWrapper<ElderCustomer> queryWrapper = QueryGenerator.initQueryWrapper(elderCustomer, req.getParameterMap(),customeRuleMap);
 		Page<ElderCustomer> page = new Page<ElderCustomer>(pageNo, pageSize);
-		IPage<ElderCustomer> pageList = elderCustomerService.page(page, queryWrapper);
+		IPage<ElderCustomer> pageList = elderCustomerService.pageList(page, elderCustomer);
 		return Result.OK(pageList);
 	}
 	
@@ -91,9 +84,7 @@ public class ElderCustomerController extends JeecgController<ElderCustomer, IEld
 	@RequiresPermissions("elder_customer:add")
 	@PostMapping(value = "/add")
 	public Result<String> add(@RequestBody ElderCustomer elderCustomer) {
-		elderCustomerService.save(elderCustomer);
-
-		return Result.OK("添加成功！");
+		return elderCustomerService.saveInfo(elderCustomer);
 	}
 	
 	/**
@@ -107,8 +98,7 @@ public class ElderCustomerController extends JeecgController<ElderCustomer, IEld
 	@RequiresPermissions("elder_customer:edit")
 	@RequestMapping(value = "/edit", method = {RequestMethod.PUT,RequestMethod.POST})
 	public Result<String> edit(@RequestBody ElderCustomer elderCustomer) {
-		elderCustomerService.updateById(elderCustomer);
-		return Result.OK("编辑成功!");
+		return elderCustomerService.updateInfo(elderCustomer);
 	}
 	
 	/**

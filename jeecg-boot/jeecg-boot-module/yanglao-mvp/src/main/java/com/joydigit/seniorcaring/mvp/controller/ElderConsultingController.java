@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+
+import com.joydigit.seniorcaring.mvp.vo.ElderConsultingVo;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.shiro.SecurityUtils;
@@ -73,7 +75,16 @@ public class ElderConsultingController extends JeecgController<ElderConsulting, 
 		IPage<ElderConsulting> pageList = elderConsultingService.pageList(page, elderConsulting);
 		return Result.OK(pageList);
 	}
-	
+
+	 /**
+	  *
+	  * @param projectId
+	  * @return
+	  */
+	 @GetMapping("/getElderConsultingAllList")
+	public Result<List<ElderConsultingVo>> getElderConsultingAllList(@RequestParam String projectId){
+		 return Result.OK(elderConsultingService.getElderConsultingAllList(projectId));
+	}
 	/**
 	 *   添加
 	 *

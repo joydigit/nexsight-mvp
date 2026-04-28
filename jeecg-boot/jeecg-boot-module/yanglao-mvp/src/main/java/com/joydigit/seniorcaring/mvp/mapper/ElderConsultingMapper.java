@@ -5,6 +5,7 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.joydigit.seniorcaring.mvp.vo.ElderConsultingVo;
 import org.apache.ibatis.annotations.Param;
 import com.joydigit.seniorcaring.mvp.entity.ElderConsulting;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -19,4 +20,6 @@ public interface ElderConsultingMapper extends BaseMapper<ElderConsulting> {
 
     IPage<ElderConsulting> pageList(Page<ElderConsulting> page, @Param("elderConsulting") ElderConsulting elderConsulting);
     List<ElderConsulting> getList(@Param("elderConsulting") ElderConsulting elderConsulting,@Param("selectionList") List<String> selectionList);
+
+    List<ElderConsultingVo> getElderConsultingAllList(@Param("projectId") String projectId);
 }

@@ -4,9 +4,10 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.math.BigDecimal;
-import java.util.List;
-
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import org.jeecg.common.constant.ProvinceCityArea;
 import org.jeecg.common.util.SpringContextUtils;
 import lombok.Data;
@@ -19,61 +20,51 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 /**
- * @Description: elder_customer
+ * @Description: 房间预定
  * @Author: jeecg-boot
- * @Date:   2026-04-17
+ * @Date:   2026-04-28
  * @Version: V1.0
  */
 @Data
-@TableName("elder_customer")
+@TableName("elder_room_reserve")
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
-@Schema(description="elder_customer")
-public class ElderCustomer implements Serializable {
+@Schema(description="房间预定")
+public class ElderRoomReserve implements Serializable {
     private static final long serialVersionUID = 1L;
 
-	/**主键*/
+	/**id*/
 	@TableId(type = IdType.ASSIGN_ID)
-    @Schema(description = "主键")
+    @Schema(description = "id")
     private String id;
+	/**客户id*/
+	@Excel(name = "客户id", width = 15)
+    @Schema(description = "客户id")
+    private String customerId;
+	/**咨询接待id*/
+	@Excel(name = "咨询接待id", width = 15)
+    @Schema(description = "咨询接待id")
+    private String consultingId;
+	/**房间id*/
+	@Excel(name = "房间id", width = 15)
+    @Schema(description = "房间id")
+    private String roomId;
+	/**床位id*/
+	@Excel(name = "床位id", width = 15)
+    @Schema(description = "床位id")
+    private String bedId;
+	/**状态 1 预定 2 取消预定*/
+	@Excel(name = "状态 1 预定 2 取消预定", width = 15)
+    @Schema(description = "状态 1 预定 2 取消预定")
+    private String status;
 	/**租户ID*/
 	@Excel(name = "租户ID", width = 15)
     @Schema(description = "租户ID")
     private Integer tenantId;
-	/**所属项目ID*/
-	@Excel(name = "所属项目ID", width = 15)
-    @Schema(description = "所属项目ID")
+	/**项目ID*/
+	@Excel(name = "项目ID", width = 15)
+    @Schema(description = "项目ID")
     private String projectId;
-	/**姓名*/
-	@Excel(name = "姓名", width = 15)
-    @Schema(description = "姓名")
-    private String name;
-	/**性别：0-女，1-男，2-未知*/
-	@Excel(name = "性别：0-女，1-男，2-未知", width = 15)
-    @Schema(description = "性别：0-女，1-男，2-未知")
-    private String gender;
-	/**身份证号*/
-	@Excel(name = "身份证号", width = 15)
-    @Schema(description = "身份证号")
-    private String idCard;
-	/**证件类型*/
-	@Excel(name = "证件类型", width = 15)
-    @Schema(description = "证件类型")
-    private String idCardType;
-	/**地址*/
-	@Excel(name = "地址", width = 15)
-    @Schema(description = "地址")
-    private String address;
-	/**联系电话*/
-	@Excel(name = "联系电话", width = 15)
-    @Schema(description = "联系电话")
-    private String phone;
-	/**出生日期*/
-	@Excel(name = "出生日期", width = 15, format = "yyyy-MM-dd")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
-    @DateTimeFormat(pattern="yyyy-MM-dd")
-    @Schema(description = "出生日期")
-    private Date birthDate;
 	/**备注*/
 	@Excel(name = "备注", width = 15)
     @Schema(description = "备注")
@@ -99,18 +90,4 @@ public class ElderCustomer implements Serializable {
     @Schema(description = "删除状态：0正常，1已删除")
     @TableLogic
     private Integer delFlag;
-    /**
-     * 项目名称
-     */
-    @TableField(exist = false)
-    private String projectName;
-
-    @TableField(exist = false)
-    private List<String> projectIds;
-    // 入住状态
-    @TableField(exist = false)
-    private String checkinStatus;
-    // 预定状态
-    @TableField(exist = false)
-    private String reserveStatus;
 }

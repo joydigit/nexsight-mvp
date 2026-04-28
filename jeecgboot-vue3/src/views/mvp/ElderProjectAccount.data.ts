@@ -6,44 +6,31 @@ import { getWeekMonthQuarterYear } from '/@/utils';
 //列表数据
 export const columns: BasicColumn[] = [
   {
-    title: '所属项目',
+    title: '项目',
     align: "center",
     dataIndex: 'projectName'
   },
   {
-    title: '姓名',
+    title: '账户类型',
     align: "center",
-    dataIndex: 'name'
-  },
-  {
-    title: '性别',
-    align: "center",
-    dataIndex: 'gender',
+    dataIndex: 'accountTypeCode',
     customRender: ({ text }) => {
-      return render.renderDict(text, 'gender_type');
+      return render.renderDict(text, 'account_type');
     },
   },
   {
-    title: '证件类型',
+    title: '状态',
     align: "center",
-    dataIndex: 'idCardType',
+    dataIndex: 'status',
     customRender: ({ text }) => {
-      return render.renderDict(text, 'id_card_type');
+      return render.renderDict(text, 'fee_status');
     },
-  }, 
-  {
-    title: '身份证号',
-    align: "center",
-    dataIndex: 'idCard'
   },
-  {
-    title: '联系电话',
-    align: "center",
-    dataIndex: 'phone'
-  },  
 ];
 
 // 高级查询数据
 export const superQuerySchema = {
- 
+  projectId: {title: '项目id',order: 0,view: 'list', type: 'string',dictCode: '',},
+  accountTypeCode: {title: '账户类型',order: 1,view: 'list', type: 'string',dictCode: '',},
+  tenantId: {title: '租户ID',order: 3,view: 'number', type: 'number',},
 };

@@ -8,6 +8,7 @@ import com.joydigit.seniorcaring.mvp.entity.ElderConsulting;
 import com.joydigit.seniorcaring.mvp.mapper.ElderConsultingMapper;
 import com.joydigit.seniorcaring.mvp.service.IElderConsultingService;
 import com.joydigit.seniorcaring.mvp.service.IElderProjectService;
+import com.joydigit.seniorcaring.mvp.vo.ElderConsultingVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,5 +47,11 @@ public class ElderConsultingServiceImpl extends ServiceImpl<ElderConsultingMappe
             return new ArrayList<>();
         }
         return this.baseMapper.getList(elderConsulting,selectionList);
+    }
+
+    @Override
+    public List<ElderConsultingVo> getElderConsultingAllList(String projectId) {
+
+        return this.baseMapper.getElderConsultingAllList(projectId);
     }
 }
