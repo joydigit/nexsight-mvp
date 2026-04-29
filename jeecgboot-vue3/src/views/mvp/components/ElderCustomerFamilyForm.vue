@@ -3,40 +3,30 @@
     <JFormContainer :disabled="disabled">
       <template #detail>
         <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ElderCustomerFamilyForm">
-          <a-row>
-						<a-col :span="24">
-							<a-form-item label="租户ID" v-bind="validateInfos.tenantId" id="ElderCustomerFamilyForm-tenantId" name="tenantId">
-								<a-input v-model:value="formData.tenantId" placeholder="请输入租户ID"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="所属项目ID" v-bind="validateInfos.projectId" id="ElderCustomerFamilyForm-projectId" name="projectId">
-								<a-input v-model:value="formData.projectId" placeholder="请输入所属项目ID"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="客户id" v-bind="validateInfos.customerId" id="ElderCustomerFamilyForm-customerId" name="customerId">
-								<a-input v-model:value="formData.customerId" placeholder="请输入客户id"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
+          <a-row>						
 						<a-col :span="24">
 							<a-form-item label="姓名" v-bind="validateInfos.name" id="ElderCustomerFamilyForm-name" name="name">
 								<a-input v-model:value="formData.name" placeholder="请输入姓名"  allow-clear ></a-input>
 							</a-form-item>
 						</a-col>
-						<a-col :span="24">
-							<a-form-item label="性别：0-女，1-男，2-未知" v-bind="validateInfos.gender" id="ElderCustomerFamilyForm-gender" name="gender">
-								<a-input v-model:value="formData.gender" placeholder="请输入性别：0-女，1-男，2-未知"  allow-clear ></a-input>
+            <a-col :span="24">
+							<a-form-item label="亲属类型" v-bind="validateInfos.kinshipType" id="ElderCustomerFamilyForm-kinshipType" name="kinshipType">
+								<JDictSelectTag type="select" v-model:value="formData.kinshipType" dictCode="kinship_type" placeholder="请选择性别" />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="身份证号" v-bind="validateInfos.idCard" id="ElderCustomerFamilyForm-idCard" name="idCard">
-								<a-input v-model:value="formData.idCard" placeholder="请输入身份证号"  allow-clear ></a-input>
+							<a-form-item label="性别" v-bind="validateInfos.gender" id="ElderCustomerFamilyForm-gender" name="gender">
+								<JDictSelectTag type="select" v-model:value="formData.gender" dictCode="gender_type" placeholder="请选择性别" />
 							</a-form-item>
 						</a-col>
-						<a-col :span="24">
+            <a-col :span="24">
 							<a-form-item label="证件类型" v-bind="validateInfos.idCardType" id="ElderCustomerFamilyForm-idCardType" name="idCardType">
-								<a-input v-model:value="formData.idCardType" placeholder="请输入证件类型"  allow-clear ></a-input>
+								<JDictSelectTag type="select" v-model:value="formData.idCardType" dictCode="id_card_type" placeholder="请选择证件类型" />
+							</a-form-item>
+						</a-col>
+						<a-col :span="24">
+							<a-form-item label="证件号" v-bind="validateInfos.idCard" id="ElderCustomerFamilyForm-idCard" name="idCard">
+								<a-input v-model:value="formData.idCard" placeholder="请输入证件号"  allow-clear ></a-input>
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
@@ -46,7 +36,7 @@
 						</a-col>
 						<a-col :span="24">
 							<a-form-item label="备注" v-bind="validateInfos.remark" id="ElderCustomerFamilyForm-remark" name="remark">
-								<a-input v-model:value="formData.remark" placeholder="请输入备注"  allow-clear ></a-input>
+								<a-textarea v-model:value="formData.remark" placeholder="请输入备注"  allow-clear ></a-textarea>
 							</a-form-item>
 						</a-col>
           </a-row>
@@ -62,8 +52,11 @@
   import { useMessage } from '/@/hooks/web/useMessage';
   import { getDateByPicker, getValueType } from '/@/utils';
   import { saveOrUpdate } from '../ElderCustomerFamily.api';
+  import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
   import { Form } from 'ant-design-vue';
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
+  import { useRoute } from 'vue-router';
+  const route = useRoute();
   const props = defineProps({
     formDisabled: { type: Boolean, default: false },
     formData: { type: Object, default: () => ({})},
@@ -76,11 +69,12 @@
     id: '',
     tenantId: '',   
     projectId: '',   
-    customerId: '',   
+    customerId: route.query.id,   
     name: '',   
-    gender: '',   
+    kinshipType: undefined,
+    gender: undefined,   
     idCard: '',   
-    idCardType: '',   
+    idCardType: undefined,   
     phone: '',   
     remark: '',   
     delFlag: undefined,
@@ -91,10 +85,10 @@
   const confirmLoading = ref<boolean>(false);
   //表单验证
   const validatorRules = reactive({
-    tenantId: [{ required: true, message: '请输入租户ID!'},],
-    projectId: [{ required: true, message: '请输入所属项目ID!'},],
-    customerId: [{ required: true, message: '请输入客户id!'},],
+    kinshipType: [{ required: true, message: '请选择亲属类型!'},],
     name: [{ required: true, message: '请输入姓名!'},],
+    phone: [{ required: true, message: '请输入手机号!'},],
+    gender: [{ required: true, message: '请选择性别!'},],
   });
   const { resetFields, validate, validateInfos } = useForm(formData, validatorRules, { immediate: false });
   //日期个性化选择

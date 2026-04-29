@@ -48,9 +48,10 @@
   import ElderCustomerFamilyModal from './components/ElderCustomerFamilyModal.vue'
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
-   import {useModal} from '/@/components/Modal';
+  import {useModal} from '/@/components/Modal';
   import { getDateByPicker } from '/@/utils';
-
+  import { useRoute } from 'vue-router';
+  const route = useRoute();
   const fieldPickers = reactive({
   });
 
@@ -79,6 +80,8 @@
             queryParam[key] = getDateByPicker(queryParam[key], fieldPickers[key]);
           }
         }
+        console.log(route.query.id)
+        queryParam.customerId = route.query.id;
         return Object.assign(params, queryParam);
       },
     },
@@ -199,6 +202,7 @@
    * 查询
    */
   function searchQuery() {
+    queryParam.customerId = route.query.id;
     reload();
   }
   

@@ -6,19 +6,9 @@ import { getWeekMonthQuarterYear } from '/@/utils';
 //列表数据
 export const columns: BasicColumn[] = [
   {
-    title: '租户ID',
+    title: '客户名称',
     align: "center",
-    dataIndex: 'tenantId'
-  },
-  {
-    title: '所属项目ID',
-    align: "center",
-    dataIndex: 'projectId'
-  },
-  {
-    title: '客户id',
-    align: "center",
-    dataIndex: 'customerId'
+    dataIndex: 'customerName'
   },
   {
     title: '姓名',
@@ -26,24 +16,19 @@ export const columns: BasicColumn[] = [
     dataIndex: 'name'
   },
   {
-    title: '性别：0-女，1-男，2-未知',
+    title: '性别',
     align: "center",
     dataIndex: 'gender'
-  },
-  {
-    title: '身份证号',
-    align: "center",
-    dataIndex: 'idCard'
-  },
-  {
-    title: '证件类型',
-    align: "center",
-    dataIndex: 'idCardType'
-  },
+  },  
   {
     title: '联系电话',
     align: "center",
     dataIndex: 'phone'
+  },
+  {
+    title: '亲属类型',
+    align: "center",
+    dataIndex: 'kinshipType'
   },
   {
     title: '备注',
