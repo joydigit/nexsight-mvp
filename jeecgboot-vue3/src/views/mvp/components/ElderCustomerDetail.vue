@@ -65,7 +65,7 @@
     </div>
 
     <!-- Tab 内容区 -->
-    <a-tabs v-model:activeKey="activeTab" class="detail-tabs" type="card">
+    <a-tabs v-model:activeKey="activeTab" class="detail-tabs" type="card" destroyInactiveTabPane>
       <a-tab-pane key="family" tab="家属列表">
         <div class="tab-content">
           <ElderCustomerFamilyList/>
@@ -167,7 +167,7 @@ import ElderAssessmentList from './../ElderAssessmentList.vue';
 import ElderCustomerFamilyList from './../ElderCustomerFamilyList.vue';
 
 const route = useRoute()
-const activeTab = ref('checkin');
+const activeTab = ref('family');
 // 客户基本信息
 const customerInfo = ref({});
 onMounted(async () => {

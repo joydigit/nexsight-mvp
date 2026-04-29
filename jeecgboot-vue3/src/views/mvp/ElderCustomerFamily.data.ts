@@ -6,11 +6,6 @@ import { getWeekMonthQuarterYear } from '/@/utils';
 //列表数据
 export const columns: BasicColumn[] = [
   {
-    title: '客户名称',
-    align: "center",
-    dataIndex: 'customerName'
-  },
-  {
     title: '姓名',
     align: "center",
     dataIndex: 'name'
@@ -18,7 +13,10 @@ export const columns: BasicColumn[] = [
   {
     title: '性别',
     align: "center",
-    dataIndex: 'gender'
+    dataIndex: 'gender',
+    customRender: ({ record }) => {
+      return render.renderDict(record.gender, 'gender_type');
+    },
   },  
   {
     title: '联系电话',
@@ -28,7 +26,10 @@ export const columns: BasicColumn[] = [
   {
     title: '亲属类型',
     align: "center",
-    dataIndex: 'kinshipType'
+    dataIndex: 'kinshipType',
+    customRender: ({ text }) => {
+      return render.renderDict(text, 'kinship_type');
+    },
   },
   {
     title: '备注',
