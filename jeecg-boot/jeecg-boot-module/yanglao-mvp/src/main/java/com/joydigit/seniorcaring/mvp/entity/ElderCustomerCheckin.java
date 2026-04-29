@@ -4,10 +4,9 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.math.BigDecimal;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.TableLogic;
+import java.util.List;
+
+import com.baomidou.mybatisplus.annotation.*;
 import org.jeecg.common.constant.ProvinceCityArea;
 import org.jeecg.common.util.SpringContextUtils;
 import lombok.Data;
@@ -71,6 +70,15 @@ public class ElderCustomerCheckin implements Serializable {
 	@Excel(name = "合同号", width = 15)
     @Schema(description = "合同号")
     private String contractNo;
+    @Excel(name = "护理等级", width = 15)
+    @Schema(description = "护理等级")
+    private String nursingLevel;
+    @Excel(name = "床位id", width = 15)
+    @Schema(description = "床位id")
+    private String bedId;
+    @Excel(name = "房间id", width = 15)
+    @Schema(description = "房间id")
+    private String roomId;
 	/**实际退住时间*/
 	@Excel(name = "实际退住时间", width = 20, format = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
@@ -95,6 +103,7 @@ public class ElderCustomerCheckin implements Serializable {
 	@Excel(name = "客户id", width = 15)
     @Schema(description = "客户id")
     private String customerId;
+
 	/**创建人*/
     @Schema(description = "创建人")
     private String createBy;
@@ -116,4 +125,31 @@ public class ElderCustomerCheckin implements Serializable {
     @Schema(description = "删除状态：0正常，1已删除")
     @TableLogic
     private Integer delFlag;
+
+    /**
+     * 项目名称
+     */
+    @TableField(exist = false)
+    private String projectName;
+
+    @TableField(exist = false)
+    private String buildingName;
+
+    @TableField(exist = false)
+    private String floorName;
+    @TableField(exist = false)
+    private String buildingId;
+
+    @TableField(exist = false)
+    private String floorId;
+
+    @TableField(exist = false)
+    private String roomNo;
+
+    @TableField(exist = false)
+    private String bedNo;
+
+    @TableField(exist = false)
+    private List<String> projectIds;
+
 }

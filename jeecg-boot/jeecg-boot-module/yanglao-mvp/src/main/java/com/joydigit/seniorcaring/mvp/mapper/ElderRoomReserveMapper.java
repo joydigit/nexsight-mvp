@@ -2,6 +2,7 @@ package com.joydigit.seniorcaring.mvp.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.joydigit.seniorcaring.mvp.entity.ElderRoomReserve;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * @Description: 房间预定
@@ -11,4 +12,5 @@ import com.joydigit.seniorcaring.mvp.entity.ElderRoomReserve;
  */
 public interface ElderRoomReserveMapper extends BaseMapper<ElderRoomReserve> {
 
+    ElderRoomReserve getRoomReserveByCustomerId(@Param("customerId") String customerId);
 }

@@ -14,4 +14,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface ElderCustomerCheckinMapper extends BaseMapper<ElderCustomerCheckin> {
 
+    ElderCustomerCheckin getLastInfoByCustomerId(@Param("customerId") String customerId);
 }

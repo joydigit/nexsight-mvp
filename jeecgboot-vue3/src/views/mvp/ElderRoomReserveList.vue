@@ -11,9 +11,7 @@
     <BasicTable @register="registerTable" :rowSelection="rowSelection">
       <!--插槽:table标题-->
       <template #tableTitle>
-        <a-button type="primary" v-auth="'com.joydigit.seniorcaring.mvp:elder_room_reserve:add'"  @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
-        <a-button  type="primary" v-auth="'com.joydigit.seniorcaring.mvp:elder_room_reserve:exportXls'" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
-        <j-upload-button  type="primary" v-auth="'com.joydigit.seniorcaring.mvp:elder_room_reserve:importExcel'"  preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button>
+        <a-button type="primary" v-auth="'elder_room_reserve:add'"  @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>       
         <a-dropdown v-if="selectedRowKeys.length > 0">
           <template #overlay>
             <a-menu>
@@ -23,12 +21,10 @@
               </a-menu-item>
             </a-menu>
           </template>
-          <a-button v-auth="'com.joydigit.seniorcaring.mvp:elder_room_reserve:deleteBatch'">批量操作
+          <a-button v-auth="'elder_room_reserve:deleteBatch'">批量操作
             <Icon icon="mdi:chevron-down"></Icon>
           </a-button>
-        </a-dropdown>
-        <!-- 高级查询 -->
-        <super-query :config="superQueryConfig" @search="handleSuperQuery" />
+        </a-dropdown>       
       </template>
       <!--操作栏-->
       <template #action="{ record }">
@@ -72,6 +68,7 @@
       columns,
       canResize:true,
       useSearchForm: false,
+      showTableSetting: false,
       actionColumn: {
         width: 120,
         fixed: 'right',
@@ -173,7 +170,7 @@
       {
         label: '编辑',
         onClick: handleEdit.bind(null, record),
-        auth: 'com.joydigit.seniorcaring.mvp:elder_room_reserve:edit'
+        auth: 'elder_room_reserve:edit'
       },
     ];
   }
@@ -193,7 +190,7 @@
           confirm: handleDelete.bind(null, record),
           placement: 'topLeft',
         },
-        auth: 'com.joydigit.seniorcaring.mvp:elder_room_reserve:delete'
+        auth: 'elder_room_reserve:delete'
       }
     ]
   }

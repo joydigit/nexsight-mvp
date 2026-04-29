@@ -5,15 +5,15 @@
       <a-form ref="formRef" @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol">
         <a-row :gutter="24">
           <a-col :lg="6">
-            <a-form-item name="customerId">
-              <template #label><span title="客户ID（逻辑外键）">客户ID</span></template>
-              <a-input placeholder="请输入客户ID（逻辑外键）" v-model:value="queryParam.customerId" allow-clear ></a-input>
+            <a-form-item name="customerName">
+              <template #label><span title="客户名称">客户名称</span></template>
+              <a-input placeholder="请输入客户名称" v-model:value="queryParam.customerName" allow-clear ></a-input>
             </a-form-item>
           </a-col>
           <a-col :lg="6">
             <a-form-item name="billMonth">
-              <template #label><span title="账单月份（yyyy-MM，如2026-04）">账单月份</span></template>
-              <a-input placeholder="请输入账单月份（yyyy-MM，如2026-04）" v-model:value="queryParam.billMonth" allow-clear ></a-input>
+              <template #label><span title="账单月份">账单月份</span></template>
+              <a-input placeholder="请输入账单月份" v-model:value="queryParam.billMonth" allow-clear ></a-input>
             </a-form-item>
           </a-col>
           <a-col :xl="6" :lg="7" :md="8" :sm="24">
@@ -36,8 +36,6 @@
       <!--插槽:table标题-->
       <template #tableTitle>
         <a-button type="primary" v-auth="'elder_bill:add'"  @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
-        <a-button  type="primary" v-auth="'elder_bill:exportXls'" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
-        <j-upload-button  type="primary" v-auth="'elder_bill:importExcel'"  preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button>
         <a-dropdown v-if="selectedRowKeys.length > 0">
           <template #overlay>
             <a-menu>
@@ -50,9 +48,7 @@
           <a-button v-auth="'elder_bill:deleteBatch'">批量操作
             <Icon icon="mdi:chevron-down"></Icon>
           </a-button>
-        </a-dropdown>
-        <!-- 高级查询 -->
-        <super-query :config="superQueryConfig" @search="handleSuperQuery" />
+        </a-dropdown>      
       </template>
       <!--操作栏-->
       <template #action="{ record }">
@@ -96,6 +92,7 @@
       columns,
       canResize:true,
       useSearchForm: false,
+      showTableSetting: false,
       actionColumn: {
         width: 120,
         fixed: 'right',
@@ -197,7 +194,7 @@
       {
         label: '编辑',
         onClick: handleEdit.bind(null, record),
-        auth: 'com.joydigit.seniorcaring.mvp:elder_bill:edit'
+        auth: 'elder_bill:edit'
       },
     ];
   }
@@ -217,7 +214,7 @@
           confirm: handleDelete.bind(null, record),
           placement: 'topLeft',
         },
-        auth: 'com.joydigit.seniorcaring.mvp:elder_bill:delete'
+        auth: 'elder_bill:delete'
       }
     ]
   }

@@ -55,8 +55,8 @@
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="变更原因（如"家属要求换向阳房间"）" v-bind="validateInfos.reason" id="ElderResidenceHistoryForm-reason" name="reason">
-								<a-input v-model:value="formData.reason" placeholder="请输入变更原因（如"家属要求换向阳房间"）"  allow-clear ></a-input>
+							<a-form-item label="变更原因" v-bind="validateInfos.reason" id="ElderResidenceHistoryForm-reason" name="reason">
+								<a-input v-model:value="formData.reason" placeholder="请输入变更原因"  allow-clear ></a-input>
 							</a-form-item>
 						</a-col>
           </a-row>

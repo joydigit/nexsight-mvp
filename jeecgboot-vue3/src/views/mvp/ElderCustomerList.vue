@@ -96,10 +96,11 @@
   import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
   import { getDateByPicker } from '/@/utils';
   import { getProjectListAllM } from './ElderProject.api'; 
+  import { useRouter } from 'vue-router';
   const projectList = ref([]);
   const fieldPickers = reactive({
   });
-
+  const router = useRouter();
   const formRef = ref();
   const queryParam = reactive<any>({});
   const toggleSearchStatus = ref<boolean>(false);
@@ -186,8 +187,7 @@
    * 详情
    */
   function handleDetail(record: Recordable) {
-    registerModal.value.disableSubmit = true;
-    registerModal.value.edit(record);
+    router.push({ path: '/customer/detail', query: {id: record.id} });
   }
    
   /**

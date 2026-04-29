@@ -60,8 +60,8 @@
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="异常情况描述（如"老人拒食"、"皮肤红肿"）" v-bind="validateInfos.abnormalDesc" id="ElderNursingRecordForm-abnormalDesc" name="abnormalDesc">
-								<a-input v-model:value="formData.abnormalDesc" placeholder="请输入异常情况描述（如"老人拒食"、"皮肤红肿"）"  allow-clear ></a-input>
+							<a-form-item label="异常情况描述" v-bind="validateInfos.abnormalDesc" id="ElderNursingRecordForm-abnormalDesc" name="abnormalDesc">
+								<a-input v-model:value="formData.abnormalDesc" placeholder="请输入异常情况描述"  allow-clear ></a-input>
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">

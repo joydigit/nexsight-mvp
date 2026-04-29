@@ -5,14 +5,17 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.joydigit.seniorcaring.mvp.entity.ElderCustomer;
-import com.joydigit.seniorcaring.mvp.entity.ElderCustomerAccount;
-import com.joydigit.seniorcaring.mvp.entity.ElderProjectAccount;
+import com.joydigit.seniorcaring.mvp.entity.*;
+import com.joydigit.seniorcaring.mvp.mapper.ElderCustomerCheckinMapper;
 import com.joydigit.seniorcaring.mvp.mapper.ElderCustomerMapper;
+import com.joydigit.seniorcaring.mvp.mapper.ElderProjectMapper;
+import com.joydigit.seniorcaring.mvp.mapper.ElderRoomReserveMapper;
 import com.joydigit.seniorcaring.mvp.service.IElderCustomerAccountService;
 import com.joydigit.seniorcaring.mvp.service.IElderCustomerService;
 import com.joydigit.seniorcaring.mvp.service.IElderProjectAccountService;
+import com.joydigit.seniorcaring.mvp.vo.ElderCustomerVo;
 import org.jeecg.common.api.vo.Result;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -37,6 +41,12 @@ public class ElderCustomerServiceImpl extends ServiceImpl<ElderCustomerMapper, E
     private IElderProjectAccountService elderProjectAccountService;
     @Autowired
     private IElderCustomerAccountService elderCustomerAccountService;
+    @Autowired
+    private ElderCustomerCheckinMapper elderCustomerCheckinMapper;
+    @Autowired
+    private ElderRoomReserveMapper elderRoomReserveMapper;
+    @Autowired
+    private ElderProjectMapper elderProjectMapper;
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Result<String> saveInfo(ElderCustomer elderCustomer) {
@@ -111,5 +121,49 @@ public class ElderCustomerServiceImpl extends ServiceImpl<ElderCustomerMapper, E
     @Override
     public IPage<ElderCustomer> pageList(Page<ElderCustomer> page, ElderCustomer elderCustomer) {
         return this.baseMapper.pageList(page,elderCustomer);
+    }
+
+    @Override
+    public Result<ElderCustomerVo> getCustomerLastInfo(String id) {
+        ElderCustomer customer = getById(id);
+        if (Objects.isNull(customer)){
+            return Result.OK();
+        }
+        ElderCustomerVo vo = new ElderCustomerVo();
+        BeanUtils.copyProperties(customer,vo);
+        ElderProject elderProject = elderProjectMapper.selectById(customer.getProjectId());
+        if (Objects.nonNull(elderProject)){
+            vo.setProjectName(elderProject.getProjectName());
+        }
+        // 查询最新的入住记录
+        ElderCustomerCheckin checkin = elderCustomerCheckinMapper.getLastInfoByCustomerId(id);
+        if (Objects.nonNull(checkin) && checkin.getStatus().equals("1")){
+            vo.setBedId(checkin.getBedId());
+            vo.setBedNo(checkin.getBedNo());
+            vo.setRoomId(checkin.getRoomId());
+            vo.setRoomNo(checkin.getRoomNo());
+            vo.setFloorId(checkin.getFloorId());
+            vo.setFloorName(checkin.getFloorName());
+            vo.setBuildingId(checkin.getBuildingId());
+            vo.setBuildingName(checkin.getBuildingName());
+            vo.setCheckinStatus(checkin.getStatus());
+        } else {
+            // 查询最新的预定记录
+            ElderRoomReserve reserve = elderRoomReserveMapper.getRoomReserveByCustomerId(id);
+            if (Objects.nonNull(reserve) && reserve.getStatus().equals("1")
+                    &&( Objects.isNull (checkin) ||
+                    (Objects.nonNull(checkin.getCreateTime())&&checkin.getCreateTime().before(reserve.getCreateTime())))){
+                vo.setBedId(reserve.getBedId());
+                vo.setBedNo(reserve.getBedNo());
+                vo.setRoomId(reserve.getRoomId());
+                vo.setRoomNo(reserve.getRoomNo());
+                vo.setFloorId(reserve.getFloorId());
+                vo.setFloorName(reserve.getFloorName());
+                vo.setBuildingId(reserve.getBuildingId());
+                vo.setBuildingName(reserve.getBuildingName());
+                vo.setReserveStatus(reserve.getStatus());
+            }
+        }
+        return Result.OK(vo);
     }
 }

@@ -40,8 +40,8 @@
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="评估结果描述（如"轻度依赖"）" v-bind="validateInfos.result" id="ElderAssessmentForm-result" name="result">
-								<a-input v-model:value="formData.result" placeholder="请输入评估结果描述（如"轻度依赖"）"  allow-clear ></a-input>
+							<a-form-item label="评估结果描述" v-bind="validateInfos.result" id="ElderAssessmentForm-result" name="result">
+								<a-input v-model:value="formData.result" placeholder="请输入评估结果描述"  allow-clear ></a-input>
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">

@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+
+import com.joydigit.seniorcaring.mvp.vo.ElderCustomerVo;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jeecg.common.api.vo.Result;
@@ -148,6 +150,18 @@ public class ElderCustomerController extends JeecgController<ElderCustomer, IEld
 		return Result.OK(elderCustomer);
 	}
 
+	 /**
+	  * 通过id查询
+	  *
+	  * @param id
+	  * @return
+	  */
+	 //@AutoLog(value = "elder_customer-通过id查询")
+	 @Operation(summary="查询客户最新状态信息")
+	 @GetMapping(value = "/getCustomerLastInfo")
+	 public Result<ElderCustomerVo> getCustomerLastInfo(@RequestParam(name="id",required=true) String id) {
+		 return elderCustomerService.getCustomerLastInfo(id);
+	 }
     /**
     * 导出excel
     *

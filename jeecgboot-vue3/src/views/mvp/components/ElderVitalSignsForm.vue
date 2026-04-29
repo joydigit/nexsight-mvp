@@ -60,8 +60,8 @@
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="备注（如"餐后2小时"）" v-bind="validateInfos.remark" id="ElderVitalSignsForm-remark" name="remark">
-								<a-input v-model:value="formData.remark" placeholder="请输入备注（如"餐后2小时"）"  allow-clear ></a-input>
+							<a-form-item label="备注" v-bind="validateInfos.remark" id="ElderVitalSignsForm-remark" name="remark">
+								<a-input v-model:value="formData.remark" placeholder="请输入备注"  allow-clear ></a-input>
 							</a-form-item>
 						</a-col>
           </a-row>
