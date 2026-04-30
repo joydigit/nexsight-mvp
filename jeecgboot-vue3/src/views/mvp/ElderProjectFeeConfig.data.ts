@@ -27,6 +27,14 @@ export const columns: BasicColumn[] = [
     },
   },
   {
+    title: '入住类型',
+    align: "center",
+    dataIndex: 'checkinType',
+    customRender: ({ text }) => {
+      return render.renderDict(text, 'checkin_type');
+    },
+  },
+  {
     title: '单价（元）',
     align: "center",
     dataIndex: 'price'

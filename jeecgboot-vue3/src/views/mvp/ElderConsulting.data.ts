@@ -10,6 +10,11 @@ import { filterMultiDictText } from '/@/utils/dict/JDictSelectUtil.js';
 //列表数据
 export const columns: BasicColumn[] = [
   {
+    title: '编码',
+    align: "center",
+    dataIndex: 'id'
+  },
+  {
     title: '所属项目',
     align: "center",
     dataIndex: 'projectName'

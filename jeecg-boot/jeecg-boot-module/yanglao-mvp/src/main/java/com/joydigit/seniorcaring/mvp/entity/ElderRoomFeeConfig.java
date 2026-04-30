@@ -52,6 +52,8 @@ public class ElderRoomFeeConfig implements Serializable {
 	@Excel(name = "费用项类型 1 房间 2 床位", width = 15)
     @Schema(description = "费用项类型 1 房间 2 床位")
     private String itemType;
+    @Schema(description = "入住类型 1长住 2短")
+    private String checkinType;
 	/**费用*/
 	@Excel(name = "费用", width = 15)
     @Schema(description = "费用")

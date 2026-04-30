@@ -49,6 +49,12 @@ public class ElderCustomerCheckinFee implements Serializable {
 	@Excel(name = "费用类型 1 床费 2 其它费用", width = 15)
     @Schema(description = "费用类型 1 床费 2 其它费用")
     private String feeType;
+    @Schema(description = "支付费用类型")
+    private String paymentTypeCode;
+    @Schema(description = "金额")
+    private BigDecimal amount;
+    @Schema(description = "单位")
+    private String unitCode;
 	/**入住id*/
 	@Excel(name = "入住id", width = 15)
     @Schema(description = "入住id")

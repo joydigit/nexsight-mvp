@@ -4,6 +4,44 @@
     <div class="jeecg-basic-table-form-container">
       <a-form ref="formRef" @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol">
         <a-row :gutter="24">
+          <a-col :lg="6">
+            <a-form-item name="roomNo">
+              <template #label><span title="房间号">房间号</span></template>
+              <a-input placeholder="请输入房间号" v-model:value="queryParam.roomNo" allow-clear ></a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :lg="6">
+              <a-form-item name="status">
+                <template #label><span title="状态">状态</span></template>
+                <JDictSelectTag type="select" v-model:value="queryParam.status" dictCode="checkin_status" placeholder="请选择状态" />
+              </a-form-item>
+            </a-col>
+          <template v-if="toggleSearchStatus">
+            <a-col :lg="6">
+              <a-form-item name="consultingId">
+                <template #label><span title="咨询接待">咨询接待</span></template>
+                <a-input placeholder="请输入咨询接待编码" v-model:value="queryParam.consultingId" allow-clear ></a-input>
+              </a-form-item>
+            </a-col>
+            <a-col :lg="6">
+              <a-form-item name="checkinTimeArr">
+                <template #label><span title="入住时间">入住时间</span></template>
+                <a-range-picker value-format="YYYY-MM-DD" v-model:value="queryParam.checkinTimeArr" class="query-group-cust"/>
+              </a-form-item>
+            </a-col>
+          </template>
+          <a-col :xl="6" :lg="7" :md="8" :sm="24">
+            <span style="float: left; overflow: hidden" class="table-page-search-submitButtons">
+              <a-col :lg="6">
+                <a-button type="primary" preIcon="ant-design:search-outlined" @click="searchQuery">查询</a-button>
+                <a-button type="primary" preIcon="ant-design:reload-outlined" @click="searchReset" style="margin-left: 8px">重置</a-button>
+                <a @click="toggleSearchStatus = !toggleSearchStatus" style="margin-left: 8px">
+                  {{ toggleSearchStatus ? '收起' : '展开' }}
+                  <Icon :icon="toggleSearchStatus ? 'ant-design:up-outlined' : 'ant-design:down-outlined'" />
+                </a>
+              </a-col>
+            </span>
+          </a-col>
         </a-row>
       </a-form>
     </div>
@@ -12,19 +50,6 @@
       <!--插槽:table标题-->
       <template #tableTitle>
         <a-button type="primary" v-auth="'elder_customer_checkin:add'"  @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>       
-        <a-dropdown v-if="selectedRowKeys.length > 0">
-          <template #overlay>
-            <a-menu>
-              <a-menu-item key="1" @click="batchHandleDelete">
-                <Icon icon="ant-design:delete-outlined"></Icon>
-                删除
-              </a-menu-item>
-            </a-menu>
-          </template>
-          <a-button v-auth="'elder_customer_checkin:deleteBatch'">批量操作
-            <Icon icon="mdi:chevron-down"></Icon>
-          </a-button>
-        </a-dropdown>        
       </template>
       <!--操作栏-->
       <template #action="{ record }">
@@ -48,9 +73,12 @@
   import ElderCustomerCheckinModal from './components/ElderCustomerCheckinModal.vue'
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
-   import {useModal} from '/@/components/Modal';
+  import {useModal} from '/@/components/Modal';
   import { getDateByPicker } from '/@/utils';
-
+  import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
+  import { useRoute } from 'vue-router';
+  const route = useRoute();
+  const emit = defineEmits(['successReload']);
   const fieldPickers = reactive({
   });
 
@@ -122,7 +150,11 @@
    */
   function handleAdd() {
     registerModal.value.disableSubmit = false;
-    registerModal.value.add();
+    const pardata = {
+      projectId:route.query.projectId,
+      customerId: route.query.id
+    }
+    registerModal.value.add(pardata);
   }
   
   /**
@@ -160,6 +192,7 @@
    */
   function handleSuccess() {
     (selectedRowKeys.value = []) && reload();
+    emit('successReload');
   }
    
   /**
@@ -183,14 +216,21 @@
       {
         label: '详情',
         onClick: handleDetail.bind(null, record),
-      }, {
-        label: '删除',
-        popConfirm: {
-          title: '是否确认删除',
-          confirm: handleDelete.bind(null, record),
-          placement: 'topLeft',
-        },
-        auth: 'elder_customer_checkin:delete'
+      },
+      {
+        label: '费用配置',
+        onClick: handleDetail.bind(null, record),
+        auth: 'elder_customer_checkin:feeConfig'
+      },
+      {
+        label: '退住',
+        onClick: handleDetail.bind(null, record),
+        auth: 'elder_customer_checkin:feeConfig'
+      },
+      {
+        label: '换房',
+        onClick: handleDetail.bind(null, record),
+        auth: 'elder_customer_checkin:feeConfig'
       }
     ]
   }

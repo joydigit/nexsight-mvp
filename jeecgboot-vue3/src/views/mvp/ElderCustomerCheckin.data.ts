@@ -6,14 +6,9 @@ import { getWeekMonthQuarterYear } from '/@/utils';
 //列表数据
 export const columns: BasicColumn[] = [
   {
-    title: '租户ID',
+    title: '入住编码',
     align: "center",
-    dataIndex: 'tenantId'
-  },
-  {
-    title: '所属项目ID',
-    align: "center",
-    dataIndex: 'projectId'
+    dataIndex: 'id'
   },
   {
     title: '销售名称',
@@ -21,24 +16,29 @@ export const columns: BasicColumn[] = [
     dataIndex: 'salesName'
   },
   {
-    title: '咨询接待id',
+    title: '咨询接待编码',
     align: "center",
     dataIndex: 'consultingId'
-  },
-  {
-    title: '销售id',
-    align: "center",
-    dataIndex: 'salesId'
   },
   {
     title: '入住时间',
     align: "center",
     dataIndex: 'checkinTime'
+  },  
+  {
+    title: '房间',
+    align: "center",
+    dataIndex: 'roomNo',
+    width: 200,
+    customRender: ({ record }) => {
+      return record.buildingName + '/'+record.floorName + '/'+ record.roomNo;
+    },
   },
   {
-    title: '合同url',
+    title: '床位',
     align: "center",
-    dataIndex: 'contractFileUrl'
+    dataIndex: 'bedNo',
+    width: 100,
   },
   {
     title: '合同号',
@@ -56,20 +56,21 @@ export const columns: BasicColumn[] = [
     dataIndex: 'expectCheckoutTime'
   },
   {
-    title: '入住类型 1长住 2短住',
+    title: '入住类型',
     align: "center",
-    dataIndex: 'checkinType'
+    dataIndex: 'checkinType',
+    customRender: ({ text }) => {
+      return render.renderDict(text, 'checkin_type');
+    },
   },
   {
-    title: '状态 1 入住 2 退住',
+    title: '状态',
     align: "center",
-    dataIndex: 'status'
-  },
-  {
-    title: '客户id',
-    align: "center",
-    dataIndex: 'customerId'
-  },
+    dataIndex: 'status',
+    customRender: ({ text }) => {
+      return render.renderDict(text, 'checkin_status');
+    },
+  }  
 ];
 
 // 高级查询数据

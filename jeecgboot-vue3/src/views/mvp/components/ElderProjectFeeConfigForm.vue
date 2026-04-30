@@ -25,6 +25,11 @@
 								<JDictSelectTag type="select" v-model:value="formData.roomType" dictCode="room_type" placeholder="请选择房间类型" />
 							</a-form-item>
 						</a-col>
+            <a-col :span="24">
+							<a-form-item label="入住类型" v-bind="validateInfos.checkinType" id="ElderCustomerCheckinForm-checkinType" name="checkinType">
+								<JDictSelectTag type="select" v-model:value="formData.checkinType" dictCode="checkin_type" placeholder="请选择入住类型"/>
+							</a-form-item>
+						</a-col>
 						<a-col :span="24">
 							<a-form-item label="单价（元）" v-bind="validateInfos.price" id="ElderProjectFeeConfigForm-price" name="price">
 								<a-input-number v-model:value="formData.price" placeholder="请输入单价（元）" style="width: 100%" />
@@ -97,6 +102,7 @@
     unitCode: [{ required: true, message: '请选择单位!'},],
     status: [{ required: true, message: '请选择状态!'},],
     roomType: [{ required: false, message: '请选择房间类型!'},],
+    checkinType: [{ required: true, message: '请选择入住类型!'},],
   });
   const { resetFields, validate, validateInfos } = useForm(formData, validatorRules, { immediate: false });
   //日期个性化选择

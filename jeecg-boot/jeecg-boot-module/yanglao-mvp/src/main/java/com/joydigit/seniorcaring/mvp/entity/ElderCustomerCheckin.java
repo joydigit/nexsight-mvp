@@ -57,9 +57,9 @@ public class ElderCustomerCheckin implements Serializable {
     @Schema(description = "销售id")
     private String salesId;
 	/**入住时间*/
-	@Excel(name = "入住时间", width = 20, format = "yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
-    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	@Excel(name = "入住时间", width = 20, format = "yyyy-MM-dd")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern="yyyy-MM-dd")
     @Schema(description = "入住时间")
     private Date checkinTime;
 	/**合同url*/
@@ -80,15 +80,15 @@ public class ElderCustomerCheckin implements Serializable {
     @Schema(description = "房间id")
     private String roomId;
 	/**实际退住时间*/
-	@Excel(name = "实际退住时间", width = 20, format = "yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
-    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	@Excel(name = "实际退住时间", width = 20, format = "yyyy-MM-dd")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern="yyyy-MM-dd")
     @Schema(description = "实际退住时间")
     private Date realCheckoutTime;
 	/**预计退住时间*/
-	@Excel(name = "预计退住时间", width = 20, format = "yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
-    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	@Excel(name = "预计退住时间", width = 20, format = "yyyy-MM-dd")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern="yyyy-MM-dd")
     @Schema(description = "预计退住时间")
     private Date expectCheckoutTime;
 	/**入住类型 1长住 2短住*/
@@ -151,5 +151,7 @@ public class ElderCustomerCheckin implements Serializable {
 
     @TableField(exist = false)
     private List<String> projectIds;
+    @TableField(exist = false)
+    private List<String> checkinTimeArr;
 
 }

@@ -40,6 +40,9 @@
           <if test="data.status != null and data.status != ''">
               AND rr.`status` = #{data.status}
           </if>
+          <if test="data.consultingId != null and data.consultingId != ''">
+            AND rr.`consulting_id` LIKE concat(concat('%',#{data.consultingId}),'%')
+          </if>
           <if test="data.customerId != null and data.customerId != ''">
               AND rr.`customer_id` = #{data.customerId}
           </if>

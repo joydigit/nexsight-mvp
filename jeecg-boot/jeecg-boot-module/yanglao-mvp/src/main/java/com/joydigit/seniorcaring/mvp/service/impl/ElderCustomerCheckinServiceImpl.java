@@ -1,11 +1,27 @@
 package com.joydigit.seniorcaring.mvp.service.impl;
 
-import com.joydigit.seniorcaring.mvp.entity.ElderCustomerCheckin;
-import com.joydigit.seniorcaring.mvp.mapper.ElderCustomerCheckinMapper;
+import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.joydigit.seniorcaring.mvp.entity.*;
+import com.joydigit.seniorcaring.mvp.enums.*;
+import com.joydigit.seniorcaring.mvp.mapper.*;
+import com.joydigit.seniorcaring.mvp.service.IElderCustomerCheckinFeeService;
 import com.joydigit.seniorcaring.mvp.service.IElderCustomerCheckinService;
+import org.apache.commons.lang3.StringUtils;
+import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.system.api.ISysBaseAPI;
+import org.jeecg.common.system.vo.LoginUser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @Description: elder_customer_checkin
@@ -16,4 +32,130 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 @Service
 public class ElderCustomerCheckinServiceImpl extends ServiceImpl<ElderCustomerCheckinMapper, ElderCustomerCheckin> implements IElderCustomerCheckinService {
 
+    @Autowired
+    private ElderCustomerMapper elderCustomerMapper;
+    @Autowired
+    private ISysBaseAPI sysBaseAPI;
+    @Autowired
+    private ElderBedMapper elderBedMapper;
+    @Autowired
+    private ElderProjectFeeConfigMapper elderProjectFeeConfigMapper;
+    @Autowired
+    private IElderCustomerCheckinFeeService elderCustomerCheckinFeeService;
+    @Autowired
+    private ElderRoomFeeConfigMapper elderRoomFeeConfigMapper;
+    @Autowired
+    private ElderResidenceHistoryMapper elderResidenceHistoryMapper;
+    @Override
+    public IPage<ElderCustomerCheckin> pageList(Page<ElderCustomerCheckin> page, ElderCustomerCheckin elderCustomerCheckin) {
+        return this.baseMapper.pageList(page,elderCustomerCheckin);
+    }
+
+    @Override
+    public Result<String> saveInfo(ElderCustomerCheckin elderCustomerCheckin) {
+        ElderCustomer elderCustomer = elderCustomerMapper.selectById(elderCustomerCheckin.getCustomerId());
+        if (Objects.isNull(elderCustomer)){
+            return Result.error("客户不存在");
+        }
+        elderCustomerCheckin.setConsultingId(elderCustomer.getConsultingId());
+        if (StringUtils.isNotBlank(elderCustomerCheckin.getSalesId())){
+            LoginUser user = sysBaseAPI.getUserById(elderCustomerCheckin.getSalesId());
+            if (Objects.nonNull(user)){
+                elderCustomerCheckin.setSalesName(user.getRealname());
+            }
+        }
+        elderCustomerCheckin.setStatus(CheckinStatusEnum.CHECKIN.getKey());
+        long existCount = count(Wrappers.lambdaQuery(ElderCustomerCheckin.class)
+                .and(s -> s.eq(ElderCustomerCheckin::getBedId, elderCustomerCheckin.getBedId()).or()
+                        .eq(ElderCustomerCheckin::getCustomerId, elderCustomerCheckin.getCustomerId()))
+                .eq(ElderCustomerCheckin::getStatus, CheckinStatusEnum.CHECKIN.getKey()));
+        if (existCount > 0){
+            return Result.error("不可重复入住");
+        }
+        // 查询 床位 是否空闲 或者 是本人预定状态 ，否则不可以入住
+        int checkBed = this.baseMapper.checkBedStatusByBedId(elderCustomerCheckin.getCustomerId(), elderCustomerCheckin.getBedId());
+        if (checkBed != 1){
+            return Result.error("床位不可用，检查床位状态");
+        }
+        // 添加费用配置
+        List<ElderProjectFeeConfig> projectFeeConfigs = elderProjectFeeConfigMapper.selectList(Wrappers.lambdaQuery(ElderProjectFeeConfig.class)
+                .eq(ElderProjectFeeConfig::getProjectId, elderCustomerCheckin.getProjectId())
+                .eq(ElderProjectFeeConfig::getCheckinType,elderCustomerCheckin.getCheckinType())
+                .eq(ElderProjectFeeConfig::getStatus, StatusEnum.YES.getKey()));
+        if (CollectionUtil.isEmpty(projectFeeConfigs)){
+            return Result.error("费用未配置");
+        }
+        elderCustomerCheckin.setId(IdWorker.getIdStr());
+        save(elderCustomerCheckin);
+        ElderBed bed = new ElderBed();
+        bed.setId(elderCustomerCheckin.getBedId());
+        bed.setStatus(RoomStatusEnum.OCCUPIED.getKey());
+        elderBedMapper.updateById(bed);
+
+        List<ElderRoomFeeConfig> elderRoomFeeConfigs = elderRoomFeeConfigMapper.selectList(Wrappers.lambdaQuery(ElderRoomFeeConfig.class)
+                .eq(ElderRoomFeeConfig::getItemType, "2")
+                .eq(ElderRoomFeeConfig::getCheckinType,elderCustomerCheckin.getCheckinType())
+                .eq(ElderRoomFeeConfig::getItemId, elderCustomerCheckin.getBedId()));
+
+        List<ElderCustomerCheckinFee> feeList = new ArrayList<>();
+        for (ElderProjectFeeConfig projectFeeConfig : projectFeeConfigs) {
+            ElderCustomerCheckinFee fee = new ElderCustomerCheckinFee();
+            fee.setCheckinId(elderCustomerCheckin.getId());
+            fee.setPaymentTypeCode(projectFeeConfig.getPaymentTypeCode());
+            fee.setUnitCode(projectFeeConfig.getUnitCode());
+            if (projectFeeConfig.getPaymentTypeCode().equals(PaymentTypeEnum.BED.getKey())){
+                fee.setFeeType(FeeTypeEnum.BED.getKey());
+                fee.setAmount(projectFeeConfig.getPrice());
+                if (CollectionUtil.isNotEmpty(elderRoomFeeConfigs)){
+                    ElderRoomFeeConfig elderRoomFeeConfig = elderRoomFeeConfigs.get(0);
+                    fee.setAmount(elderRoomFeeConfig.getPrice());
+                }
+            } else {
+                fee.setFeeType(FeeTypeEnum.OTHER.getKey());
+                fee.setAmount(projectFeeConfig.getPrice());
+            }
+            fee.setFeeConfigId(projectFeeConfig.getId());
+            fee.setProjectId(elderCustomerCheckin.getProjectId());
+            feeList.add(fee);
+        }
+        elderCustomerCheckinFeeService.saveBatch(feeList);
+
+        // 添加历史记录
+        ElderResidenceHistory history = new ElderResidenceHistory();
+        history.setCheckinId(elderCustomerCheckin.getId());
+        history.setCustomerId(elderCustomerCheckin.getCustomerId());
+        history.setProjectId(elderCustomerCheckin.getProjectId());
+        history.setNewBedId(elderCustomerCheckin.getBedId());
+        history.setNewRoomId(elderCustomerCheckin.getRoomId());
+        history.setChangeTypeCode(ChangeTypeEnum.CHECKIN.getKey());
+        history.setChangeTypeName(ChangeTypeEnum.CHECKIN.getMsg());
+        elderResidenceHistoryMapper.insert(history);
+        return Result.OK("入住成功");
+    }
+
+    @Override
+    public Result<String> updateInfo(ElderCustomerCheckin elderCustomerCheckin) {
+        ElderCustomerCheckin checkinQuery = getById(elderCustomerCheckin.getId());
+        if (Objects.isNull(checkinQuery)){
+            return Result.error("记录不存在");
+        }
+        if (StringUtils.isNotBlank(checkinQuery.getSalesId()) &&
+                StringUtils.isNotBlank(elderCustomerCheckin.getSalesId()) &&
+                checkinQuery.getSalesId().equals(elderCustomerCheckin.getSalesId())){
+
+        } else if(StringUtils.isNotBlank(elderCustomerCheckin.getSalesId())){
+            LoginUser user = sysBaseAPI.getUserById(elderCustomerCheckin.getSalesId());
+            if (Objects.nonNull(user)){
+                checkinQuery.setSalesName(user.getRealname());
+            }
+            checkinQuery.setSalesId(elderCustomerCheckin.getSalesId());
+        }
+        checkinQuery.setCheckinTime(elderCustomerCheckin.getCheckinTime());
+        checkinQuery.setContractNo(elderCustomerCheckin.getContractNo());
+        checkinQuery.setContractFileUrl(elderCustomerCheckin.getContractFileUrl());
+        checkinQuery.setNursingLevel(elderCustomerCheckin.getNursingLevel());
+        checkinQuery.setExpectCheckoutTime(elderCustomerCheckin.getExpectCheckoutTime());
+        updateById(checkinQuery);
+        return Result.OK("修改成功");
+    }
 }

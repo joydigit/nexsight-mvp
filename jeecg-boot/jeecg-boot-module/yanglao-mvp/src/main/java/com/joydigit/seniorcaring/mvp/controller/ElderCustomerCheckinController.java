@@ -69,10 +69,8 @@ public class ElderCustomerCheckinController extends JeecgController<ElderCustome
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
 
-
-        QueryWrapper<ElderCustomerCheckin> queryWrapper = QueryGenerator.initQueryWrapper(elderCustomerCheckin, req.getParameterMap());
 		Page<ElderCustomerCheckin> page = new Page<ElderCustomerCheckin>(pageNo, pageSize);
-		IPage<ElderCustomerCheckin> pageList = elderCustomerCheckinService.page(page, queryWrapper);
+		IPage<ElderCustomerCheckin> pageList = elderCustomerCheckinService.pageList(page, elderCustomerCheckin);
 		return Result.OK(pageList);
 	}
 	
@@ -87,9 +85,7 @@ public class ElderCustomerCheckinController extends JeecgController<ElderCustome
 	@RequiresPermissions("elder_customer_checkin:add")
 	@PostMapping(value = "/add")
 	public Result<String> add(@RequestBody ElderCustomerCheckin elderCustomerCheckin) {
-		elderCustomerCheckinService.save(elderCustomerCheckin);
-
-		return Result.OK("添加成功！");
+		return elderCustomerCheckinService.saveInfo(elderCustomerCheckin);
 	}
 	
 	/**
@@ -103,38 +99,7 @@ public class ElderCustomerCheckinController extends JeecgController<ElderCustome
 	@RequiresPermissions("elder_customer_checkin:edit")
 	@RequestMapping(value = "/edit", method = {RequestMethod.PUT,RequestMethod.POST})
 	public Result<String> edit(@RequestBody ElderCustomerCheckin elderCustomerCheckin) {
-		elderCustomerCheckinService.updateById(elderCustomerCheckin);
-		return Result.OK("编辑成功!");
-	}
-	
-	/**
-	 *   通过id删除
-	 *
-	 * @param id
-	 * @return
-	 */
-	@AutoLog(value = "elder_customer_checkin-通过id删除")
-	@Operation(summary="elder_customer_checkin-通过id删除")
-	@RequiresPermissions("elder_customer_checkin:delete")
-	@DeleteMapping(value = "/delete")
-	public Result<String> delete(@RequestParam(name="id",required=true) String id) {
-		elderCustomerCheckinService.removeById(id);
-		return Result.OK("删除成功!");
-	}
-	
-	/**
-	 *  批量删除
-	 *
-	 * @param ids
-	 * @return
-	 */
-	@AutoLog(value = "elder_customer_checkin-批量删除")
-	@Operation(summary="elder_customer_checkin-批量删除")
-	@RequiresPermissions("elder_customer_checkin:deleteBatch")
-	@DeleteMapping(value = "/deleteBatch")
-	public Result<String> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
-		this.elderCustomerCheckinService.removeByIds(Arrays.asList(ids.split(",")));
-		return Result.OK("批量删除成功!");
+		return elderCustomerCheckinService.updateInfo(elderCustomerCheckin);
 	}
 	
 	/**

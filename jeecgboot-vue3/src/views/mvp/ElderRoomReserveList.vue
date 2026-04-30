@@ -24,6 +24,12 @@
               </a-form-item>
             </a-col>
             <a-col :lg="6">
+              <a-form-item name="consultingId">
+                <template #label><span title="咨询接待">咨询接待</span></template>
+                <a-input placeholder="请输入咨询接待编码" v-model:value="queryParam.consultingId" allow-clear ></a-input>
+              </a-form-item>
+            </a-col>
+            <a-col :lg="6">
               <a-form-item name="createTimeArr">
                 <template #label><span title="预定时间">预定时间</span></template>
                 <a-range-picker value-format="YYYY-MM-DD" v-model:value="queryParam.createTimeArr" class="query-group-cust"/>
@@ -91,7 +97,8 @@
   import { useRoute } from 'vue-router';
   import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
   const route = useRoute();
-
+  const emit = defineEmits(['successReload']);
+  
   const fieldPickers = reactive({
   });
 
@@ -206,6 +213,7 @@
    */
   function handleSuccess() {
     (selectedRowKeys.value = []) && reload();
+    emit('successReload');
   }
    
   /**

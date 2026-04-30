@@ -85,6 +85,8 @@ public class ElderProjectFeeConfig implements Serializable {
     @Schema(description = "删除状态：0正常，1已删除")
     @TableLogic
     private Integer delFlag;
+    @Schema(description = "入住类型 1长住 2短")
+    private String checkinType;
     /**
      * 项目名称
      */

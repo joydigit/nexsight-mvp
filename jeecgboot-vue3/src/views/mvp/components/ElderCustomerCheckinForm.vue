@@ -3,72 +3,79 @@
     <JFormContainer :disabled="disabled">
       <template #detail>
         <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ElderCustomerCheckinForm">
-          <a-row>
+          <a-row>						
 						<a-col :span="24">
-							<a-form-item label="租户ID" v-bind="validateInfos.tenantId" id="ElderCustomerCheckinForm-tenantId" name="tenantId">
-								<a-input v-model:value="formData.tenantId" placeholder="请输入租户ID"  allow-clear ></a-input>
+							<a-form-item label="销售" v-bind="validateInfos.salesId" id="ElderCustomerCheckinForm-salesId" name="salesId">
+                <JSelectUser v-model:value="formData.salesId" rowKey="id" placeholder="请选择用户" :isRadioSelection="true"></JSelectUser>
+							</a-form-item>
+						</a-col>
+            <a-col :span="24">
+							<a-form-item label="客户" v-bind="validateInfos.customerId" id="ElderRoomReserveForm-customerId" name="customerId">
+								<a-select
+                  v-model:value="formData.customerId"
+                  :options="customerList"
+                  :disabled="dealType == '1' || !!formData.id"
+                  :fieldNames="{ label: 'name', value: 'id' }"
+                  showSearch
+                  placeholder="请选择客户"
+                />
+							</a-form-item>
+						</a-col>					
+						<a-col :span="24">
+							<a-form-item label="房间" v-bind="validateInfos.roomId" id="ElderRoomReserveForm-roomId" name="roomId">
+                <a-select
+                  v-model:value="formData.roomId"
+                  :options="roomList"
+                  :disabled="dealType == '2' || !!formData.id"
+                  :fieldNames="{ label: 'roomNo', value: 'roomId' }"
+                  showSearch
+                  placeholder="请选择房间"
+                  @change="handleChangeRoomId"
+                />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="所属项目ID" v-bind="validateInfos.projectId" id="ElderCustomerCheckinForm-projectId" name="projectId">
-								<a-input v-model:value="formData.projectId" placeholder="请输入所属项目ID"  allow-clear ></a-input>
+							<a-form-item label="床位" v-bind="validateInfos.bedId" id="ElderRoomReserveForm-bedId" name="bedId">
+								<a-select
+                  v-model:value="formData.bedId"
+                  :options="bedList"
+                  :disabled="dealType == '2'  || !!formData.id"
+                  :fieldNames="{ label: 'bedNo', value: 'id' }"
+                  showSearch
+                  placeholder="请选择床位"
+                />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="销售名称" v-bind="validateInfos.salesName" id="ElderCustomerCheckinForm-salesName" name="salesName">
-								<a-input v-model:value="formData.salesName" placeholder="请输入销售名称"  allow-clear ></a-input>
+							<a-form-item label="入住类型" v-bind="validateInfos.checkinType" id="ElderCustomerCheckinForm-checkinType" name="checkinType">
+								<JDictSelectTag type="select" v-model:value="formData.checkinType" dictCode="checkin_type" placeholder="请选择入住类型" :disabled="!!formData.id"/>
 							</a-form-item>
 						</a-col>
-						<a-col :span="24">
-							<a-form-item label="咨询接待id" v-bind="validateInfos.consultingId" id="ElderCustomerCheckinForm-consultingId" name="consultingId">
-								<a-input v-model:value="formData.consultingId" placeholder="请输入咨询接待id"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="销售id" v-bind="validateInfos.salesId" id="ElderCustomerCheckinForm-salesId" name="salesId">
-								<a-input v-model:value="formData.salesId" placeholder="请输入销售id"  allow-clear ></a-input>
+            <a-col :span="24">
+							<a-form-item label="护理等级" v-bind="validateInfos.nursingLevel" id="ElderCustomerCheckinForm-nursingLevel" name="nursingLevel">
+								<JDictSelectTag type="select" v-model:value="formData.nursingLevel" dictCode="care_level" placeholder="请选择护理等级"/>
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
 							<a-form-item label="入住时间" v-bind="validateInfos.checkinTime" id="ElderCustomerCheckinForm-checkinTime" name="checkinTime">
-								<a-date-picker placeholder="请选择入住时间"  v-model:value="formData.checkinTime" showTime value-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"  allow-clear />
+								<a-date-picker placeholder="请选择入住时间"  v-model:value="formData.checkinTime" value-format="YYYY-MM-DD" style="width: 100%"  allow-clear />
 							</a-form-item>
 						</a-col>
-						<a-col :span="24">
-							<a-form-item label="合同url" v-bind="validateInfos.contractFileUrl" id="ElderCustomerCheckinForm-contractFileUrl" name="contractFileUrl">
-								<a-input v-model:value="formData.contractFileUrl" placeholder="请输入合同url"  allow-clear ></a-input>
+            <a-col :span="24">
+							<a-form-item label="预计退住时间" v-bind="validateInfos.expectCheckoutTime" id="ElderCustomerCheckinForm-expectCheckoutTime" name="expectCheckoutTime">
+								<a-date-picker placeholder="请选择预计退住时间"  v-model:value="formData.expectCheckoutTime" value-format="YYYY-MM-DD" style="width: 100%"  allow-clear />
 							</a-form-item>
 						</a-col>
-						<a-col :span="24">
+            <a-col :span="24">
 							<a-form-item label="合同号" v-bind="validateInfos.contractNo" id="ElderCustomerCheckinForm-contractNo" name="contractNo">
 								<a-input v-model:value="formData.contractNo" placeholder="请输入合同号"  allow-clear ></a-input>
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="实际退住时间" v-bind="validateInfos.realCheckoutTime" id="ElderCustomerCheckinForm-realCheckoutTime" name="realCheckoutTime">
-								<a-date-picker placeholder="请选择实际退住时间"  v-model:value="formData.realCheckoutTime" showTime value-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"  allow-clear />
+							<a-form-item label="合同" v-bind="validateInfos.contractFileUrl" id="ElderCustomerCheckinForm-contractFileUrl" name="contractFileUrl">
+								<j-upload v-model:value="formData.contractFileUrl"   ></j-upload>
 							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="预计退住时间" v-bind="validateInfos.expectCheckoutTime" id="ElderCustomerCheckinForm-expectCheckoutTime" name="expectCheckoutTime">
-								<a-date-picker placeholder="请选择预计退住时间"  v-model:value="formData.expectCheckoutTime" showTime value-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"  allow-clear />
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="入住类型 1长住 2短住" v-bind="validateInfos.checkinType" id="ElderCustomerCheckinForm-checkinType" name="checkinType">
-								<a-input v-model:value="formData.checkinType" placeholder="请输入入住类型 1长住 2短住"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="状态 1 入住 2 退住" v-bind="validateInfos.status" id="ElderCustomerCheckinForm-status" name="status">
-								<a-input v-model:value="formData.status" placeholder="请输入状态 1 入住 2 退住"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="客户id" v-bind="validateInfos.customerId" id="ElderCustomerCheckinForm-customerId" name="customerId">
-								<a-input v-model:value="formData.customerId" placeholder="请输入客户id"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
+						</a-col>	
           </a-row>
         </a-form>
       </template>
@@ -77,18 +84,31 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive, defineExpose, nextTick, defineProps, computed, onMounted } from 'vue';
+  import { ref, reactive, defineExpose, nextTick, defineProps, computed, onMounted,watch } from 'vue';
   import { defHttp } from '/@/utils/http/axios';
   import { useMessage } from '/@/hooks/web/useMessage';
+  import JUpload from '/@/components/Form/src/jeecg/components/JUpload/JUpload.vue';
+  import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
   import { getDateByPicker, getValueType } from '/@/utils';
   import { saveOrUpdate } from '../ElderCustomerCheckin.api';
   import { Form } from 'ant-design-vue';
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
+  import {getBedListByRoomIdMethod} from './../ElderBed.api';
+  import {getRoomListByProjectIdMethod} from './../ElderRoom.api';
+  import {getCustomerListByProjectIdMethod} from './../ElderCustomer.api';
+  import { useUserStore } from '/@/store/modules/user';
+  import JSelectUser from '/@/components/Form/src/jeecg/components/JSelectUser.vue';
+  const roomList = ref([]);
+  const customerList = ref([]);
+  const bedList = ref([]);
+  const dealType = ref('');
   const props = defineProps({
     formDisabled: { type: Boolean, default: false },
     formData: { type: Object, default: () => ({})},
     formBpm: { type: Boolean, default: true }
   });
+  const userStore = useUserStore();
+  const userId = ref<Nullable<number | string>>(0);
   const formRef = ref();
   const useForm = Form.useForm;
   const emit = defineEmits(['register', 'ok']);
@@ -103,10 +123,13 @@
     contractFileUrl: '',   
     contractNo: '',   
     realCheckoutTime: '',   
-    expectCheckoutTime: '',   
+    expectCheckoutTime: '',  
+    nursingLevel: '', 
     checkinType: '',   
     status: '',   
-    customerId: '',   
+    customerId: undefined, 
+    bedId: undefined,
+    roomId: undefined, 
     delFlag: undefined,
   });
   const { createMessage } = useMessage();
@@ -114,9 +137,44 @@
   const wrapperCol = ref<any>({ xs: { span: 24 }, sm: { span: 16 } });
   const confirmLoading = ref<boolean>(false);
   //表单验证
+  watch(() => formData.projectId, async (val) => {
+    if (val) {
+      // 查询客户，查询房间列表
+      roomList.value = await getRoomListByProjectIdMethod({ projectId: val });
+      customerList.value = await getCustomerListByProjectIdMethod({ projectId: val });
+      // 如果已有 roomId，联动加载床位
+      if (formData.roomId) {
+        await handleChangeRoomId(formData.roomId);
+      }
+    } else {
+      roomList.value = [];
+      customerList.value = [];
+      bedList.value = [];
+    }
+  });
+  onMounted(() => {
+    // 记录当前的UserId
+    userId.value = userStore.getUserInfo?.id;
+    console.log('Mounted', userId.value);
+  });
+  async function handleChangeRoomId(value) {
+    if (value) {
+      let beds = await getBedListByRoomIdMethod({ roomId: value });
+      beds.forEach(item=>{
+        item.disabled = item.status == '1';
+      })
+      bedList.value = beds;
+    } else {
+      bedList.value = [];
+    }
+  }
   const validatorRules = reactive({
-    tenantId: [{ required: true, message: '请输入租户ID!'},],
-    projectId: [{ required: true, message: '请输入所属项目ID!'},],
+    customerId: [{ required: true, message: '请选择客户!'},],
+    roomId: [{ required: true, message: '请选择房间!'},],
+    bedId: [{ required: true, message: '请选择床位!'},],
+    checkinType: [{ required: true, message: '请选择入住类型!'},],
+    checkinTime: [{ required: true, message: '请选择入住时间!'},],
+    expectCheckoutTime:  [{ required: true, message: '请选择预计退住时间!'},],
   });
   const { resetFields, validate, validateInfos } = useForm(formData, validatorRules, { immediate: false });
   //日期个性化选择
@@ -139,8 +197,15 @@
   /**
    * 新增
    */
-  function add() {
-    edit({});
+  function add(initData) {
+    if (initData.customerId){
+      dealType.value = '1';
+    }
+    if (initData.bedId){
+      dealType.value = '2';
+    }
+    initData.salesId= userId.value;
+    edit(initData);
   }
 
   /**

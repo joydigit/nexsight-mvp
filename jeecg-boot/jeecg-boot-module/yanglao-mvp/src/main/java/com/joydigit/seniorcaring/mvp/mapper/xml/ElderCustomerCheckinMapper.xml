@@ -24,4 +24,49 @@
             c.create_time DESC
             limit 1
     </select>
+
+    <select id="checkBedStatusByBedId" resultType="java.lang.Integer">
+        SELECT
+            COUNT(*)
+        FROM
+            elder_bed b
+                LEFT JOIN elder_room_reserve r ON b.id = r.bed_id AND r.`status` = '1'
+        WHERE
+            b.del_flag = 0
+          AND (b.`status` = '0' or (b.`status` = '1' AND r.customer_id = #{customerId}))
+          AND b.id = #{bedId}
+    </select>
+
+    <select id="pageList" resultType="com.joydigit.seniorcaring.mvp.entity.ElderCustomerCheckin">
+        SELECT
+            cc.*,
+            b.bed_no,
+            r.room_no,
+            f.floor_name,
+            be.building_name
+        FROM
+            elder_customer_checkin cc
+            LEFT JOIN elder_bed b ON b.id = cc.bed_id
+            LEFT JOIN elder_room r ON r.id = cc.room_id
+            LEFT JOIN elder_floor f ON f.id = r.floor_id
+            LEFT JOIN elder_building be ON be.id = r.building_id
+        WHERE
+            cc.del_flag = 0
+        <if test="data.status != null and data.status != ''">
+            AND cc.`status` = #{data.status}
+        </if>
+        <if test="data.consultingId != null and data.consultingId != ''">
+            AND cc.`consulting_id` LIKE concat(concat('%',#{data.consultingId}),'%')
+        </if>
+        <if test="data.customerId != null and data.customerId != ''">
+            AND cc.`customer_id` = #{data.customerId}
+        </if>
+        <if test="data.roomNo != null and data.roomNo != ''">
+            AND r.room_no LIKE concat(concat('%',#{data.roomNo}),'%')
+        </if>
+        <if test="data.checkinTimeArr != null and data.checkinTimeArr.size() > 0">
+            AND cc.checkin_time BETWEEN concat(#{data.checkinTimeArr[0]},' 00:00:00') AND concat(#{data.checkinTimeArr[1]},' 23:59:59')
+        </if>
+        order by cc.create_time desc
+    </select>
 </mapper>

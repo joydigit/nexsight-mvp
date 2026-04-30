@@ -6,8 +6,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.joydigit.seniorcaring.mvp.entity.ElderRoom;
+import com.joydigit.seniorcaring.mvp.enums.RoomStatusEnum;
 import com.joydigit.seniorcaring.mvp.service.IElderRoomService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -104,6 +106,10 @@ public class ElderBedController extends JeecgController<ElderBed, IElderBedServi
 	@RequiresPermissions("elder_bed:edit")
 	@RequestMapping(value = "/edit", method = {RequestMethod.PUT,RequestMethod.POST})
 	public Result<String> edit(@RequestBody ElderBed elderBed) {
+		if (elderBed.getStatus().equals(RoomStatusEnum.RESERVED.getKey()) ||
+				elderBed.getStatus().equals(RoomStatusEnum.OCCUPIED.getKey())){
+			return Result.error("床位占用，不能修改");
+		}
 		elderBedService.updateById(elderBed);
 		return Result.OK("编辑成功!");
 	}
@@ -119,6 +125,11 @@ public class ElderBedController extends JeecgController<ElderBed, IElderBedServi
 	@RequiresPermissions("elder_bed:delete")
 	@DeleteMapping(value = "/delete")
 	public Result<String> delete(@RequestParam(name="id",required=true) String id) {
+		ElderBed elderBed = elderBedService.getById(id);
+		if (elderBed.getStatus().equals(RoomStatusEnum.RESERVED.getKey()) ||
+				elderBed.getStatus().equals(RoomStatusEnum.OCCUPIED.getKey())){
+			return Result.error("床位占用，不能删除");
+		}
 		elderBedService.removeById(id);
 		return Result.OK("删除成功!");
 	}
@@ -134,7 +145,17 @@ public class ElderBedController extends JeecgController<ElderBed, IElderBedServi
 	@RequiresPermissions("elder_bed:deleteBatch")
 	@DeleteMapping(value = "/deleteBatch")
 	public Result<String> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
-		this.elderBedService.removeByIds(Arrays.asList(ids.split(",")));
+		List<String> idList = Arrays.asList(ids.split(","));
+		List<ElderBed> list = elderBedService.list(Wrappers.lambdaQuery(ElderBed.class).in(ElderBed::getId, idList));
+		if (CollectionUtil.isNotEmpty(list)){
+			for (ElderBed elderBed : list) {
+				if (elderBed.getStatus().equals(RoomStatusEnum.RESERVED.getKey()) ||
+						elderBed.getStatus().equals(RoomStatusEnum.OCCUPIED.getKey())){
+					return Result.error("床位占用，不能删除");
+				}
+			}
+		}
+		this.elderBedService.removeByIds(idList);
 		return Result.OK("批量删除成功!");
 	}
 	
@@ -164,8 +185,7 @@ public class ElderBedController extends JeecgController<ElderBed, IElderBedServi
 	 @GetMapping(value = "/getBedListByRoomId")
 	 public Result<List<ElderBed>> getBedListByRoomId(@RequestParam String roomId) {
 		 List<ElderBed> list = elderBedService.list(Wrappers.lambdaQuery(ElderBed.class)
-				 .eq(ElderBed::getRoomId, roomId)
-				 .eq(ElderBed::getStatus,"0"));
+				 .eq(ElderBed::getRoomId, roomId));
 		 return Result.OK(list);
 	 }
     /**

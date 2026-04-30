@@ -73,13 +73,13 @@
       </a-tab-pane>
       <a-tab-pane key="reserve" tab="预定记录">
         <div class="tab-content">
-          <ElderRoomReserveList/>
+          <ElderRoomReserveList @successReload="handleSuccess"/>
         </div>
       </a-tab-pane>
 
       <a-tab-pane key="checkin" tab="入住记录">
         <div class="tab-content">
-          <ElderCustomerCheckinList/>
+          <ElderCustomerCheckinList @successReload="handleSuccess"/>
         </div>
       </a-tab-pane>
 
@@ -171,6 +171,10 @@ const activeTab = ref('family');
 // 客户基本信息
 const customerInfo = ref({});
 onMounted(async () => {
+  await queryCustomerInfo();
+});
+
+async function queryCustomerInfo(){
   let dataResult = await getCustomerLastInfoMethod(route.query);
   if (dataResult && dataResult.checkinStatus && dataResult.checkinStatus == '1'){
     dataResult.status = '在住'
@@ -178,7 +182,11 @@ onMounted(async () => {
     dataResult.status = '预定'
   }
   customerInfo.value = dataResult;
-});
+}
+
+function handleSuccess(){
+  queryCustomerInfo();
+}
 
 function getStatusColor(status: string) {
   const map: Record<string, string> = {

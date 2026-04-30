@@ -16,6 +16,9 @@ export const columns: BasicColumn[] = [
     align: "center",
     dataIndex: 'roomNo',
     width: 200,
+    customRender: ({ record }) => {
+      return record.buildingName + '/'+record.floorName + '/'+ record.roomNo;
+    },
   },
   {
     title: '床位',

@@ -127,7 +127,11 @@
 
   async function handleChangeRoomId(value) {
     if (value) {
-      bedList.value = await getBedListByRoomIdMethod({ roomId: value });
+      let beds = await getBedListByRoomIdMethod({ roomId: value });
+      beds.forEach(item=>{
+        item.disabled = item.status == '1';
+      })
+      bedList.value = beds;
     } else {
       bedList.value = [];
     }
