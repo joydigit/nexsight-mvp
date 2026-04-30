@@ -6,40 +6,37 @@ import { getWeekMonthQuarterYear } from '/@/utils';
 //列表数据
 export const columns: BasicColumn[] = [
   {
-    title: '客户id',
+    title: '咨询接待编码',
     align: "center",
-    dataIndex: 'customerId'
+    dataIndex: 'consultingId',
+    width: 200,
   },
   {
-    title: '咨询接待id',
+    title: '房间',
     align: "center",
-    dataIndex: 'consultingId'
+    dataIndex: 'roomNo',
+    width: 200,
   },
   {
-    title: '房间id',
+    title: '床位',
     align: "center",
-    dataIndex: 'roomId'
+    dataIndex: 'bedNo',
+    width: 100,
   },
   {
-    title: '床位id',
+    title: '状态',
     align: "center",
-    dataIndex: 'bedId'
-  },
+    dataIndex: 'status',
+    customRender: ({ text }) => {
+      return render.renderDict(text, 'reserve_status');
+    },
+    width: 100,
+  },  
   {
-    title: '状态 1 预定 2 取消预定',
+    title: '预定时间',
     align: "center",
-    dataIndex: 'status'
-  },
-  {
-    title: '租户ID',
-    align: "center",
-    dataIndex: 'tenantId'
-  },
-  {
-    title: '项目ID',
-    align: "center",
-    dataIndex: 'projectId'
-  },
+    dataIndex: 'createTime',
+  },  
   {
     title: '备注',
     align: "center",

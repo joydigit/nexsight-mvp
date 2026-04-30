@@ -44,6 +44,8 @@ public class ElderCustomer implements Serializable {
 	@Excel(name = "所属项目ID", width = 15)
     @Schema(description = "所属项目ID")
     private String projectId;
+    @Schema(description = "咨询接待id")
+    private String consultingId;
 	/**姓名*/
 	@Excel(name = "姓名", width = 15)
     @Schema(description = "姓名")

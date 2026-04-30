@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.joydigit.seniorcaring.mvp.entity.ElderRoom;
 import com.joydigit.seniorcaring.mvp.service.IElderRoomService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -159,6 +160,14 @@ public class ElderBedController extends JeecgController<ElderBed, IElderBedServi
 		return Result.OK(elderBed);
 	}
 
+	 @Operation(summary="通过房间id查询床位列表")
+	 @GetMapping(value = "/getBedListByRoomId")
+	 public Result<List<ElderBed>> getBedListByRoomId(@RequestParam String roomId) {
+		 List<ElderBed> list = elderBedService.list(Wrappers.lambdaQuery(ElderBed.class)
+				 .eq(ElderBed::getRoomId, roomId)
+				 .eq(ElderBed::getStatus,"0"));
+		 return Result.OK(list);
+	 }
     /**
     * 导出excel
     *

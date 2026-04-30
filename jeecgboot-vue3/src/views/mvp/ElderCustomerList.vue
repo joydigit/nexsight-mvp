@@ -187,7 +187,7 @@
    * 详情
    */
   function handleDetail(record: Recordable) {
-    router.push({ path: '/customer/detail', query: {id: record.id} });
+    router.push({ path: '/customer/detail', query: {id: record.id,projectId: record.projectId} });
   }
    
   /**

@@ -1,6 +1,8 @@
 package com.joydigit.seniorcaring.mvp.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.joydigit.seniorcaring.mvp.entity.ElderRoomReserve;
 import org.apache.ibatis.annotations.Param;
 
@@ -13,4 +15,6 @@ import org.apache.ibatis.annotations.Param;
 public interface ElderRoomReserveMapper extends BaseMapper<ElderRoomReserve> {
 
     ElderRoomReserve getRoomReserveByCustomerId(@Param("customerId") String customerId);
+
+    IPage<ElderRoomReserve> pageList(Page<ElderRoomReserve> page,@Param("data") ElderRoomReserve elderRoomReserve);
 }

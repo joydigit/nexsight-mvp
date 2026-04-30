@@ -51,6 +51,17 @@ public class ElderRoomServiceImpl extends ServiceImpl<ElderRoomMapper, ElderRoom
     }
 
     @Override
+    public List<RoomSelectVo> getRoomListByProjectId(String projectId) {
+        List<RoomSelectVo> roomSelectVoList = this.baseMapper.getRoomSelectByProjectId(projectId);
+        if (CollectionUtil.isNotEmpty(roomSelectVoList)){
+            for (RoomSelectVo roomSelectVo : roomSelectVoList) {
+                roomSelectVo.setRoomNo(roomSelectVo.getBuildingName()+"/"+roomSelectVo.getFloorName()+"/"+roomSelectVo.getRoomNo());
+            }
+        }
+        return roomSelectVoList;
+    }
+
+    @Override
     public List<RoomCascaderVo> getRoomCascaderList(String type,String projectId) {
         List<RoomCascaderVo> list = new ArrayList<>();
         if ("1".equals(type)){

@@ -51,10 +51,8 @@ public class ElderRoomReserveController extends JeecgController<ElderRoomReserve
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
 
-
-        QueryWrapper<ElderRoomReserve> queryWrapper = QueryGenerator.initQueryWrapper(elderRoomReserve, req.getParameterMap());
 		Page<ElderRoomReserve> page = new Page<ElderRoomReserve>(pageNo, pageSize);
-		IPage<ElderRoomReserve> pageList = elderRoomReserveService.page(page, queryWrapper);
+		IPage<ElderRoomReserve> pageList = elderRoomReserveService.pageList(page, elderRoomReserve);
 		return Result.OK(pageList);
 	}
 	
@@ -69,9 +67,7 @@ public class ElderRoomReserveController extends JeecgController<ElderRoomReserve
 	@RequiresPermissions("elder_room_reserve:add")
 	@PostMapping(value = "/add")
 	public Result<String> add(@RequestBody ElderRoomReserve elderRoomReserve) {
-		elderRoomReserveService.save(elderRoomReserve);
-
-		return Result.OK("添加成功！");
+		return elderRoomReserveService.saveInfo(elderRoomReserve);
 	}
 	
 	/**
@@ -80,13 +76,12 @@ public class ElderRoomReserveController extends JeecgController<ElderRoomReserve
 	 * @param elderRoomReserve
 	 * @return
 	 */
-	@AutoLog(value = "房间预定-编辑")
-	@Operation(summary="房间预定-编辑")
+	@AutoLog(value = "取消预定")
+	@Operation(summary="取消预定")
 	@RequiresPermissions("elder_room_reserve:edit")
 	@RequestMapping(value = "/edit", method = {RequestMethod.PUT,RequestMethod.POST})
 	public Result<String> edit(@RequestBody ElderRoomReserve elderRoomReserve) {
-		elderRoomReserveService.updateById(elderRoomReserve);
-		return Result.OK("编辑成功!");
+		return elderRoomReserveService.updateInfo(elderRoomReserve);
 	}
 	
 	/**
@@ -100,8 +95,7 @@ public class ElderRoomReserveController extends JeecgController<ElderRoomReserve
 	@RequiresPermissions("elder_room_reserve:delete")
 	@DeleteMapping(value = "/delete")
 	public Result<String> delete(@RequestParam(name="id",required=true) String id) {
-		elderRoomReserveService.removeById(id);
-		return Result.OK("删除成功!");
+		return elderRoomReserveService.delete(id);
 	}
 	
 	/**
@@ -115,7 +109,9 @@ public class ElderRoomReserveController extends JeecgController<ElderRoomReserve
 	@RequiresPermissions("elder_room_reserve:deleteBatch")
 	@DeleteMapping(value = "/deleteBatch")
 	public Result<String> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
-		this.elderRoomReserveService.removeByIds(Arrays.asList(ids.split(",")));
+		for (String id : Arrays.asList(ids.split(","))) {
+			elderRoomReserveService.delete(id);
+		}
 		return Result.OK("批量删除成功!");
 	}
 	

@@ -80,7 +80,6 @@
             queryParam[key] = getDateByPicker(queryParam[key], fieldPickers[key]);
           }
         }
-        console.log(route.query.id)
         queryParam.customerId = route.query.id;
         return Object.assign(params, queryParam);
       },

@@ -22,4 +22,36 @@
         ORDER BY
             rr.create_time DESC limit 1
     </select>
+
+    <select id="pageList" resultType="com.joydigit.seniorcaring.mvp.entity.ElderRoomReserve">
+        SELECT
+            rr.* ,
+            b.bed_no,
+            r.room_no,
+            f.floor_name,
+            be.building_name
+        FROM
+            `elder_room_reserve` rr
+                LEFT JOIN elder_bed b ON b.id = rr.bed_id
+                LEFT JOIN elder_room r on r.id = rr.room_id
+                LEFT JOIN elder_floor f on f.id = r.floor_id
+                LEFT JOIN elder_building be on be.id = r.building_id
+        WHERE rr.del_flag = 0
+          <if test="data.status != null and data.status != ''">
+              AND rr.`status` = #{data.status}
+          </if>
+          <if test="data.customerId != null and data.customerId != ''">
+              AND rr.`customer_id` = #{data.customerId}
+          </if>
+            <if test="data.bedNo != null and data.bedNo != ''">
+                AND b.bed_no LIKE concat(concat('%',#{data.bedNo}),'%')
+            </if>
+        <if test="data.roomNo != null and data.roomNo != ''">
+            AND r.room_no LIKE concat(concat('%',#{data.roomNo}),'%')
+        </if>
+        <if test="data.createTimeArr != null and data.createTimeArr.size() > 0">
+            AND rr.create_time BETWEEN concat(#{data.createTimeArr[0]},' 00:00:00') AND concat(#{data.createTimeArr[1]},' 23:59:59')
+        </if>
+          order by rr.create_time desc
+    </select>
 </mapper>

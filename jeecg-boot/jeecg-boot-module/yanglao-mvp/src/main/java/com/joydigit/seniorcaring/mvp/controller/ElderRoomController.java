@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.joydigit.seniorcaring.mvp.vo.FloorDataVo;
 import com.joydigit.seniorcaring.mvp.vo.RoomCascaderVo;
+import com.joydigit.seniorcaring.mvp.vo.RoomSelectVo;
 import com.joydigit.seniorcaring.mvp.vo.RoomStatusQueryVo;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -82,6 +83,13 @@ public class ElderRoomController extends JeecgController<ElderRoom, IElderRoomSe
 	@GetMapping("/getRoomListByFloorId")
 	public Result<List<ElderRoom>> getRoomListByFloorId(@RequestParam String floorId){
 		 List<ElderRoom> list = elderRoomService.getRoomListByFloorId(floorId);
+		 return Result.OK(list);
+	 }
+
+	 @Operation(summary="elder_room-查询项目下的房间")
+	 @GetMapping("/getRoomListByProjectId")
+	 public Result<List<RoomSelectVo>> getRoomListByProjectId(@RequestParam String projectId){
+		 List<RoomSelectVo> list = elderRoomService.getRoomListByProjectId(projectId);
 		 return Result.OK(list);
 	 }
 

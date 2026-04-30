@@ -25,4 +25,6 @@ public interface ElderRoomMapper extends BaseMapper<ElderRoom> {
     List<RoomSelectVo> getBedSelectByProjectId(@Param("projectId")  String projectId);
 
     List<RoomStatusVo> getRoomStatusListByParams(Page<RoomStatusVo> page, @Param("data") RoomStatusQueryVo roomStatusQueryVo);
+
+
 }

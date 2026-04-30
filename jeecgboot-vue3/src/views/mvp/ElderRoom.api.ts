@@ -13,7 +13,8 @@ enum Api {
   exportXls = '/elderRoom/exportXls',
   getRoomListByFloorId = '/elderRoom/getRoomListByFloorId',
   getRoomCascaderList ='/elderRoom/getRoomCascaderList',
-  getRoomStatusPageList = '/elderRoom/getRoomStatusPageList'
+  getRoomStatusPageList = '/elderRoom/getRoomStatusPageList',
+  getRoomListByProjectId = '/elderRoom/getRoomListByProjectId'
 }
 
 /**
@@ -44,6 +45,12 @@ export const getRoomStatusPageListMethod = (params) => defHttp.get({ url: Api.ge
  * @param params
  */
 export const getRoomListByFloorIdMethod = (params) => defHttp.get({ url: Api.getRoomListByFloorId, params });
+
+/**
+ * 列表接口
+ * @param params
+ */
+export const getRoomListByProjectIdMethod = (params) => defHttp.get({ url: Api.getRoomListByProjectId, params });
 /**
  * 列表接口
  * @param params

@@ -70,3 +70,8 @@ export const saveOrUpdate = (params, isUpdate) => {
   let url = isUpdate ? Api.edit : Api.save;
   return defHttp.post({ url: url, params }, { isTransformResponse: false });
 }
+
+
+export const cancelReserve = (params,handleSuccess) => defHttp.post({ url: Api.edit, params }).then(() => {
+  handleSuccess();
+});;

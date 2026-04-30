@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
+import com.joydigit.seniorcaring.mvp.vo.CustomerSelectVo;
 import com.joydigit.seniorcaring.mvp.vo.ElderCustomerVo;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -149,6 +150,18 @@ public class ElderCustomerController extends JeecgController<ElderCustomer, IEld
 		}
 		return Result.OK(elderCustomer);
 	}
+
+	 /**
+	  * 通过项目id查询客户列表
+	  *
+	  * @param projectId
+	  * @return
+	  */
+	 @Operation(summary="通过项目id查询客户列表")
+	 @GetMapping(value = "/getCustomerListByProjectId")
+	 public Result<List<CustomerSelectVo>> getCustomerListByProjectId(@RequestParam String projectId) {
+		 return elderCustomerService.getCustomerListByProjectId(projectId);
+	 }
 
 	 /**
 	  * 通过id查询

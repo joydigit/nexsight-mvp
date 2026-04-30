@@ -13,6 +13,7 @@ import com.joydigit.seniorcaring.mvp.mapper.ElderRoomReserveMapper;
 import com.joydigit.seniorcaring.mvp.service.IElderCustomerAccountService;
 import com.joydigit.seniorcaring.mvp.service.IElderCustomerService;
 import com.joydigit.seniorcaring.mvp.service.IElderProjectAccountService;
+import com.joydigit.seniorcaring.mvp.vo.CustomerSelectVo;
 import com.joydigit.seniorcaring.mvp.vo.ElderCustomerVo;
 import org.jeecg.common.api.vo.Result;
 import org.springframework.beans.BeanUtils;
@@ -165,5 +166,18 @@ public class ElderCustomerServiceImpl extends ServiceImpl<ElderCustomerMapper, E
             }
         }
         return Result.OK(vo);
+    }
+
+    @Override
+    public Result<List<CustomerSelectVo>> getCustomerListByProjectId(String projectId) {
+        List<ElderCustomer> list = list(Wrappers.lambdaQuery(ElderCustomer.class).eq(ElderCustomer::getProjectId, projectId));
+        List<CustomerSelectVo> selectVoList = new ArrayList<>();
+        for (ElderCustomer elderCustomer : list) {
+            CustomerSelectVo vo = new CustomerSelectVo();
+            vo.setId(elderCustomer.getId());
+            vo.setName(elderCustomer.getName());
+            selectVoList.add(vo);
+        }
+        return Result.OK(selectVoList);
     }
 }

@@ -57,7 +57,7 @@
         <div class="header-right" v-if="customerInfo.roomNo">
           <div class="room-card">
             <div class="room-label">当前房间</div>
-            <div class="room-value">{{ customerInfo.roomNo }}</div>
+            <div class="room-value">{{ customerInfo.buildingName }} /{{ customerInfo.floorName }} /{{ customerInfo.roomNo }}</div>
             <div class="room-bed">{{ customerInfo.bedNo }}</div>
           </div>
         </div>

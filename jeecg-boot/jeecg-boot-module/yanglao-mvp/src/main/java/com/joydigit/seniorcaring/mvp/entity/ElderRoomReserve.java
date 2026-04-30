@@ -114,5 +114,6 @@ public class ElderRoomReserve implements Serializable {
 
     @TableField(exist = false)
     private List<String> projectIds;
-
+    @TableField(exist = false)
+    private List<String> createTimeArr;
 }

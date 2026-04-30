@@ -4,6 +4,44 @@
     <div class="jeecg-basic-table-form-container">
       <a-form ref="formRef" @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol">
         <a-row :gutter="24">
+          <a-col :lg="6">
+            <a-form-item name="roomNo">
+              <template #label><span title="房间号">房间号</span></template>
+              <a-input placeholder="请输入房间号" v-model:value="queryParam.roomNo" allow-clear ></a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :lg="6">
+            <a-form-item name="bedNo">
+              <template #label><span title="床位">床位</span></template>
+              <a-input placeholder="请输入床位" v-model:value="queryParam.bedNo" allow-clear ></a-input>
+            </a-form-item>
+          </a-col>
+          <template v-if="toggleSearchStatus">
+            <a-col :lg="6">
+              <a-form-item name="status">
+                <template #label><span title="状态">状态</span></template>
+                <JDictSelectTag type="select" v-model:value="queryParam.status" dictCode="reserve_status" placeholder="请选择状态" />
+              </a-form-item>
+            </a-col>
+            <a-col :lg="6">
+              <a-form-item name="createTimeArr">
+                <template #label><span title="预定时间">预定时间</span></template>
+                <a-range-picker value-format="YYYY-MM-DD" v-model:value="queryParam.createTimeArr" class="query-group-cust"/>
+              </a-form-item>
+            </a-col>
+          </template>
+          <a-col :xl="6" :lg="7" :md="8" :sm="24">
+            <span style="float: left; overflow: hidden" class="table-page-search-submitButtons">
+              <a-col :lg="6">
+                <a-button type="primary" preIcon="ant-design:search-outlined" @click="searchQuery">查询</a-button>
+                <a-button type="primary" preIcon="ant-design:reload-outlined" @click="searchReset" style="margin-left: 8px">重置</a-button>
+                <a @click="toggleSearchStatus = !toggleSearchStatus" style="margin-left: 8px">
+                  {{ toggleSearchStatus ? '收起' : '展开' }}
+                  <Icon :icon="toggleSearchStatus ? 'ant-design:up-outlined' : 'ant-design:down-outlined'" />
+                </a>
+              </a-col>
+            </span>
+          </a-col>
         </a-row>
       </a-form>
     </div>
@@ -43,13 +81,16 @@
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { useListPage } from '/@/hooks/system/useListPage';
   import { columns, superQuerySchema } from './ElderRoomReserve.data';
-  import { list, deleteOne, batchDelete, getImportUrl, getExportUrl } from './ElderRoomReserve.api';
+  import { list, deleteOne, batchDelete, getImportUrl, getExportUrl,cancelReserve } from './ElderRoomReserve.api';
   import { downloadFile } from '/@/utils/common/renderUtils';
   import ElderRoomReserveModal from './components/ElderRoomReserveModal.vue'
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
    import {useModal} from '/@/components/Modal';
   import { getDateByPicker } from '/@/utils';
+  import { useRoute } from 'vue-router';
+  import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
+  const route = useRoute();
 
   const fieldPickers = reactive({
   });
@@ -70,7 +111,7 @@
       useSearchForm: false,
       showTableSetting: false,
       actionColumn: {
-        width: 120,
+        width: 200,
         fixed: 'right',
       },
       beforeFetch: async (params) => {
@@ -79,6 +120,7 @@
             queryParam[key] = getDateByPicker(queryParam[key], fieldPickers[key]);
           }
         }
+        queryParam.customerId = route.query.id;
         return Object.assign(params, queryParam);
       },
     },
@@ -122,15 +164,19 @@
    */
   function handleAdd() {
     registerModal.value.disableSubmit = false;
-    registerModal.value.add();
+    const pardata = {
+      projectId:route.query.projectId,
+      customerId: route.query.id
+    }
+    registerModal.value.add(pardata);
   }
   
   /**
    * 编辑事件
    */
-  function handleEdit(record: Recordable) {
-    registerModal.value.disableSubmit = false;
-    registerModal.value.edit(record);
+  async function handleEdit(record: Recordable) {
+    record.status = '2';
+    await cancelReserve(record,handleSuccess)
   }
    
   /**
@@ -168,8 +214,13 @@
   function getTableAction(record) {
     return [
       {
-        label: '编辑',
-        onClick: handleEdit.bind(null, record),
+        label: '取消预定',
+        popConfirm: {
+          title: '是否确认取消',
+          confirm: handleEdit.bind(null, record),
+          placement: 'topLeft',
+        },
+        ifShow: record.status == '1',
         auth: 'elder_room_reserve:edit'
       },
     ];

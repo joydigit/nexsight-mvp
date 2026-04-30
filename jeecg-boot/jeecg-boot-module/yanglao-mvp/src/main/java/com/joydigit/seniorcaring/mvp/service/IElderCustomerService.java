@@ -4,8 +4,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.joydigit.seniorcaring.mvp.entity.ElderCustomer;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.joydigit.seniorcaring.mvp.vo.CustomerSelectVo;
 import com.joydigit.seniorcaring.mvp.vo.ElderCustomerVo;
 import org.jeecg.common.api.vo.Result;
+
+import java.util.List;
 
 /**
  * @Description: elder_customer
@@ -22,4 +25,6 @@ public interface IElderCustomerService extends IService<ElderCustomer> {
     IPage<ElderCustomer> pageList(Page<ElderCustomer> page, ElderCustomer elderCustomer);
 
     Result<ElderCustomerVo> getCustomerLastInfo(String id);
+
+    Result<List<CustomerSelectVo>> getCustomerListByProjectId(String projectId);
 }
