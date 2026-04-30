@@ -12,8 +12,6 @@
       <!--插槽:table标题-->
       <template #tableTitle>
         <a-button type="primary" v-auth="'elder_customer_checkin_fee:add'"  @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
-        <a-button  type="primary" v-auth="'elder_customer_checkin_fee:exportXls'" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
-        <j-upload-button  type="primary" v-auth="'elder_customer_checkin_fee:importExcel'"  preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button>
         <a-dropdown v-if="selectedRowKeys.length > 0">
           <template #overlay>
             <a-menu>
@@ -26,9 +24,7 @@
           <a-button v-auth="'elder_customer_checkin_fee:deleteBatch'">批量操作
             <Icon icon="mdi:chevron-down"></Icon>
           </a-button>
-        </a-dropdown>
-        <!-- 高级查询 -->
-        <super-query :config="superQueryConfig" @search="handleSuperQuery" />
+        </a-dropdown>       
       </template>
       <!--操作栏-->
       <template #action="{ record }">
@@ -43,7 +39,7 @@
 </template>
 
 <script lang="ts" name="com.joydigit.seniorcaring.mvp-elderCustomerCheckinFee" setup>
-  import { ref, reactive } from 'vue';
+  import { ref, reactive, defineProps } from 'vue';
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { useListPage } from '/@/hooks/system/useListPage';
   import { columns, superQuerySchema } from './ElderCustomerCheckinFee.data';
@@ -54,6 +50,13 @@
   import { useMessage } from '/@/hooks/web/useMessage';
    import {useModal} from '/@/components/Modal';
   import { getDateByPicker } from '/@/utils';
+
+  const props = defineProps({
+    checkinId: {
+      type: String,
+      default: ''
+    }
+  });
 
   const fieldPickers = reactive({
   });
@@ -72,6 +75,7 @@
       columns,
       canResize:true,
       useSearchForm: false,
+      showTableSetting: false,
       actionColumn: {
         width: 120,
         fixed: 'right',
@@ -81,6 +85,9 @@
           if (queryParam[key] && fieldPickers[key]) {
             queryParam[key] = getDateByPicker(queryParam[key], fieldPickers[key]);
           }
+        }
+        if (props.checkinId) {
+          params.checkinId = props.checkinId;
         }
         return Object.assign(params, queryParam);
       },
@@ -173,7 +180,7 @@
       {
         label: '编辑',
         onClick: handleEdit.bind(null, record),
-        auth: 'com.joydigit.seniorcaring.mvp:elder_customer_checkin_fee:edit'
+        auth: 'elder_customer_checkin_fee:edit'
       },
     ];
   }
@@ -193,7 +200,7 @@
           confirm: handleDelete.bind(null, record),
           placement: 'topLeft',
         },
-        auth: 'com.joydigit.seniorcaring.mvp:elder_customer_checkin_fee:delete'
+        auth: 'elder_customer_checkin_fee:delete'
       }
     ]
   }

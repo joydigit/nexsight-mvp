@@ -60,6 +60,8 @@
     </BasicTable>
     <!-- 表单区域 -->
     <ElderCustomerCheckinModal ref="registerModal" @success="handleSuccess"></ElderCustomerCheckinModal>
+    <!-- 费用配置弹框 -->
+    <ElderCustomerCheckinFeeListModal ref="registerFeeModal" />
   </div>
 </template>
 
@@ -71,6 +73,7 @@
   import { list, deleteOne, batchDelete, getImportUrl, getExportUrl } from './ElderCustomerCheckin.api';
   import { downloadFile } from '/@/utils/common/renderUtils';
   import ElderCustomerCheckinModal from './components/ElderCustomerCheckinModal.vue'
+  import ElderCustomerCheckinFeeListModal from './components/ElderCustomerCheckinFeeListModal.vue'
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
   import {useModal} from '/@/components/Modal';
@@ -86,6 +89,7 @@
   const queryParam = reactive<any>({});
   const toggleSearchStatus = ref<boolean>(false);
   const registerModal = ref();
+  const registerFeeModal = ref();
   const userStore = useUserStore();
   const { createMessage } = useMessage();
   //注册table数据
@@ -172,7 +176,14 @@
     registerModal.value.disableSubmit = true;
     registerModal.value.edit(record);
   }
-   
+
+  /**
+   * 费用配置
+   */
+  function handleFeeConfig(record: Recordable) {
+    registerFeeModal.value.open(record.id);
+  }
+
   /**
    * 删除事件
    */
@@ -219,18 +230,18 @@
       },
       {
         label: '费用配置',
-        onClick: handleDetail.bind(null, record),
+        onClick: handleFeeConfig.bind(null, record),
         auth: 'elder_customer_checkin:feeConfig'
       },
       {
         label: '退住',
         onClick: handleDetail.bind(null, record),
-        auth: 'elder_customer_checkin:feeConfig'
+        auth: 'elder_customer_checkin:checkout'
       },
       {
         label: '换房',
         onClick: handleDetail.bind(null, record),
-        auth: 'elder_customer_checkin:feeConfig'
+        auth: 'elder_customer_checkin:changeRoom'
       }
     ]
   }

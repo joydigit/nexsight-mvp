@@ -5,28 +5,23 @@
         <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ElderCustomerCheckinFeeForm">
           <a-row>
 						<a-col :span="24">
-							<a-form-item label="租户ID" v-bind="validateInfos.tenantId" id="ElderCustomerCheckinFeeForm-tenantId" name="tenantId">
-								<a-input v-model:value="formData.tenantId" placeholder="请输入租户ID"  allow-clear ></a-input>
+							<a-form-item label="入住编码" v-bind="validateInfos.checkinId" id="ElderCustomerCheckinFeeForm-projectId" name="checkinId">
+								<a-input v-model:value="formData.checkinId" disabled></a-input>
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="所属项目ID" v-bind="validateInfos.projectId" id="ElderCustomerCheckinFeeForm-projectId" name="projectId">
-								<a-input v-model:value="formData.projectId" placeholder="请输入所属项目ID"  allow-clear ></a-input>
+							<a-form-item label="费用类型" v-bind="validateInfos.paymentTypeCode" id="ElderCustomerCheckinFeeForm-feeType" name="paymentTypeCode">
+								<JDictSelectTag type="select" v-model:value="formData.paymentTypeCode" dictCode="payment_type" placeholder="请选择费用类型" />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="费用类型 1 床费 2 其它费用" v-bind="validateInfos.feeType" id="ElderCustomerCheckinFeeForm-feeType" name="feeType">
-								<a-input v-model:value="formData.feeType" placeholder="请输入费用类型 1 床费 2 其它费用"  allow-clear ></a-input>
+							<a-form-item label="金额" v-bind="validateInfos.amount" id="ElderCustomerCheckinFeeForm-amount" name="amount">
+								<a-input-number v-model:value="formData.amount" placeholder="请输入金额" style="width: 100%" allow-clear ></a-input-number>
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="入住id" v-bind="validateInfos.checkinId" id="ElderCustomerCheckinFeeForm-checkinId" name="checkinId">
-								<a-input v-model:value="formData.checkinId" placeholder="请输入入住id"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="费用配置id" v-bind="validateInfos.feeConfigId" id="ElderCustomerCheckinFeeForm-feeConfigId" name="feeConfigId">
-								<a-input v-model:value="formData.feeConfigId" placeholder="请输入费用配置id"  allow-clear ></a-input>
+							<a-form-item label="单位" v-bind="validateInfos.unitCode" id="ElderCustomerCheckinFeeForm-feeConfigId" name="unitCode">
+								<JDictSelectTag type="select" v-model:value="formData.unitCode" dictCode="fee_unit" placeholder="请选择单位" />
 							</a-form-item>
 						</a-col>
           </a-row>
@@ -44,6 +39,7 @@
   import { saveOrUpdate } from '../ElderCustomerCheckinFee.api';
   import { Form } from 'ant-design-vue';
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
+  import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
   const props = defineProps({
     formDisabled: { type: Boolean, default: false },
     formData: { type: Object, default: () => ({})},

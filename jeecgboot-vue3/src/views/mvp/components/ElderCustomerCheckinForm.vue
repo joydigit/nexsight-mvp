@@ -161,7 +161,7 @@
     if (value) {
       let beds = await getBedListByRoomIdMethod({ roomId: value });
       beds.forEach(item=>{
-        item.disabled = item.status == '1';
+        item.disabled = item.status == '2';
       })
       bedList.value = beds;
     } else {
