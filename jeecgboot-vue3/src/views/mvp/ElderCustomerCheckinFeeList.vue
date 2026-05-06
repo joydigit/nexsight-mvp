@@ -132,7 +132,7 @@
    */
   function handleAdd() {
     registerModal.value.disableSubmit = false;
-    registerModal.value.add();
+    registerModal.value.add({checkinId: props.checkinId});
   }
   
   /**

@@ -5,7 +5,7 @@
         <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ElderCustomerCheckinFeeForm">
           <a-row>
 						<a-col :span="24">
-							<a-form-item label="入住编码" v-bind="validateInfos.checkinId" id="ElderCustomerCheckinFeeForm-projectId" name="checkinId">
+							<a-form-item label="入住编码" v-bind="validateInfos.checkinId" id="ElderCustomerCheckinFeeForm-checkinId" name="checkinId">
 								<a-input v-model:value="formData.checkinId" disabled></a-input>
 							</a-form-item>
 						</a-col>
@@ -50,11 +50,13 @@
   const emit = defineEmits(['register', 'ok']);
   const formData = reactive<Record<string, any>>({
     id: '',
-    tenantId: '',   
+    paymentTypeCode: '',   
     projectId: '',   
     feeType: '',   
     checkinId: '',   
-    feeConfigId: '',   
+    feeConfigId: '',  
+    unitCode: undefined,
+    amount: 0,
     delFlag: undefined,
   });
   const { createMessage } = useMessage();
@@ -63,8 +65,10 @@
   const confirmLoading = ref<boolean>(false);
   //表单验证
   const validatorRules = reactive({
-    tenantId: [{ required: true, message: '请输入租户ID!'},],
-    projectId: [{ required: true, message: '请输入所属项目ID!'},],
+    checkinId: [{ required: true, message: '请输入入住编码!'},],
+    paymentTypeCode: [{ required: true, message: '请选择费用类型!'},],
+    amount: [{ required: true, message: '请输入金额!'},],
+    unitCode: [{ required: true, message: '请选择单位!'},],
   });
   const { resetFields, validate, validateInfos } = useForm(formData, validatorRules, { immediate: false });
   //日期个性化选择
@@ -87,8 +91,8 @@
   /**
    * 新增
    */
-  function add() {
-    edit({});
+  function add(val) {
+    edit(val);
   }
 
   /**
