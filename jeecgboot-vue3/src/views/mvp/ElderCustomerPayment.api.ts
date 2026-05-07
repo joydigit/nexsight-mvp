@@ -11,6 +11,7 @@ enum Api {
   deleteBatch = '/elderCustomerPayment/deleteBatch',
   importExcel = '/elderCustomerPayment/importExcel',
   exportXls = '/elderCustomerPayment/exportXls',
+  confirm = '/elderCustomerPayment/confirm'
 }
 
 /**
@@ -69,4 +70,24 @@ export const batchDelete = (params, handleSuccess) => {
 export const saveOrUpdate = (params, isUpdate) => {
   let url = isUpdate ? Api.edit : Api.save;
   return defHttp.post({ url: url, params }, { isTransformResponse: false });
+}
+
+/**
+ * 保存或者更新
+ * @param params
+ * @param isUpdate
+ */
+export const confirmMethod = (params, handleSuccess) => {
+  createConfirm({
+    iconType: 'warning',
+    title: '确认流水',
+    content: '是否确认选中数据',
+    okText: '确认',
+    cancelText: '取消',
+    onOk: () => {
+      return defHttp.post({ url: Api.confirm, params }, {joinParamsToUrl: true}).then(() => {
+        handleSuccess();
+      });
+    }
+  });
 }

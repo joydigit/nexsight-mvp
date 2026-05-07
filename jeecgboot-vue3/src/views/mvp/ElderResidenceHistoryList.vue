@@ -12,19 +12,6 @@
       <!--插槽:table标题-->
       <template #tableTitle>
         <a-button type="primary" v-auth="'elder_residence_history:add'"  @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
-        <a-dropdown v-if="selectedRowKeys.length > 0">
-          <template #overlay>
-            <a-menu>
-              <a-menu-item key="1" @click="batchHandleDelete">
-                <Icon icon="ant-design:delete-outlined"></Icon>
-                删除
-              </a-menu-item>
-            </a-menu>
-          </template>
-          <a-button v-auth="'elder_residence_history:deleteBatch'">批量操作
-            <Icon icon="mdi:chevron-down"></Icon>
-          </a-button>
-        </a-dropdown>       
       </template>
       <!--操作栏-->
       <template #action="{ record }">
@@ -48,9 +35,10 @@
   import ElderResidenceHistoryModal from './components/ElderResidenceHistoryModal.vue'
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
-   import {useModal} from '/@/components/Modal';
+  import {useModal} from '/@/components/Modal';
   import { getDateByPicker } from '/@/utils';
-
+  import { useRoute } from 'vue-router';
+  const route = useRoute();
   const fieldPickers = reactive({
   });
 
@@ -69,6 +57,7 @@
       canResize:true,
       useSearchForm: false,
       showTableSetting: false,
+      showActionColumn: false,
       actionColumn: {
         width: 120,
         fixed: 'right',
@@ -79,6 +68,7 @@
             queryParam[key] = getDateByPicker(queryParam[key], fieldPickers[key]);
           }
         }
+        queryParam.customerId = route.query.id;
         return Object.assign(params, queryParam);
       },
     },
@@ -92,7 +82,7 @@
 	    success: handleSuccess
 	  },
   });
-  const [registerTable, { reload, collapseAll, updateTableDataRecord, findTableDataRecord, getDataSource }, { rowSelection, selectedRowKeys }] = tableContext;
+  const [registerTable, { reload, collapseAll, updateTableDataRecord, findTableDataRecord, getDataSource }, { selectedRowKeys }] = tableContext;
   const labelCol = reactive({
     xs:24,
     sm:4,

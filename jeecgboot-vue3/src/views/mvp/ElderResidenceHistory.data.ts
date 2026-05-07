@@ -6,22 +6,7 @@ import { getWeekMonthQuarterYear } from '/@/utils';
 //列表数据
 export const columns: BasicColumn[] = [
   {
-    title: '租户ID',
-    align: "center",
-    dataIndex: 'tenantId'
-  },
-  {
-    title: '项目ID',
-    align: "center",
-    dataIndex: 'projectId'
-  },
-  {
-    title: '客户ID',
-    align: "center",
-    dataIndex: 'customerId'
-  },
-  {
-    title: '入住id',
+    title: '入住编码',
     align: "center",
     dataIndex: 'checkinId'
   },
@@ -29,34 +14,29 @@ export const columns: BasicColumn[] = [
     title: '变更类型名称',
     align: "center",
     dataIndex: 'changeTypeName'
-  },
+  },  
   {
-    title: '变更类型编码',
+    title: '原房间',
     align: "center",
-    dataIndex: 'changeTypeCode'
+    dataIndex: 'oldRoomName'
   },
   {
-    title: '原房间ID（换房/退住时填充）',
+    title: '原床位',
     align: "center",
-    dataIndex: 'oldRoomId'
+    dataIndex: 'oldBedName'
   },
   {
-    title: '原床位ID（换房/退住时填充）',
+    title: '新房间',
     align: "center",
-    dataIndex: 'oldBedId'
+    dataIndex: 'newRoomName'
   },
   {
-    title: '新房间ID（入住/换房时填充）',
+    title: '新床位',
     align: "center",
-    dataIndex: 'newRoomId'
+    dataIndex: 'newBedName'
   },
   {
-    title: '新床位ID（入住/换房时填充）',
-    align: "center",
-    dataIndex: 'newBedId'
-  },
-  {
-    title: '变更原因（如"家属要求换向阳房间"）',
+    title: '变更原因',
     align: "center",
     dataIndex: 'reason'
   },

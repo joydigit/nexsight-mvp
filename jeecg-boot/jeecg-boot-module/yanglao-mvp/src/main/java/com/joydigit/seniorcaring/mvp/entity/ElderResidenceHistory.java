@@ -4,10 +4,8 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.math.BigDecimal;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.TableLogic;
+
+import com.baomidou.mybatisplus.annotation.*;
 import org.jeecg.common.constant.ProvinceCityArea;
 import org.jeecg.common.util.SpringContextUtils;
 import lombok.Data;
@@ -65,18 +63,26 @@ public class ElderResidenceHistory implements Serializable {
 	@Excel(name = "原房间ID（换房/退住时填充）", width = 15)
     @Schema(description = "原房间ID（换房/退住时填充）")
     private String oldRoomId;
+    @TableField(exist = false)
+    private String oldRoomName;
 	/**原床位ID（换房/退住时填充）*/
 	@Excel(name = "原床位ID（换房/退住时填充）", width = 15)
     @Schema(description = "原床位ID（换房/退住时填充）")
     private String oldBedId;
+    @TableField(exist = false)
+    private String oldBedName;
 	/**新房间ID（入住/换房时填充）*/
 	@Excel(name = "新房间ID（入住/换房时填充）", width = 15)
     @Schema(description = "新房间ID（入住/换房时填充）")
     private String newRoomId;
+    @TableField(exist = false)
+    private String newRoomName;
 	/**新床位ID（入住/换房时填充）*/
 	@Excel(name = "新床位ID（入住/换房时填充）", width = 15)
     @Schema(description = "新床位ID（入住/换房时填充）")
     private String newBedId;
+    @TableField(exist = false)
+    private String newBedName;
 	/**变更原因（如"家属要求换向阳房间"）*/
 	@Excel(name = "变更原因（如家属要求换向阳房间）", width = 15)
     @Schema(description = "变更原因（如家属要求换向阳房间）")

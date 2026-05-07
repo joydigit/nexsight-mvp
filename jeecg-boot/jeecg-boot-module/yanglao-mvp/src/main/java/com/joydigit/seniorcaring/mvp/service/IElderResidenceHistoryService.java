@@ -1,5 +1,7 @@
 package com.joydigit.seniorcaring.mvp.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.joydigit.seniorcaring.mvp.entity.ElderResidenceHistory;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -10,5 +12,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @Version: V1.0
  */
 public interface IElderResidenceHistoryService extends IService<ElderResidenceHistory> {
+
+    IPage<ElderResidenceHistory> pageList(Page<ElderResidenceHistory> page, ElderResidenceHistory elderResidenceHistory);
 
 }

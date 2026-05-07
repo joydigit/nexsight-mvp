@@ -1,18 +1,20 @@
 package com.joydigit.seniorcaring.mvp.controller;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+
+import com.joydigit.seniorcaring.mvp.entity.ElderConsulting;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.query.QueryRuleEnum;
+import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.oConvertUtils;
 import com.joydigit.seniorcaring.mvp.entity.ElderCustomerPayment;
 import com.joydigit.seniorcaring.mvp.service.IElderCustomerPaymentService;
@@ -22,6 +24,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
+import org.jeecg.config.JeecgBaseConfig;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -51,6 +54,8 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 public class ElderCustomerPaymentController extends JeecgController<ElderCustomerPayment, IElderCustomerPaymentService> {
 	@Autowired
 	private IElderCustomerPaymentService elderCustomerPaymentService;
+	 @Autowired
+	 private JeecgBaseConfig jeecgBaseConfig;
 	
 	/**
 	 * 分页列表查询
@@ -68,11 +73,8 @@ public class ElderCustomerPaymentController extends JeecgController<ElderCustome
 								   @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
-
-
-        QueryWrapper<ElderCustomerPayment> queryWrapper = QueryGenerator.initQueryWrapper(elderCustomerPayment, req.getParameterMap());
 		Page<ElderCustomerPayment> page = new Page<ElderCustomerPayment>(pageNo, pageSize);
-		IPage<ElderCustomerPayment> pageList = elderCustomerPaymentService.page(page, queryWrapper);
+		IPage<ElderCustomerPayment> pageList = elderCustomerPaymentService.pageList(page, elderCustomerPayment);
 		return Result.OK(pageList);
 	}
 	
@@ -84,14 +86,25 @@ public class ElderCustomerPaymentController extends JeecgController<ElderCustome
 	 */
 	@AutoLog(value = "elder_customer_payment-添加")
 	@Operation(summary="elder_customer_payment-添加")
-	@RequiresPermissions("elder_customer_payment:add")
+	@RequiresPermissions("elder_customer_payment:custAdd")
 	@PostMapping(value = "/add")
 	public Result<String> add(@RequestBody ElderCustomerPayment elderCustomerPayment) {
-		elderCustomerPaymentService.save(elderCustomerPayment);
-
-		return Result.OK("添加成功！");
+		return elderCustomerPaymentService.saveInfo(elderCustomerPayment);
 	}
-	
+
+	 /**
+	  *  确认流水
+	  *
+	  * @param id
+	  * @return
+	  */
+	 @AutoLog(value = "elder_customer_payment-添加")
+	 @Operation(summary="elder_customer_payment-添加")
+	 @RequiresPermissions("elder_customer_payment:confirm")
+	 @PostMapping(value = "/confirm")
+	 public Result<String> confirm(@RequestParam(name="ids",required=true) String ids) throws Exception {
+		 return elderCustomerPaymentService.confirm(ids);
+	 }
 	/**
 	 *  编辑
 	 *
@@ -100,11 +113,10 @@ public class ElderCustomerPaymentController extends JeecgController<ElderCustome
 	 */
 	@AutoLog(value = "elder_customer_payment-编辑")
 	@Operation(summary="elder_customer_payment-编辑")
-	@RequiresPermissions("elder_customer_payment:edit")
+	@RequiresPermissions("elder_customer_payment:custedit")
 	@RequestMapping(value = "/edit", method = {RequestMethod.PUT,RequestMethod.POST})
 	public Result<String> edit(@RequestBody ElderCustomerPayment elderCustomerPayment) {
-		elderCustomerPaymentService.updateById(elderCustomerPayment);
-		return Result.OK("编辑成功!");
+		return elderCustomerPaymentService.updateInfo(elderCustomerPayment);
 	}
 	
 	/**
@@ -115,26 +127,10 @@ public class ElderCustomerPaymentController extends JeecgController<ElderCustome
 	 */
 	@AutoLog(value = "elder_customer_payment-通过id删除")
 	@Operation(summary="elder_customer_payment-通过id删除")
-	@RequiresPermissions("elder_customer_payment:delete")
+	@RequiresPermissions("elder_customer_payment:custdelete")
 	@DeleteMapping(value = "/delete")
 	public Result<String> delete(@RequestParam(name="id",required=true) String id) {
-		elderCustomerPaymentService.removeById(id);
-		return Result.OK("删除成功!");
-	}
-	
-	/**
-	 *  批量删除
-	 *
-	 * @param ids
-	 * @return
-	 */
-	@AutoLog(value = "elder_customer_payment-批量删除")
-	@Operation(summary="elder_customer_payment-批量删除")
-	@RequiresPermissions("elder_customer_payment:deleteBatch")
-	@DeleteMapping(value = "/deleteBatch")
-	public Result<String> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
-		this.elderCustomerPaymentService.removeByIds(Arrays.asList(ids.split(",")));
-		return Result.OK("批量删除成功!");
+		return elderCustomerPaymentService.removeInfo(id);
 	}
 	
 	/**
@@ -163,7 +159,27 @@ public class ElderCustomerPaymentController extends JeecgController<ElderCustome
     @RequiresPermissions("elder_customer_payment:exportXls")
     @RequestMapping(value = "/exportXls")
     public ModelAndView exportXls(HttpServletRequest request, ElderCustomerPayment elderCustomerPayment) {
-        return super.exportXls(request, elderCustomerPayment, ElderCustomerPayment.class, "elder_customer_payment");
+		LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+		// 过滤选中数据
+		String selections = request.getParameter("selections");
+		List<String> selectionList = new ArrayList<>();
+		if (StringUtils.isNotBlank(selections)){
+			selectionList = Arrays.asList(selections.split(","));
+		}
+		List<ElderCustomerPayment> exportList = elderCustomerPaymentService.getList(elderCustomerPayment,selectionList);
+		// Step.3 AutoPoi 导出Excel
+		ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
+		//此处设置的filename无效 ,前端会重更新设置一下
+		String title = "资金流水";
+		mv.addObject(NormalExcelConstants.FILE_NAME, title);
+		mv.addObject(NormalExcelConstants.CLASS, ElderCustomerPayment.class);
+		//update-begin--Author:liusq  Date:20210126 for：图片导出报错，ImageBasePath未设置--------------------
+		ExportParams exportParams=new ExportParams(title + "报表", "导出人:" + sysUser.getRealname(), title);
+		exportParams.setImageBasePath(jeecgBaseConfig.getPath().getUpload());
+		//update-end--Author:liusq  Date:20210126 for：图片导出报错，ImageBasePath未设置----------------------
+		mv.addObject(NormalExcelConstants.PARAMS,exportParams);
+		mv.addObject(NormalExcelConstants.DATA_LIST, exportList);
+		return mv;
     }
 
     /**

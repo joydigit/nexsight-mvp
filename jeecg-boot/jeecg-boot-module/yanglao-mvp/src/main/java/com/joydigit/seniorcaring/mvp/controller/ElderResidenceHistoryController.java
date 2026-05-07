@@ -68,11 +68,8 @@ public class ElderResidenceHistoryController extends JeecgController<ElderReside
 								   @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
-
-
-        QueryWrapper<ElderResidenceHistory> queryWrapper = QueryGenerator.initQueryWrapper(elderResidenceHistory, req.getParameterMap());
 		Page<ElderResidenceHistory> page = new Page<ElderResidenceHistory>(pageNo, pageSize);
-		IPage<ElderResidenceHistory> pageList = elderResidenceHistoryService.page(page, queryWrapper);
+		IPage<ElderResidenceHistory> pageList = elderResidenceHistoryService.pageList(page, elderResidenceHistory);
 		return Result.OK(pageList);
 	}
 	

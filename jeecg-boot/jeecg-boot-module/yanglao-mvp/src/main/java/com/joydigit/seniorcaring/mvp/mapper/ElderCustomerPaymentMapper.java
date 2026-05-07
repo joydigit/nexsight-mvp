@@ -2,6 +2,8 @@ package com.joydigit.seniorcaring.mvp.mapper;
 
 import java.util.List;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 import com.joydigit.seniorcaring.mvp.entity.ElderCustomerPayment;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -14,4 +16,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface ElderCustomerPaymentMapper extends BaseMapper<ElderCustomerPayment> {
 
+    IPage<ElderCustomerPayment> pageList(Page<ElderCustomerPayment> page,@Param("data") ElderCustomerPayment elderCustomerPayment);
+    List<ElderCustomerPayment> getList(@Param("data") ElderCustomerPayment elderCustomerPayment,@Param("selectionList") List<String> selectionList);
 }

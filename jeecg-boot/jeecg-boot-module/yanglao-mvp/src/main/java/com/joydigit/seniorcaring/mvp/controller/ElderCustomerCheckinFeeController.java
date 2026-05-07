@@ -1,13 +1,13 @@
 package com.joydigit.seniorcaring.mvp.controller;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+
+import com.joydigit.seniorcaring.mvp.entity.ElderCustomerCheckin;
+import com.joydigit.seniorcaring.mvp.service.IElderCustomerCheckinService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jeecg.common.api.vo.Result;
@@ -51,7 +51,8 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 public class ElderCustomerCheckinFeeController extends JeecgController<ElderCustomerCheckinFee, IElderCustomerCheckinFeeService> {
 	@Autowired
 	private IElderCustomerCheckinFeeService elderCustomerCheckinFeeService;
-	
+	@Autowired
+	private IElderCustomerCheckinService elderCustomerCheckinService;
 	/**
 	 * 分页列表查询
 	 *
@@ -87,8 +88,12 @@ public class ElderCustomerCheckinFeeController extends JeecgController<ElderCust
 	@RequiresPermissions("elder_customer_checkin_fee:add")
 	@PostMapping(value = "/add")
 	public Result<String> add(@RequestBody ElderCustomerCheckinFee elderCustomerCheckinFee) {
+		ElderCustomerCheckin checkin = elderCustomerCheckinService.getById(elderCustomerCheckinFee.getCheckinId());
+		if (Objects.isNull(checkin)){
+			return Result.error("入住记录不存在");
+		}
+		elderCustomerCheckinFee.setProjectId(checkin.getProjectId());
 		elderCustomerCheckinFeeService.save(elderCustomerCheckinFee);
-
 		return Result.OK("添加成功！");
 	}
 	

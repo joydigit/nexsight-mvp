@@ -5,68 +5,67 @@
         <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ElderCustomerPaymentForm">
           <a-row>
 						<a-col :span="24">
-							<a-form-item label="租户ID" v-bind="validateInfos.tenantId" id="ElderCustomerPaymentForm-tenantId" name="tenantId">
-								<a-input v-model:value="formData.tenantId" placeholder="请输入租户ID"  allow-clear ></a-input>
+							<a-form-item label="客户" v-bind="validateInfos.customerId" id="ElderCustomerPaymentForm-customerId" name="customerId">
+								<a-select
+                  v-model:value="formData.customerId"
+                  :options="customerList"
+                  :disabled="dealType == '1' || !!formData.id"
+                  :fieldNames="{ label: 'name', value: 'id' }"
+                  showSearch
+                  placeholder="请选择客户"
+                />
+							</a-form-item>
+						</a-col>
+            <a-col :span="24">
+							<a-form-item label="交易类型" v-bind="validateInfos.transactionTypeCode" id="ElderCustomerPaymentForm-transactionTypeCode" name="transactionTypeCode">
+								<JDictSelectTag type="select" v-model:value="formData.transactionTypeCode" dictCode="transaction_type_code" placeholder="请选择交易类型" @change="changetransactionType"/>
+							</a-form-item>
+						</a-col>
+            <a-col :span="24">
+							<a-form-item label="账单" v-bind="validateInfos.billId" id="ElderCustomerPaymentForm-billId" name="billId" v-if="formData.transactionTypeCode == '4'" >
+								<a-input v-model:value="formData.billId" placeholder="请选择账单"  allow-clear ></a-input>
+							</a-form-item>
+						</a-col>	
+            <a-col :span="24">
+							<a-form-item label="支付方式" v-bind="validateInfos.paymentMethodCode" id="ElderCustomerPaymentForm-paymentMethodCode" name="paymentMethodCode">
+								<JDictSelectTag type="select" v-model:value="formData.paymentMethodCode" dictCode="payment_method" placeholder="请选择支付方式" @change="changePaymentMethodCode"/>
+							</a-form-item>
+						</a-col>			
+            <a-col :span="24">
+							<a-form-item label="账户" v-bind="validateInfos.accountId" id="ElderCustomerPaymentForm-accountId" name="accountId" v-if="formData.transactionTypeCode == '1' || formData.transactionTypeCode == '3' || formData.paymentMethodCode == '1' || formData.paymentMethodCode == '2'" >
+								<a-select
+                  v-model:value="formData.accountId"
+                  :options="customerAccountList"
+                  :fieldNames="{ label: 'accountTypeName', value: 'id' }"
+                  showSearch
+                  :disabled="formData.paymentMethodCode == '1' || formData.paymentMethodCode == '2'"
+                  placeholder="请选择账户"
+                />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="项目ID" v-bind="validateInfos.projectId" id="ElderCustomerPaymentForm-projectId" name="projectId">
-								<a-input v-model:value="formData.projectId" placeholder="请输入项目ID"  allow-clear ></a-input>
+							<a-form-item label="金额" v-bind="validateInfos.amount" id="ElderCustomerPaymentForm-amount" name="amount">
+								<a-input-number v-model:value="formData.amount" placeholder="请输入金额（元）" style="width: 100%" />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="客户ID" v-bind="validateInfos.customerId" id="ElderCustomerPaymentForm-customerId" name="customerId">
-								<a-input v-model:value="formData.customerId" placeholder="请输入客户ID"  allow-clear ></a-input>
+							<a-form-item label="第三方支付流水号" v-bind="validateInfos.transactionNo" id="ElderCustomerPaymentForm-transactionNo" name="transactionNo" v-if="formData.paymentMethodCode == '3' || formData.paymentMethodCode == '4'">
+								<a-input v-model:value="formData.transactionNo" placeholder="请输入第三方支付流水号"  allow-clear ></a-input>
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="入住id" v-bind="validateInfos.checkinId" id="ElderCustomerPaymentForm-checkinId" name="checkinId">
-								<a-input v-model:value="formData.checkinId" placeholder="请输入入住id"  allow-clear ></a-input>
+							<a-form-item label="收款日期" v-bind="validateInfos.paymentDate" id="ElderCustomerPaymentForm-paymentDate" name="paymentDate">
+								<a-date-picker placeholder="请选择收款日期"  v-model:value="formData.paymentDate" value-format="YYYY-MM-DD"  style="width: 100%"  allow-clear />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="账单ID" v-bind="validateInfos.billId" id="ElderCustomerPaymentForm-billId" name="billId">
-								<a-input v-model:value="formData.billId" placeholder="请输入账单ID"  allow-clear ></a-input>
+							<a-form-item label="凭证文件" v-bind="validateInfos.voucherUrl" id="ElderCustomerPaymentForm-voucherUrl" name="voucherUrl">
+								<j-upload v-model:value="formData.voucherUrl"   ></j-upload>
 							</a-form-item>
 						</a-col>
-						<a-col :span="24">
-							<a-form-item label="收款类型名称" v-bind="validateInfos.paymentTypeName" id="ElderCustomerPaymentForm-paymentTypeName" name="paymentTypeName">
-								<a-input v-model:value="formData.paymentTypeName" placeholder="请输入收款类型名称"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="收款类型编码" v-bind="validateInfos.paymentTypeCode" id="ElderCustomerPaymentForm-paymentTypeCode" name="paymentTypeCode">
-								<a-input v-model:value="formData.paymentTypeCode" placeholder="请输入收款类型编码"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="金额（元），退款时为负数" v-bind="validateInfos.amount" id="ElderCustomerPaymentForm-amount" name="amount">
-								<a-input-number v-model:value="formData.amount" placeholder="请输入金额（元），退款时为负数" style="width: 100%" />
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="支付方式名称" v-bind="validateInfos.paymentMethodName" id="ElderCustomerPaymentForm-paymentMethodName" name="paymentMethodName">
-								<a-input v-model:value="formData.paymentMethodName" placeholder="请输入支付方式名称"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="支付方式编码" v-bind="validateInfos.paymentMethodCode" id="ElderCustomerPaymentForm-paymentMethodCode" name="paymentMethodCode">
-								<a-input v-model:value="formData.paymentMethodCode" placeholder="请输入支付方式编码"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="第三方支付流水号（微信/支付宝订单号）" v-bind="validateInfos.transactionNo" id="ElderCustomerPaymentForm-transactionNo" name="transactionNo">
-								<a-input v-model:value="formData.transactionNo" placeholder="请输入第三方支付流水号（微信/支付宝订单号）"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="收款日期（业务日期）" v-bind="validateInfos.paymentDate" id="ElderCustomerPaymentForm-paymentDate" name="paymentDate">
-								<a-date-picker placeholder="请选择收款日期（业务日期）"  v-model:value="formData.paymentDate" value-format="YYYY-MM-DD"  style="width: 100%"  allow-clear />
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="凭证图片URL（收据拍照）" v-bind="validateInfos.voucherUrl" id="ElderCustomerPaymentForm-voucherUrl" name="voucherUrl">
-								<a-input v-model:value="formData.voucherUrl" placeholder="请输入凭证图片URL（收据拍照）"  allow-clear ></a-input>
+            <a-col :span="24">
+							<a-form-item label="备注" v-bind="validateInfos.remark" id="ElderCustomerPaymentForm-remark" name="remark">
+                <a-textarea v-model:value="formData.remark" rows="4" placeholder="请输入备注" />
 							</a-form-item>
 						</a-col>
           </a-row>
@@ -77,18 +76,27 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive, defineExpose, nextTick, defineProps, computed, onMounted } from 'vue';
+  import { ref, reactive, defineExpose, nextTick, defineProps, computed, onMounted,watch } from 'vue';
   import { defHttp } from '/@/utils/http/axios';
   import { useMessage } from '/@/hooks/web/useMessage';
+  import JUpload from '/@/components/Form/src/jeecg/components/JUpload/JUpload.vue';
   import { getDateByPicker, getValueType } from '/@/utils';
   import { saveOrUpdate } from '../ElderCustomerPayment.api';
+  import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
   import { Form } from 'ant-design-vue';
+  import { useUserStore } from '/@/store/modules/user';
+  import {getCustomerListByProjectIdMethod} from './../ElderCustomer.api';
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
+  import {getListByCustomerIdMothod} from './../ElderCustomerAccount.api';
+  import { render } from '/@/utils/common/renderUtils';
+  import { useRoute } from 'vue-router';
+  const route = useRoute()
   const props = defineProps({
     formDisabled: { type: Boolean, default: false },
     formData: { type: Object, default: () => ({})},
     formBpm: { type: Boolean, default: true }
   });
+  const customerList = ref([]);
   const formRef = ref();
   const useForm = Form.useForm;
   const emit = defineEmits(['register', 'ok']);
@@ -98,32 +106,50 @@
     projectId: '',   
     customerId: '',   
     checkinId: '',   
+    accountId: undefined,
     billId: '',   
     paymentTypeName: '',   
     paymentTypeCode: '',   
     amount: undefined,
-    paymentMethodName: '',   
+    transactionTypeCode: undefined,
+    paymentMethodName: '', 
     paymentMethodCode: '',   
     transactionNo: '',   
     paymentDate: '',   
     voucherUrl: '',   
     delFlag: undefined,
   });
+  const dealType = ref('');
+  const customerAccountList = ref([]);
+  const userStore = useUserStore();
+  const userId = ref<Nullable<number | string>>(0);
   const { createMessage } = useMessage();
   const labelCol = ref<any>({ xs: { span: 24 }, sm: { span: 5 } });
   const wrapperCol = ref<any>({ xs: { span: 24 }, sm: { span: 16 } });
   const confirmLoading = ref<boolean>(false);
   //表单验证
+  watch(() => formData.projectId, async (val) => {
+    if (val) {
+      // 查询客户，查询房间列表
+      customerList.value = await getCustomerListByProjectIdMethod({ projectId: val });
+    } else {
+      customerList.value = [];
+    }
+  });
+  onMounted(() => {
+    // 记录当前的UserId
+    userId.value = userStore.getUserInfo?.id;
+    console.log('Mounted', userId.value);
+  });
+  //表单验证
   const validatorRules = reactive({
-    tenantId: [{ required: true, message: '请输入租户ID!'},],
-    projectId: [{ required: true, message: '请输入项目ID!'},],
     customerId: [{ required: true, message: '请输入客户ID!'},],
-    paymentTypeName: [{ required: true, message: '请输入收款类型名称!'},],
-    paymentTypeCode: [{ required: true, message: '请输入收款类型编码!'},],
     amount: [{ required: true, message: '请输入金额（元），退款时为负数!'},],
-    paymentMethodName: [{ required: true, message: '请输入支付方式名称!'},],
-    paymentMethodCode: [{ required: true, message: '请输入支付方式编码!'},],
-    paymentDate: [{ required: true, message: '请输入收款日期（业务日期）!'},],
+    paymentMethodCode: [{ required: true, message: '请选择支付方式!'},],
+    paymentDate: [{ required: true, message: '请输入收款日期!'},],
+    transactionTypeCode: [{ required: true, message: '请选择交易类型!'},],
+    accountId:  [{ required: false, message: '请选择账户!'},],
+    billId:  [{ required: false, message: '请选择账单!'},]
   });
   const { resetFields, validate, validateInfos } = useForm(formData, validatorRules, { immediate: false });
   //日期个性化选择
@@ -141,13 +167,59 @@
     }
     return props.formDisabled;
   });
-
-  
+  async function queryAccount() {
+    customerAccountList.value = await getListByCustomerIdMothod({customerId: route.query.id});
+    if (customerAccountList.value){
+      customerAccountList.value.forEach(item => {
+        item.accountTypeName = getRenderDict(item.accountTypeCode,'account_type')
+      });
+      console.log(customerAccountList.value)
+    }
+  }
+  function getRenderDict( text , dictCode){
+    let te = render.renderDict(text, dictCode);
+    return te.children;
+  }
+  function changetransactionType(val){
+    console.log(val)
+    if (formData.transactionTypeCode == '1' || formData.transactionTypeCode == '3'){
+      queryAccount();
+      validatorRules.accountId =  [{ required: true, message: '请选择账户!'},];
+    } else {
+      validatorRules.accountId =  [{ required: false, message: '请选择账户!'},];
+    }
+    if (formData.transactionTypeCode == '4'){
+      validatorRules.billId =  [{ required: true, message: '请选择账单!'},];
+    } else {
+      validatorRules.billId =  [{ required: false, message: '请选择账单!'},];
+    }   
+  }
+  async function changePaymentMethodCode(val) {
+    if (formData.transactionTypeCode == '1' || formData.transactionTypeCode == '3' || formData.paymentMethodCode == '1' || formData.paymentMethodCode == '2'){
+      await queryAccount();
+      validatorRules.accountId =  [{ required: true, message: '请选择账户!'},];
+    } else {
+      validatorRules.accountId =  [{ required: false, message: '请选择账户!'},];
+    }
+    if (formData.paymentMethodCode == '1' || formData.paymentMethodCode == '2') {
+      const accList = customerAccountList.value.filter(item=> item.accountTypeCode == formData.paymentMethodCode);
+      if (accList) {
+        formData.accountId = accList[0].id
+      } else {
+        formData.accountId = undefined;
+      }
+    }
+  }
   /**
    * 新增
    */
-  function add() {
-    edit({});
+  function add(initData) {
+    if (initData.customerId){
+      dealType.value = '1';
+    } else {
+      dealType.value = '2';
+    }
+    edit(initData);
   }
 
   /**

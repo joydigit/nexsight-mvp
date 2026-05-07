@@ -11,6 +11,7 @@ enum Api {
   deleteBatch = '/elderCustomerAccount/deleteBatch',
   importExcel = '/elderCustomerAccount/importExcel',
   exportXls = '/elderCustomerAccount/exportXls',
+  getListByCustomerId = '/elderCustomerAccount/getListByCustomerId'
 }
 
 /**
@@ -29,6 +30,11 @@ export const getImportUrl = Api.importExcel;
  * @param params
  */
 export const list = (params) => defHttp.get({ url: Api.list, params });
+/**
+ * 列表接口
+ * @param params
+ */
+export const getListByCustomerIdMothod = (params) => defHttp.get({ url: Api.getListByCustomerId, params });
 
 /**
  * 删除单个

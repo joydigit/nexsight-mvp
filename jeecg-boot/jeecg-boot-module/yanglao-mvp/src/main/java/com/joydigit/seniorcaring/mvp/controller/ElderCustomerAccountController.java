@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jeecg.common.api.vo.Result;
@@ -75,7 +77,21 @@ public class ElderCustomerAccountController extends JeecgController<ElderCustome
 		IPage<ElderCustomerAccount> pageList = elderCustomerAccountService.page(page, queryWrapper);
 		return Result.OK(pageList);
 	}
-	
+	 /**
+	  * 查询客户账户
+	  *
+	  * @param customerId
+	  * @return
+	  */
+	 @Operation(summary="查询客户账户")
+	 @GetMapping(value = "/getListByCustomerId")
+	 public Result<List<ElderCustomerAccount>> getListByCustomerId(@RequestParam String customerId) {
+		 List<ElderCustomerAccount> pageList = elderCustomerAccountService
+				 .list(Wrappers.lambdaQuery(ElderCustomerAccount.class)
+						 .eq(ElderCustomerAccount::getCustomerId,customerId)
+						 .orderByDesc(ElderCustomerAccount::getAccountTypeCode));
+		 return Result.OK(pageList);
+	 }
 	/**
 	 *   添加
 	 *

@@ -65,7 +65,7 @@
     </div>
 
     <!-- Tab 内容区 -->
-    <a-tabs v-model:activeKey="activeTab" class="detail-tabs" type="card" destroyInactiveTabPane>
+    <a-tabs v-model:activeKey="activeTab" class="detail-tabs" type="card" destroyInactiveTabPane @tabClick="selectTabPane">
       <a-tab-pane key="family" tab="家属列表">
         <div class="tab-content">
           <ElderCustomerFamilyList/>
@@ -86,21 +86,14 @@
       <a-tab-pane key="account" tab="账户">
         <div class="tab-content">
           <div class="account-overview">
-            <div class="account-card">
-              <div class="account-label">账户余额</div>
-              <div class="account-amount">¥{{ accountInfo.balance }}</div>
-            </div>
-            <div class="account-card">
-              <div class="account-label">押金</div>
-              <div class="account-amount">¥{{ accountInfo.deposit }}</div>
-            </div>
-            <div class="account-card">
-              <div class="account-label">累计充值</div>
-              <div class="account-amount">¥{{ accountInfo.totalRecharge }}</div>
-            </div>
+            <template  v-for="(item, index) in accountInfo">
+              <div class="account-card">
+                <div class="account-label">{{ getRenderDict(item.accountTypeCode,'account_type')}}</div>
+                <div class="account-amount">¥{{ item.amount }}</div>
+              </div>     
+            </template>
           </div>
-          <a-divider orientation="left">充值记录</a-divider>
-          <ElderCustomerAccountList/>
+          <ElderCustomerPaymentList/>
         </div>
       </a-tab-pane>
 
@@ -156,7 +149,7 @@ import { useRoute } from 'vue-router'
 import { render } from '/@/utils/common/renderUtils';
 import ElderRoomReserveList from './../ElderRoomReserveList.vue';
 import ElderCustomerCheckinList from './../ElderCustomerCheckinList.vue';
-import ElderCustomerAccountList from './../ElderCustomerAccountList.vue';
+import ElderCustomerPaymentList from './../ElderCustomerPaymentList.vue';
 import ElderBillList from './../ElderBillList.vue';
 import ElderCustomerOutingRecordList from './../ElderCustomerOutingRecordList.vue';
 import ElderCustomerVisitingRecordList from './../ElderCustomerVisitingRecordList.vue';
@@ -165,6 +158,7 @@ import ElderNursingRecordList from './../ElderNursingRecordList.vue';
 import ElderVitalSignsList from './../ElderVitalSignsList.vue';
 import ElderAssessmentList from './../ElderAssessmentList.vue';
 import ElderCustomerFamilyList from './../ElderCustomerFamilyList.vue';
+import {getListByCustomerIdMothod} from './../ElderCustomerAccount.api';
 
 const route = useRoute()
 const activeTab = ref('family');
@@ -222,14 +216,16 @@ function calculateAge(birthday) {
     
     return age;
 }
+const accountInfo = ref ([])
 
-
-// 账户
-const accountInfo = reactive({
-  balance: 8500.00,
-  deposit: 5000.00,
-  totalRecharge: 35000.00,
-});
+function selectTabPane(val){
+  if (val == 'account'){
+    queryAccount();
+  }
+}
+async function queryAccount() {
+  accountInfo.value = await getListByCustomerIdMothod({customerId: route.query.id});
+}
 
 </script>
 
@@ -391,16 +387,16 @@ const accountInfo = reactive({
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 1px;
 
   .account-card {
-    padding: 20px;
+    padding: 5px;
     border-radius: 8px;
     background: #f8f9fa;
     text-align: center;
 
     .account-label {
-      font-size: 13px;
+      font-size: 16px;
       color: #8c8c8c;
       margin-bottom: 8px;
     }

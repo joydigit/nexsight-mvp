@@ -5,28 +5,52 @@
       <a-form ref="formRef" @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol">
         <a-row :gutter="24">
           <a-col :lg="6">
-            <a-form-item name="roomNo">
-              <template #label><span title="房间号">房间号</span></template>
-              <a-input placeholder="请输入房间号" v-model:value="queryParam.roomNo" allow-clear ></a-input>
+            <a-form-item name="projectId">
+              <template #label><span title="所属项目">所属项目</span></template>
+              <a-select
+                  v-model:value="queryParam.projectId"
+                  :options="projectList"
+                  :fieldNames="{ label: 'projectName', value: 'id' }"
+                  showSearch
+                  placeholder="请选择所属项目"
+                />
             </a-form-item>
           </a-col>
           <a-col :lg="6">
-              <a-form-item name="status">
-                <template #label><span title="状态">状态</span></template>
-                <JDictSelectTag type="select" v-model:value="queryParam.status" dictCode="checkin_status" placeholder="请选择状态" />
-              </a-form-item>
-            </a-col>
+            <a-form-item name="customerName">
+              <template #label><span title="姓名">姓名</span></template>
+              <a-input placeholder="请输入姓名" v-model:value="queryParam.customerName" allow-clear ></a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :lg="6">
+            <a-form-item name="checkinId">
+              <template #label><span title="入住编码">入住编码</span></template>
+              <a-input placeholder="请输入住编码" v-model:value="queryParam.checkinId" allow-clear ></a-input>
+            </a-form-item>
+          </a-col>
           <template v-if="toggleSearchStatus">
             <a-col :lg="6">
-              <a-form-item name="consultingId">
-                <template #label><span title="咨询接待">咨询接待</span></template>
-                <a-input placeholder="请输入咨询接待编码" v-model:value="queryParam.consultingId" allow-clear ></a-input>
+              <a-form-item name="billNo">
+                <template #label><span title="账单编号">账单编号</span></template>
+                <a-input placeholder="请输账单编号" v-model:value="queryParam.billNo" allow-clear ></a-input>
               </a-form-item>
             </a-col>
             <a-col :lg="6">
-              <a-form-item name="checkinTimeArr">
-                <template #label><span title="入住时间">入住时间</span></template>
-                <a-range-picker value-format="YYYY-MM-DD" v-model:value="queryParam.checkinTimeArr" class="query-group-cust"/>
+              <a-form-item name="paymentMethodCode">
+                <template #label><span title="支付方式">支付方式</span></template>
+                <JDictSelectTag type="select" v-model:value="queryParam.paymentMethodCode" dictCode="payment_method" placeholder="请选择支付方式" />
+              </a-form-item>
+            </a-col>
+            <a-col :lg="6">
+              <a-form-item name="transactionTypeCode">
+                <template #label><span title="交易类型">交易类型</span></template>
+                <JDictSelectTag type="select" v-model:value="queryParam.transactionTypeCode" dictCode="transaction_type_code" placeholder="请选择交易类型" />
+              </a-form-item>
+            </a-col>
+            <a-col :lg="6">
+              <a-form-item name="confirmFlag">
+                <template #label><span title="确认状态">确认状态</span></template>
+                <JDictSelectTag type="select" v-model:value="queryParam.confirmFlag" dictCode="payment_confirm_flag" placeholder="请选择确认状态" />
               </a-form-item>
             </a-col>
           </template>
@@ -49,7 +73,20 @@
     <BasicTable @register="registerTable" :rowSelection="rowSelection">
       <!--插槽:table标题-->
       <template #tableTitle>
-        <a-button type="primary" v-auth="'elder_customer_checkin:add'"  @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>       
+        <a-button  type="primary" v-auth="'elder_customer_payment:exportXls'" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
+        <a-dropdown v-if="selectedRowKeys.length > 0">
+          <template #overlay>
+            <a-menu>
+              <a-menu-item key="1" @click="batchHandleConfirm">
+                <Icon icon="ant-design:delete-outlined"></Icon>
+                确认
+              </a-menu-item>
+            </a-menu>
+          </template>
+          <a-button v-auth="'elder_customer_payment:confirm'">批量操作
+            <Icon icon="mdi:chevron-down"></Icon>
+          </a-button>
+        </a-dropdown>       
       </template>
       <!--操作栏-->
       <template #action="{ record }">
@@ -59,45 +96,44 @@
       </template>
     </BasicTable>
     <!-- 表单区域 -->
-    <ElderCustomerCheckinModal ref="registerModal" @success="handleSuccess"></ElderCustomerCheckinModal>
-    <!-- 费用配置弹框 -->
-    <ElderCustomerCheckinFeeListModal ref="registerFeeModal" />
+    <ElderCustomerPaymentModal ref="registerModal" @success="handleSuccess"></ElderCustomerPaymentModal>
   </div>
 </template>
 
-<script lang="ts" name="com.joydigit.seniorcaring.mvp-elderCustomerCheckin" setup>
-  import { ref, reactive } from 'vue';
+<script lang="ts" name="com.joydigit.seniorcaring.mvp-elderCustomerPayment" setup>
+  import { ref, reactive,onMounted } from 'vue';
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { useListPage } from '/@/hooks/system/useListPage';
-  import { columns, superQuerySchema } from './ElderCustomerCheckin.data';
-  import { list, deleteOne, batchDelete, getImportUrl, getExportUrl } from './ElderCustomerCheckin.api';
+  import { columnsAll, superQuerySchema } from './ElderCustomerPayment.data';
+  import { list, deleteOne, batchDelete, getImportUrl, getExportUrl, confirmMethod } from './ElderCustomerPayment.api';
   import { downloadFile } from '/@/utils/common/renderUtils';
-  import ElderCustomerCheckinModal from './components/ElderCustomerCheckinModal.vue'
-  import ElderCustomerCheckinFeeListModal from './components/ElderCustomerCheckinFeeListModal.vue'
+  import ElderCustomerPaymentModal from './components/ElderCustomerPaymentModal.vue'
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
-  import {useModal} from '/@/components/Modal';
+   import {useModal} from '/@/components/Modal';
   import { getDateByPicker } from '/@/utils';
   import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
   import { useRoute } from 'vue-router';
-  const route = useRoute();
-  const emit = defineEmits(['successReload']);
+  import { getProjectListAllM } from './ElderProject.api'; 
+  const route = useRoute()
   const fieldPickers = reactive({
   });
-
+  const projectList = ref([]);
   const formRef = ref();
   const queryParam = reactive<any>({});
   const toggleSearchStatus = ref<boolean>(false);
   const registerModal = ref();
-  const registerFeeModal = ref();
   const userStore = useUserStore();
   const { createMessage } = useMessage();
+  onMounted(async () => {
+    projectList.value = await getProjectListAllM();
+  });
   //注册table数据
   const { prefixCls, tableContext, onExportXls, onImportXls } = useListPage({
     tableProps: {
-      title: 'elder_customer_checkin',
+      title: 'elder_customer_payment',
       api: list,
-      columns,
+      columns: columnsAll,
       canResize:true,
       useSearchForm: false,
       showTableSetting: false,
@@ -116,7 +152,7 @@
       },
     },
     exportConfig: {
-      name: "elder_customer_checkin",
+      name: "资金流水",
       url: getExportUrl,
       params: queryParam,
     },
@@ -125,7 +161,7 @@
 	    success: handleSuccess
 	  },
   });
-  const [registerTable, { reload, collapseAll, updateTableDataRecord, findTableDataRecord, getDataSource }, { rowSelection, selectedRowKeys }] = tableContext;
+  const [registerTable, { reload, collapseAll, updateTableDataRecord, findTableDataRecord, getDataSource }, { rowSelection,selectedRowKeys }] = tableContext;
   const labelCol = reactive({
     xs:24,
     sm:4,
@@ -177,26 +213,19 @@
     registerModal.value.disableSubmit = true;
     registerModal.value.edit(record);
   }
-
-  /**
-   * 费用配置
-   */
-  function handleFeeConfig(record: Recordable) {
-    registerFeeModal.value.open(record.id);
-  }
-
+   
   /**
    * 删除事件
    */
-  async function handleDelete(record) {
-    await deleteOne({ id: record.id }, handleSuccess);
+  async function handleConfirmMethod(record) {
+    await confirmMethod({ ids: record.id }, handleSuccess);
   }
    
   /**
    * 批量删除事件
    */
-  async function batchHandleDelete() {
-    await batchDelete({ ids: selectedRowKeys.value }, handleSuccess);
+  async function batchHandleConfirm() {
+    await confirmMethod({ ids: selectedRowKeys.value }, handleSuccess);
   }
    
   /**
@@ -204,7 +233,6 @@
    */
   function handleSuccess() {
     (selectedRowKeys.value = []) && reload();
-    emit('successReload');
   }
    
   /**
@@ -213,9 +241,10 @@
   function getTableAction(record) {
     return [
       {
-        label: '编辑',
-        onClick: handleEdit.bind(null, record),
-        auth: 'elder_customer_checkin:edit'
+        label: '确认',
+        onClick: handleConfirmMethod.bind(null, record),
+        auth: 'elder_customer_payment:confirm',
+        ifShow: record.confirmFlag == '0'
       },
     ];
   }
@@ -224,27 +253,7 @@
    * 下拉操作栏
    */
   function getDropDownAction(record) {
-    return [
-      {
-        label: '详情',
-        onClick: handleDetail.bind(null, record),
-      },
-      {
-        label: '费用配置',
-        onClick: handleFeeConfig.bind(null, record),
-        auth: 'elder_customer_checkin:feeConfig'
-      },
-      {
-        label: '退住',
-        onClick: handleDetail.bind(null, record),
-        auth: 'elder_customer_checkin:checkout'
-      },
-      {
-        label: '换房',
-        onClick: handleDetail.bind(null, record),
-        auth: 'elder_customer_checkin:changeRoom'
-      }
-    ]
+    return []
   }
 
   /**

@@ -2,4 +2,103 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.joydigit.seniorcaring.mvp.mapper.ElderCustomerPaymentMapper">
 
+    <select id="pageList" resultType="com.joydigit.seniorcaring.mvp.entity.ElderCustomerPayment">
+        SELECT
+        cp.*,
+        b.bill_no as billNo,
+        c.`name` as customerName,
+        p.project_name as projectName
+        FROM
+            `elder_customer_payment` cp
+            LEFT JOIN elder_bill b ON cp.bill_id = b.id
+            LEFT JOIN elder_customer c on c.id = cp.customer_id
+            LEFT JOIN elder_project p on p.id = cp.project_id
+        WHERE
+            cp.del_flag = 0
+        <if test="data.projectIds != null and data.projectIds.size() > 0">
+            AND  cp.project_id IN (
+            <foreach item="id" collection="data.projectIds" separator=",">
+                #{id}
+            </foreach>
+            )
+        </if>
+        <if test="data.projectId != null and data.projectId != ''">
+            AND cp.project_id = #{data.projectId}
+        </if>
+        <if test="data.customerName != null and data.customerName != ''">
+            AND c.`name` LIKE concat(concat('%',#{data.customerName}),'%')
+        </if>
+        <if test="data.checkinId != null and data.checkinId != ''">
+            AND cp.checkin_id LIKE concat(concat('%',#{data.checkinId}),'%')
+        </if>
+        <if test="data.billNo != null and data.billNo != ''">
+            AND b.bill_no LIKE concat(concat('%',#{data.billNo}),'%')
+        </if>
+          <if test="data.customerId != null and data.customerId != ''">
+              AND cp.customer_id = #{data.customerId}
+          </if>
+        <if test="data.paymentMethodCode != null and data.paymentMethodCode != ''">
+            AND cp.payment_method_code = #{data.paymentMethodCode}
+        </if>
+        <if test="data.transactionTypeCode != null and data.transactionTypeCode != ''">
+            AND cp.transaction_type_code = #{data.transactionTypeCode}
+        </if>
+        <if test="data.confirmFlag != null and data.confirmFlag != ''">
+            AND cp.confirm_flag = #{data.confirmFlag}
+        </if>
+        ORDER BY cp.create_time DESC
+    </select>
+    <select id="getList" resultType="com.joydigit.seniorcaring.mvp.entity.ElderCustomerPayment">
+        SELECT
+        cp.*,
+        b.bill_no as billNo,
+        c.`name` as customerName,
+        p.project_name as projectName
+        FROM
+        `elder_customer_payment` cp
+        LEFT JOIN elder_bill b ON cp.bill_id = b.id
+        LEFT JOIN elder_customer c on c.id = cp.customer_id
+        LEFT JOIN elder_project p on p.id = cp.project_id
+        WHERE
+        cp.del_flag = 0
+        <if test="data.projectIds != null and data.projectIds.size() > 0">
+            AND  cp.project_id IN (
+            <foreach item="id" collection="data.projectIds" separator=",">
+                #{id}
+            </foreach>
+            )
+        </if>
+        <if test="data.projectId != null and data.projectId != ''">
+            AND cp.project_id = #{data.projectId}
+        </if>
+        <if test="data.customerName != null and data.customerName != ''">
+            AND c.`name` LIKE concat(concat('%',#{data.customerName}),'%')
+        </if>
+        <if test="data.checkinId != null and data.checkinId != ''">
+            AND cp.checkin_id LIKE concat(concat('%',#{data.checkinId}),'%')
+        </if>
+        <if test="data.billNo != null and data.billNo != ''">
+            AND b.bill_no LIKE concat(concat('%',#{data.billNo}),'%')
+        </if>
+        <if test="data.customerId != null and data.customerId != ''">
+            AND cp.customer_id = #{data.customerId}
+        </if>
+        <if test="data.paymentMethodCode != null and data.paymentMethodCode != ''">
+            AND cp.payment_method_code = #{data.paymentMethodCode}
+        </if>
+        <if test="data.transactionTypeCode != null and data.transactionTypeCode != ''">
+            AND cp.transaction_type_code = #{data.transactionTypeCode}
+        </if>
+        <if test="data.confirmFlag != null and data.confirmFlag != ''">
+            AND cp.confirm_flag = #{data.confirmFlag}
+        </if>
+        <if test="selectionList != null and selectionList.size() > 0">
+            AND  cp.id IN (
+            <foreach item="id" collection="selectionList" separator=",">
+                #{id}
+            </foreach>
+            )
+        </if>
+        ORDER BY cp.create_time DESC
+    </select>
 </mapper>
