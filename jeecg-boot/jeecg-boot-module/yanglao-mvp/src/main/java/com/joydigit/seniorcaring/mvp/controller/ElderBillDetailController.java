@@ -1,5 +1,6 @@
 package com.joydigit.seniorcaring.mvp.controller;
 
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -70,9 +71,8 @@ public class ElderBillDetailController extends JeecgController<ElderBillDetail, 
 								   HttpServletRequest req) {
 
 
-        QueryWrapper<ElderBillDetail> queryWrapper = QueryGenerator.initQueryWrapper(elderBillDetail, req.getParameterMap());
 		Page<ElderBillDetail> page = new Page<ElderBillDetail>(pageNo, pageSize);
-		IPage<ElderBillDetail> pageList = elderBillDetailService.page(page, queryWrapper);
+		IPage<ElderBillDetail> pageList = elderBillDetailService.pageList(page, elderBillDetail);
 		return Result.OK(pageList);
 	}
 	
@@ -87,8 +87,10 @@ public class ElderBillDetailController extends JeecgController<ElderBillDetail, 
 	@RequiresPermissions("elder_bill_detail:add")
 	@PostMapping(value = "/add")
 	public Result<String> add(@RequestBody ElderBillDetail elderBillDetail) {
+		elderBillDetail.setAmount(elderBillDetail.getUnitPrice()
+				.multiply(elderBillDetail.getQuantity())
+				.setScale(2, RoundingMode.HALF_UP));
 		elderBillDetailService.save(elderBillDetail);
-
 		return Result.OK("添加成功！");
 	}
 	
@@ -103,6 +105,9 @@ public class ElderBillDetailController extends JeecgController<ElderBillDetail, 
 	@RequiresPermissions("elder_bill_detail:edit")
 	@RequestMapping(value = "/edit", method = {RequestMethod.PUT,RequestMethod.POST})
 	public Result<String> edit(@RequestBody ElderBillDetail elderBillDetail) {
+		elderBillDetail.setAmount(elderBillDetail.getUnitPrice()
+				.multiply(elderBillDetail.getQuantity())
+				.setScale(2, RoundingMode.HALF_UP));
 		elderBillDetailService.updateById(elderBillDetail);
 		return Result.OK("编辑成功!");
 	}

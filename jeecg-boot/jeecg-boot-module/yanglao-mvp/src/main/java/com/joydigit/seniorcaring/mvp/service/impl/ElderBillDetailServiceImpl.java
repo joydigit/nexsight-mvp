@@ -1,5 +1,7 @@
 package com.joydigit.seniorcaring.mvp.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.joydigit.seniorcaring.mvp.entity.ElderBillDetail;
 import com.joydigit.seniorcaring.mvp.mapper.ElderBillDetailMapper;
 import com.joydigit.seniorcaring.mvp.service.IElderBillDetailService;
@@ -16,4 +18,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 @Service
 public class ElderBillDetailServiceImpl extends ServiceImpl<ElderBillDetailMapper, ElderBillDetail> implements IElderBillDetailService {
 
+    @Override
+    public IPage<ElderBillDetail> pageList(Page<ElderBillDetail> page, ElderBillDetail elderBillDetail) {
+        return this.baseMapper.pageList(page,elderBillDetail);
+    }
 }

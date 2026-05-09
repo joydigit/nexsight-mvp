@@ -5,33 +5,18 @@
         <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ElderBillDetailForm">
           <a-row>
 						<a-col :span="24">
-							<a-form-item label="租户ID" v-bind="validateInfos.tenantId" id="ElderBillDetailForm-tenantId" name="tenantId">
-								<a-input v-model:value="formData.tenantId" placeholder="请输入租户ID"  allow-clear ></a-input>
+							<a-form-item label="账单编号" v-bind="validateInfos.billNo" id="ElderBillDetailForm-billNo" name="billNo">
+								<a-input v-model:value="formData.billNo" disabled></a-input>
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="项目ID" v-bind="validateInfos.projectId" id="ElderBillDetailForm-projectId" name="projectId">
-								<a-input v-model:value="formData.projectId" placeholder="请输入项目ID"  allow-clear ></a-input>
+							<a-form-item label="费用类型" v-bind="validateInfos.itemType" id="ElderBillDetailForm-itemType" name="itemType">
+								<JDictSelectTag type="select" v-model:value="formData.itemType" dictCode="payment_type" placeholder="请选择费用类型"/>
 							</a-form-item>
-						</a-col>
+						</a-col>						
 						<a-col :span="24">
-							<a-form-item label="账单ID" v-bind="validateInfos.billId" id="ElderBillDetailForm-billId" name="billId">
-								<a-input v-model:value="formData.billId" placeholder="请输入账单ID"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="费用类型：BED_FEE床位费/CARE_FEE护理费/MEAL_FEE餐费/MEDICAL医疗费/OTHER其他" v-bind="validateInfos.itemType" id="ElderBillDetailForm-itemType" name="itemType">
-								<a-input v-model:value="formData.itemType" placeholder="请输入费用类型：BED_FEE床位费/CARE_FEE护理费/MEAL_FEE餐费/MEDICAL医疗费/OTHER其他"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="费用名称（如"床位费-单人间"、"护理费-特级"）" v-bind="validateInfos.itemName" id="ElderBillDetailForm-itemName" name="itemName">
-								<a-input v-model:value="formData.itemName" placeholder="请输入费用名称（如"床位费-单人间"、"护理费-特级"）"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="数量（如15天，或1次）" v-bind="validateInfos.quantity" id="ElderBillDetailForm-quantity" name="quantity">
-								<a-input-number v-model:value="formData.quantity" placeholder="请输入数量（如15天，或1次）" style="width: 100%" />
+							<a-form-item label="数量" v-bind="validateInfos.quantity" id="ElderBillDetailForm-quantity" name="quantity">
+								<a-input-number v-model:value="formData.quantity" placeholder="请输入数量" style="width: 100%" />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
@@ -40,13 +25,13 @@
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="金额（元）= quantity * unit_price" v-bind="validateInfos.amount" id="ElderBillDetailForm-amount" name="amount">
-								<a-input-number v-model:value="formData.amount" placeholder="请输入金额（元）= quantity * unit_price" style="width: 100%" />
+							<a-form-item label="金额（元" v-bind="validateInfos.amount" id="ElderBillDetailForm-amount" name="amount" v-if="formData.id">
+								<a-input-number v-model:value="formData.amount" disabled style="width: 100%" />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="计算说明（如"入住15天，按天折算：6000/30*15"）" v-bind="validateInfos.calcDesc" id="ElderBillDetailForm-calcDesc" name="calcDesc">
-								<a-input v-model:value="formData.calcDesc" placeholder="请输入计算说明（如"入住15天，按天折算：6000/30*15"）"  allow-clear ></a-input>
+							<a-form-item label="说明" v-bind="validateInfos.calcDesc" id="ElderBillDetailForm-calcDesc" name="calcDesc">
+								<a-textarea v-model:value="formData.calcDesc" placeholder="请输入说明"  ></a-textarea>
 							</a-form-item>
 						</a-col>
           </a-row>
@@ -64,6 +49,7 @@
   import { saveOrUpdate } from '../ElderBillDetail.api';
   import { Form } from 'ant-design-vue';
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
+  import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
   const props = defineProps({
     formDisabled: { type: Boolean, default: false },
     formData: { type: Object, default: () => ({})},
@@ -75,11 +61,12 @@
   const formData = reactive<Record<string, any>>({
     id: '',
     tenantId: '',   
-    projectId: '',   
+    projectId: '',  
+    billNo: '', 
     billId: '',   
     itemType: '',   
     itemName: '',   
-    quantity: undefined,
+    quantity: '1',
     unitPrice: undefined,
     amount: undefined,
     calcDesc: '',   
@@ -91,14 +78,9 @@
   const confirmLoading = ref<boolean>(false);
   //表单验证
   const validatorRules = reactive({
-    tenantId: [{ required: true, message: '请输入租户ID!'},],
-    projectId: [{ required: true, message: '请输入项目ID!'},],
-    billId: [{ required: true, message: '请输入账单ID!'},],
-    itemType: [{ required: true, message: '请输入费用类型：BED_FEE床位费/CARE_FEE护理费/MEAL_FEE餐费/MEDICAL医疗费/OTHER其他!'},],
-    itemName: [{ required: true, message: '请输入费用名称（如"床位费-单人间"、"护理费-特级"）!'},],
-    quantity: [{ required: true, message: '请输入数量（如15天，或1次）!'},],
-    unitPrice: [{ required: true, message: '请输入单价（元）!'},],
-    amount: [{ required: true, message: '请输入金额（元）= quantity * unit_price!'},],
+    itemType: [{ required: true, message: '请选择费用类型!'},],
+    quantity: [{ required: true, message: '请输入数量!'},],
+    unitPrice: [{ required: true, message: '请输入单价（元）!'},],    
   });
   const { resetFields, validate, validateInfos } = useForm(formData, validatorRules, { immediate: false });
   //日期个性化选择
@@ -121,8 +103,8 @@
   /**
    * 新增
    */
-  function add() {
-    edit({});
+  function add(initData) {
+    edit(initData);
   }
 
   /**

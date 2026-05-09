@@ -11,9 +11,7 @@
     <BasicTable @register="registerTable" :rowSelection="rowSelection">
       <!--插槽:table标题-->
       <template #tableTitle>
-        <a-button type="primary" v-auth="'elder_bill_detail:add'"  @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
-        <a-button  type="primary" v-auth="'elder_bill_detail:exportXls'" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
-        <j-upload-button  type="primary" v-auth="'elder_bill_detail:importExcel'"  preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button>
+        <a-button type="primary" v-auth="'elder_bill_detail:add'"  @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>       
         <a-dropdown v-if="selectedRowKeys.length > 0">
           <template #overlay>
             <a-menu>
@@ -26,9 +24,7 @@
           <a-button v-auth="'elder_bill_detail:deleteBatch'">批量操作
             <Icon icon="mdi:chevron-down"></Icon>
           </a-button>
-        </a-dropdown>
-        <!-- 高级查询 -->
-        <super-query :config="superQueryConfig" @search="handleSuperQuery" />
+        </a-dropdown>        
       </template>
       <!--操作栏-->
       <template #action="{ record }">
@@ -55,6 +51,10 @@
    import {useModal} from '/@/components/Modal';
   import { getDateByPicker } from '/@/utils';
 
+  const props = defineProps({
+    billInfo: { type: Object, default: () => ({})},
+  });
+
   const fieldPickers = reactive({
   });
 
@@ -72,6 +72,7 @@
       columns,
       canResize:true,
       useSearchForm: false,
+      showTableSetting: false,
       actionColumn: {
         width: 120,
         fixed: 'right',
@@ -82,6 +83,7 @@
             queryParam[key] = getDateByPicker(queryParam[key], fieldPickers[key]);
           }
         }
+        queryParam.billId = props.billInfo.id;
         return Object.assign(params, queryParam);
       },
     },
@@ -125,7 +127,12 @@
    */
   function handleAdd() {
     registerModal.value.disableSubmit = false;
-    registerModal.value.add();
+    const initData = {
+      billNo: props.billInfo.billNo,
+      billId: props.billInfo.id,
+      projectId: props.billInfo.projectId,
+    }
+    registerModal.value.add(initData);
   }
   
   /**
@@ -173,7 +180,7 @@
       {
         label: '编辑',
         onClick: handleEdit.bind(null, record),
-        auth: 'com.joydigit.seniorcaring.mvp:elder_bill_detail:edit'
+        auth: 'elder_bill_detail:edit'
       },
     ];
   }
@@ -193,7 +200,7 @@
           confirm: handleDelete.bind(null, record),
           placement: 'topLeft',
         },
-        auth: 'com.joydigit.seniorcaring.mvp:elder_bill_detail:delete'
+        auth: 'elder_bill_detail:delete'
       }
     ]
   }

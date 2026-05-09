@@ -23,7 +23,14 @@
 						</a-col>
             <a-col :span="24">
 							<a-form-item label="账单" v-bind="validateInfos.billId" id="ElderCustomerPaymentForm-billId" name="billId" v-if="formData.transactionTypeCode == '4'" >
-								<a-input v-model:value="formData.billId" placeholder="请选择账单"  allow-clear ></a-input>
+                <a-select
+                  v-model:value="formData.billId"
+                  :options="billList"
+                  :fieldNames="{ label: 'billNo', value: 'id' }"
+                  showSearch
+                  placeholder="请选择账单"
+                  @change="changeBill"
+                />
 							</a-form-item>
 						</a-col>	
             <a-col :span="24">
@@ -88,6 +95,7 @@
   import {getCustomerListByProjectIdMethod} from './../ElderCustomer.api';
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
   import {getListByCustomerIdMothod} from './../ElderCustomerAccount.api';
+  import {getBillListByCustomerIdMethod} from './../ElderBill.api'
   import { render } from '/@/utils/common/renderUtils';
   import { useRoute } from 'vue-router';
   const route = useRoute()
@@ -97,6 +105,7 @@
     formBpm: { type: Boolean, default: true }
   });
   const customerList = ref([]);
+  const billList = ref([]);
   const formRef = ref();
   const useForm = Form.useForm;
   const emit = defineEmits(['register', 'ok']);
@@ -107,7 +116,7 @@
     customerId: '',   
     checkinId: '',   
     accountId: undefined,
-    billId: '',   
+    billId: undefined,   
     paymentTypeName: '',   
     paymentTypeCode: '',   
     amount: undefined,
@@ -134,6 +143,9 @@
       customerList.value = await getCustomerListByProjectIdMethod({ projectId: val });
     } else {
       customerList.value = [];
+    }
+    if (formData.transactionTypeCode) {
+      changetransactionType(formData.transactionTypeCode)
     }
   });
   onMounted(() => {
@@ -180,6 +192,14 @@
     let te = render.renderDict(text, dictCode);
     return te.children;
   }
+  async function queryBill(){
+    billList.value = await getBillListByCustomerIdMethod({customerId: route.query.id});
+  }
+
+  function changeBill(val){
+    const bill =  billList.value.filter(s=>s.id == val);
+    formData.amount = bill[0].paidAmount;
+  }
   function changetransactionType(val){
     console.log(val)
     if (formData.transactionTypeCode == '1' || formData.transactionTypeCode == '3'){
@@ -189,6 +209,7 @@
       validatorRules.accountId =  [{ required: false, message: '请选择账户!'},];
     }
     if (formData.transactionTypeCode == '4'){
+      queryBill();
       validatorRules.billId =  [{ required: true, message: '请选择账单!'},];
     } else {
       validatorRules.billId =  [{ required: false, message: '请选择账单!'},];

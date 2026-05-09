@@ -3,35 +3,27 @@
     <JFormContainer :disabled="disabled">
       <template #detail>
         <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ElderBillForm">
-          <a-row>
+          <a-row>		
 						<a-col :span="24">
-							<a-form-item label="租户ID" v-bind="validateInfos.tenantId" id="ElderBillForm-tenantId" name="tenantId">
-								<a-input v-model:value="formData.tenantId" placeholder="请输入租户ID"  allow-clear ></a-input>
+							<a-form-item label="账单号" v-bind="validateInfos.billNo" id="ElderBillForm-billNo" name="billNo" v-if="formData.id">
+								<a-input v-model:value="formData.billNo" disabled ></a-input>
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="项目ID（逻辑外键）" v-bind="validateInfos.projectId" id="ElderBillForm-projectId" name="projectId">
-								<a-input v-model:value="formData.projectId" placeholder="请输入项目ID（逻辑外键）"  allow-clear ></a-input>
+							<a-form-item label="客户" v-bind="validateInfos.customerId" id="ElderBillForm-customerId" name="customerId">
+								<a-select
+                  v-model:value="formData.customerId"
+                  :options="customerList"
+                  :disabled="dealType == '1' || !!formData.id"
+                  :fieldNames="{ label: 'name', value: 'id' }"
+                  showSearch
+                  placeholder="请选择客户"
+                />
 							</a-form-item>
-						</a-col>
+						</a-col>						
 						<a-col :span="24">
-							<a-form-item label="账单号（唯一，如A001202604001）" v-bind="validateInfos.billNo" id="ElderBillForm-billNo" name="billNo">
-								<a-input v-model:value="formData.billNo" placeholder="请输入账单号（唯一，如A001202604001）"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="客户ID（逻辑外键）" v-bind="validateInfos.customerId" id="ElderBillForm-customerId" name="customerId">
-								<a-input v-model:value="formData.customerId" placeholder="请输入客户ID（逻辑外键）"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="入住id" v-bind="validateInfos.checkinId" id="ElderBillForm-checkinId" name="checkinId">
-								<a-input v-model:value="formData.checkinId" placeholder="请输入入住id"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="账单月份（yyyy-MM，如2026-04）" v-bind="validateInfos.billMonth" id="ElderBillForm-billMonth" name="billMonth">
-								<a-input v-model:value="formData.billMonth" placeholder="请输入账单月份（yyyy-MM，如2026-04）"  allow-clear ></a-input>
+							<a-form-item label="账单月份" v-bind="validateInfos.billMonth" id="ElderBillForm-billMonth" name="billMonth">
+								<a-date-picker placeholder="请选择账单月份" picker="month"  v-model:value="formData.billMonth" value-format="YYYY-MM"  style="width: 100%"  allow-clear />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
@@ -45,23 +37,23 @@
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="优惠/减免金额（元）" v-bind="validateInfos.discountAmount" id="ElderBillForm-discountAmount" name="discountAmount">
-								<a-input-number v-model:value="formData.discountAmount" placeholder="请输入优惠/减免金额（元）" style="width: 100%" />
+							<a-form-item label="优惠金额（元）" v-bind="validateInfos.discountAmount" id="ElderBillForm-discountAmount" name="discountAmount">
+								<a-input-number v-model:value="formData.discountAmount" placeholder="请输入优惠金额（元）" style="width: 100%" />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="账单状态：0-未收款，1-部分收款，2-已结清，3-已作废" v-bind="validateInfos.status" id="ElderBillForm-status" name="status">
-								<a-input v-model:value="formData.status" placeholder="请输入账单状态：0-未收款，1-部分收款，2-已结清，3-已作废"  allow-clear ></a-input>
+							<a-form-item label="账单状态" v-bind="validateInfos.status" id="ElderBillForm-status" name="status">
+								<JDictSelectTag type="select" v-model:value="formData.status" dictCode="bill_status" placeholder="请选择账单状态"/>
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="应收日期（如每月5日）" v-bind="validateInfos.dueDate" id="ElderBillForm-dueDate" name="dueDate">
-								<a-date-picker placeholder="请选择应收日期（如每月5日）"  v-model:value="formData.dueDate" value-format="YYYY-MM-DD"  style="width: 100%"  allow-clear />
+							<a-form-item label="应收日期" v-bind="validateInfos.dueDate" id="ElderBillForm-dueDate" name="dueDate">
+								<a-date-picker placeholder="请选择应收日期"  v-model:value="formData.dueDate" value-format="YYYY-MM-DD"  style="width: 100%"  allow-clear />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
 							<a-form-item label="备注" v-bind="validateInfos.remark" id="ElderBillForm-remark" name="remark">
-								<a-input v-model:value="formData.remark" placeholder="请输入备注"  allow-clear ></a-input>
+								<a-textarea v-model:value="formData.remark" placeholder="请输入备注"  allow-clear ></a-textarea>
 							</a-form-item>
 						</a-col>
           </a-row>
@@ -72,18 +64,22 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive, defineExpose, nextTick, defineProps, computed, onMounted } from 'vue';
+  import { ref, reactive, defineExpose, nextTick, defineProps, computed, onMounted,watch } from 'vue';
   import { defHttp } from '/@/utils/http/axios';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { getDateByPicker, getValueType } from '/@/utils';
   import { saveOrUpdate } from '../ElderBill.api';
   import { Form } from 'ant-design-vue';
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
+  import {getCustomerListByProjectIdMethod} from './../ElderCustomer.api';
+  import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
+
   const props = defineProps({
     formDisabled: { type: Boolean, default: false },
     formData: { type: Object, default: () => ({})},
     formBpm: { type: Boolean, default: true }
   });
+  const customerList = ref([]);
   const formRef = ref();
   const useForm = Form.useForm;
   const emit = defineEmits(['register', 'ok']);
@@ -97,8 +93,8 @@
     billMonth: '',   
     totalAmount: undefined,
     paidAmount: undefined,
-    discountAmount: undefined,
-    status: '',   
+    discountAmount: 0,
+    status: '0',   
     dueDate: '',   
     remark: '',   
     delFlag: undefined,
@@ -109,19 +105,28 @@
   const confirmLoading = ref<boolean>(false);
   //表单验证
   const validatorRules = reactive({
-    tenantId: [{ required: true, message: '请输入租户ID!'},],
-    projectId: [{ required: true, message: '请输入项目ID（逻辑外键）!'},],
-    billNo: [{ required: true, message: '请输入账单号（唯一，如A001202604001）!'},],
-    customerId: [{ required: true, message: '请输入客户ID（逻辑外键）!'},],
-    billMonth: [{ required: true, message: '请输入账单月份（yyyy-MM，如2026-04）!'},],
+    customerId: [{ required: true, message: '请选择客户!'},],
+    billMonth: [{ required: true, message: '请选择账单月份!'},],
     totalAmount: [{ required: true, message: '请输入应收总额（元）!'},],
-    dueDate: [{ required: true, message: '请输入应收日期（如每月5日）!'},],
+    paidAmount: [{ required: true, message: '请输入实收总额（元）!'},],
+    discountAmount: [{ required: true, message: '请输入优惠金额（元）!'},],
+    dueDate: [{ required: true, message: '请输入应收日期!'},],
+    status:  [{ required: true, message: '请选择!'},],
   });
   const { resetFields, validate, validateInfos } = useForm(formData, validatorRules, { immediate: false });
   //日期个性化选择
   const fieldPickers = reactive({
   });
-
+  const dealType = ref('');
+   //表单验证
+  watch(() => formData.projectId, async (val) => {
+    if (val) {
+      // 查询客户，查询房间列表
+      customerList.value = await getCustomerListByProjectIdMethod({ projectId: val });
+    } else {
+      customerList.value = [];
+    }
+  });
   // 表单禁用
   const disabled = computed(()=>{
     if(props.formBpm === true){
@@ -138,8 +143,13 @@
   /**
    * 新增
    */
-  function add() {
-    edit({});
+  function add(initData) {
+    if (initData.customerId){
+      dealType.value = '1';
+    } else {
+      dealType.value = '2';
+    }
+    edit(initData);
   }
 
   /**

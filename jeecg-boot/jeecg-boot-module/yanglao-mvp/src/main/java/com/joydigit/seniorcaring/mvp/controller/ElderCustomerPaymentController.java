@@ -95,7 +95,7 @@ public class ElderCustomerPaymentController extends JeecgController<ElderCustome
 	 /**
 	  *  确认流水
 	  *
-	  * @param id
+	  * @param ids
 	  * @return
 	  */
 	 @AutoLog(value = "elder_customer_payment-添加")

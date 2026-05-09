@@ -145,7 +145,7 @@ public class ElderCustomerPaymentServiceImpl extends ServiceImpl<ElderCustomerPa
     }
 
     private void updateBill(ElderCustomerPayment payment) throws Exception {
-        if (payment.getTransactionTypeCode().equals(TransactionTypeEnum.PAY_FEES) && StringUtils.isNotBlank(payment.getBillId())){
+        if (payment.getTransactionTypeCode().equals(TransactionTypeEnum.PAY_FEES.getKey()) && StringUtils.isNotBlank(payment.getBillId())){
             ElderBill elderBill = elderBillMapper.selectById(payment.getBillId());
             if (Objects.isNull(elderBill)){
                 throw new Exception("账单不存在");

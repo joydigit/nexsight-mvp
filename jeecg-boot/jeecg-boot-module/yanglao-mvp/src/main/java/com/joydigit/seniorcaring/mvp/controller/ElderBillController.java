@@ -69,10 +69,8 @@ public class ElderBillController extends JeecgController<ElderBill, IElderBillSe
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
 
-
-        QueryWrapper<ElderBill> queryWrapper = QueryGenerator.initQueryWrapper(elderBill, req.getParameterMap());
 		Page<ElderBill> page = new Page<ElderBill>(pageNo, pageSize);
-		IPage<ElderBill> pageList = elderBillService.page(page, queryWrapper);
+		IPage<ElderBill> pageList = elderBillService.pageList(page, elderBill);
 		return Result.OK(pageList);
 	}
 	
@@ -87,9 +85,7 @@ public class ElderBillController extends JeecgController<ElderBill, IElderBillSe
 	@RequiresPermissions("elder_bill:add")
 	@PostMapping(value = "/add")
 	public Result<String> add(@RequestBody ElderBill elderBill) {
-		elderBillService.save(elderBill);
-
-		return Result.OK("添加成功！");
+		return elderBillService.saveInfo(elderBill);
 	}
 	
 	/**
@@ -103,8 +99,7 @@ public class ElderBillController extends JeecgController<ElderBill, IElderBillSe
 	@RequiresPermissions("elder_bill:edit")
 	@RequestMapping(value = "/edit", method = {RequestMethod.PUT,RequestMethod.POST})
 	public Result<String> edit(@RequestBody ElderBill elderBill) {
-		elderBillService.updateById(elderBill);
-		return Result.OK("编辑成功!");
+		return elderBillService.updateInfo(elderBill);
 	}
 	
 	/**
@@ -118,8 +113,7 @@ public class ElderBillController extends JeecgController<ElderBill, IElderBillSe
 	@RequiresPermissions("elder_bill:delete")
 	@DeleteMapping(value = "/delete")
 	public Result<String> delete(@RequestParam(name="id",required=true) String id) {
-		elderBillService.removeById(id);
-		return Result.OK("删除成功!");
+		return elderBillService.deleteInfo(id);
 	}
 	
 	/**
@@ -133,8 +127,7 @@ public class ElderBillController extends JeecgController<ElderBill, IElderBillSe
 	@RequiresPermissions("elder_bill:deleteBatch")
 	@DeleteMapping(value = "/deleteBatch")
 	public Result<String> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
-		this.elderBillService.removeByIds(Arrays.asList(ids.split(",")));
-		return Result.OK("批量删除成功!");
+		return this.elderBillService.deleteInfos(Arrays.asList(ids.split(",")));
 	}
 	
 	/**
@@ -154,6 +147,17 @@ public class ElderBillController extends JeecgController<ElderBill, IElderBillSe
 		return Result.OK(elderBill);
 	}
 
+	 /**
+	  * 通过客户id查询未缴账单
+	  *
+	  * @param customerId
+	  * @return
+	  */
+	 @Operation(summary="通过客户id查询未缴账单")
+	 @GetMapping(value = "/getBillListByCustomerId")
+	 public Result<List<ElderBill>> getBillListByCustomerId(@RequestParam(name="customerId",required=true) String customerId) {
+		 return elderBillService.getBillListByCustomerId(customerId);
+	 }
     /**
     * 导出excel
     *

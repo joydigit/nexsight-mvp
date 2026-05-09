@@ -4,10 +4,9 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.math.BigDecimal;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.TableLogic;
+import java.util.List;
+
+import com.baomidou.mybatisplus.annotation.*;
 import org.jeecg.common.constant.ProvinceCityArea;
 import org.jeecg.common.util.SpringContextUtils;
 import lombok.Data;
@@ -108,4 +107,13 @@ public class ElderBill implements Serializable {
     @Schema(description = "删除状态：0正常，1已删除")
     @TableLogic
     private Integer delFlag;
+
+    @TableField(exist = false)
+    @Excel(name = "客户", width = 15,orderNum = "1")
+    private String customerName;
+    @Excel(name = "项目", width = 15,orderNum = "0")
+    @TableField(exist = false)
+    private String projectName;
+    @TableField(exist = false)
+    private List<String> projectIds;
 }

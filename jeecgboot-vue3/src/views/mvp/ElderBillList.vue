@@ -5,9 +5,9 @@
       <a-form ref="formRef" @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol">
         <a-row :gutter="24">
           <a-col :lg="6">
-            <a-form-item name="customerName">
-              <template #label><span title="客户名称">客户名称</span></template>
-              <a-input placeholder="请输入客户名称" v-model:value="queryParam.customerName" allow-clear ></a-input>
+            <a-form-item name="billNo">
+              <template #label><span title="账单编号">账单编号</span></template>
+              <a-input placeholder="请输入账单编号" v-model:value="queryParam.billNo" allow-clear ></a-input>
             </a-form-item>
           </a-col>
           <a-col :lg="6">
@@ -16,15 +16,17 @@
               <a-input placeholder="请输入账单月份" v-model:value="queryParam.billMonth" allow-clear ></a-input>
             </a-form-item>
           </a-col>
+          <a-col :lg="6">
+            <a-form-item name="status">
+              <template #label><span title="账单状态">账单状态</span></template>
+              <JDictSelectTag type="select" v-model:value="queryParam.status" dictCode="bill_status" placeholder="请选择账单状态" />
+            </a-form-item>
+          </a-col>
           <a-col :xl="6" :lg="7" :md="8" :sm="24">
             <span style="float: left; overflow: hidden" class="table-page-search-submitButtons">
               <a-col :lg="6">
                 <a-button type="primary" preIcon="ant-design:search-outlined" @click="searchQuery">查询</a-button>
-                <a-button type="primary" preIcon="ant-design:reload-outlined" @click="searchReset" style="margin-left: 8px">重置</a-button>
-                <a @click="toggleSearchStatus = !toggleSearchStatus" style="margin-left: 8px">
-                  {{ toggleSearchStatus ? '收起' : '展开' }}
-                  <Icon :icon="toggleSearchStatus ? 'ant-design:up-outlined' : 'ant-design:down-outlined'" />
-                </a>
+                <a-button type="primary" preIcon="ant-design:reload-outlined" @click="searchReset" style="margin-left: 8px">重置</a-button>               
               </a-col>
             </span>
           </a-col>
@@ -59,6 +61,8 @@
     </BasicTable>
     <!-- 表单区域 -->
     <ElderBillModal ref="registerModal" @success="handleSuccess"></ElderBillModal>
+    <!-- 账单明细弹框 -->
+    <ElderBillDetailListModal ref="registerBillDetailListModal"></ElderBillDetailListModal>
   </div>
 </template>
 
@@ -70,11 +74,14 @@
   import { list, deleteOne, batchDelete, getImportUrl, getExportUrl } from './ElderBill.api';
   import { downloadFile } from '/@/utils/common/renderUtils';
   import ElderBillModal from './components/ElderBillModal.vue'
+  import ElderBillDetailListModal from './components/ElderBillDetailListModal.vue'
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
    import {useModal} from '/@/components/Modal';
   import { getDateByPicker } from '/@/utils';
-
+  import { useRoute } from 'vue-router';
+  import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
+  const route = useRoute()
   const fieldPickers = reactive({
   });
 
@@ -82,6 +89,7 @@
   const queryParam = reactive<any>({});
   const toggleSearchStatus = ref<boolean>(false);
   const registerModal = ref();
+  const registerBillDetailListModal = ref();
   const userStore = useUserStore();
   const { createMessage } = useMessage();
   //注册table数据
@@ -103,6 +111,7 @@
             queryParam[key] = getDateByPicker(queryParam[key], fieldPickers[key]);
           }
         }
+        queryParam.customerId = route.query.id;
         return Object.assign(params, queryParam);
       },
     },
@@ -146,7 +155,11 @@
    */
   function handleAdd() {
     registerModal.value.disableSubmit = false;
-    registerModal.value.add();
+    const pardata = {
+      projectId:route.query.projectId,
+      customerId: route.query.id
+    }
+    registerModal.value.add(pardata);
   }
   
   /**
@@ -179,6 +192,9 @@
     await batchDelete({ ids: selectedRowKeys.value }, handleSuccess);
   }
    
+  function handleBillDetail(record: Recordable){
+    registerBillDetailListModal.value.open(record);
+  }
   /**
    * 成功回调
    */
@@ -215,7 +231,12 @@
           placement: 'topLeft',
         },
         auth: 'elder_bill:delete'
-      }
+      },
+      {
+        label: '账单明细',
+        onClick: handleBillDetail.bind(null, record),
+        auth: 'elder_bill:billDetail'
+      },
     ]
   }
 

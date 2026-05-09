@@ -2,4 +2,18 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.joydigit.seniorcaring.mvp.mapper.ElderBillDetailMapper">
 
+    <select id="pageList" resultType="com.joydigit.seniorcaring.mvp.entity.ElderBillDetail">
+        SELECT
+            bd.*,
+            b.bill_no
+        FROM
+            elder_bill_detail bd
+                LEFT JOIN elder_bill b ON bd.bill_id = b.id
+        WHERE
+            bd.del_flag = 0
+            <if test="data.billId != null and data.billId != ''">
+                and bd.bill_id = #{data.billId}
+            </if>
+        ORDER BY bd.create_time DESC
+    </select>
 </mapper>
