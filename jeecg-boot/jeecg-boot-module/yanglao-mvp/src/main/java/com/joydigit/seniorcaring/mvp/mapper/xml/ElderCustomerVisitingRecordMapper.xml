@@ -2,4 +2,18 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.joydigit.seniorcaring.mvp.mapper.ElderCustomerVisitingRecordMapper">
 
+    <select id="pageList" resultType="com.joydigit.seniorcaring.mvp.entity.ElderCustomerVisitingRecord">
+        select  * from   elder_customer_visiting_record
+        where  del_flag = 0
+        <if test="data.checkinId != null and data.checkinId != ''">
+            and checkin_id like concat(concat('%',#{data.checkinId}),'%')
+        </if>
+        <if test="data.customerId != null and data.customerId != ''">
+            and customer_id like concat(concat('%',#{data.customerId}),'%')
+        </if>
+        <if test="data.visitName != null and data.visitName != ''">
+            and visit_name like concat(concat('%',#{data.visitName}),'%')
+        </if>
+        order by create_time desc
+    </select>
 </mapper>

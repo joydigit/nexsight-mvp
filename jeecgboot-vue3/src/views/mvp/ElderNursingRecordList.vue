@@ -4,6 +4,44 @@
     <div class="jeecg-basic-table-form-container">
       <a-form ref="formRef" @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol">
         <a-row :gutter="24">
+          <a-col :lg="6">
+              <a-form-item name="checkinId">
+                <template #label><span title="入住编码">入住编码</span></template>
+                <a-input placeholder="请输入入住编码" v-model:value="queryParam.checkinId"></a-input>
+              </a-form-item>
+            </a-col>
+            <a-col :lg="6">
+              <a-form-item name="executorName">
+                <template #label><span title="执行人">执行人</span></template>
+                <a-input placeholder="请输入执行人" v-model:value="queryParam.executorName"></a-input>
+              </a-form-item>
+            </a-col>
+            <template v-if="toggleSearchStatus">
+              <a-col :lg="6">
+                <a-form-item name="itemCode">
+                  <template #label><span title="护理项目">护理项目</span></template>
+                  <JDictSelectTag type="select" v-model:value="queryParam.itemCode" dictCode="nursing_item_type" placeholder="请选择护理项目" />
+                </a-form-item>
+              </a-col>
+              <a-col :lg="6">
+                <a-form-item name="status">
+                  <template #label><span title="执行状态">执行状态</span></template>
+                  <JDictSelectTag type="select" v-model:value="queryParam.status" dictCode="nursing_record_status" placeholder="请选择执行状态" />
+                </a-form-item>
+              </a-col>
+            </template>
+            <a-col :xl="6" :lg="7" :md="8" :sm="24">
+            <span style="float: left; overflow: hidden" class="table-page-search-submitButtons">
+              <a-col :lg="6">
+                <a-button type="primary" preIcon="ant-design:search-outlined" @click="searchQuery">查询</a-button>
+                <a-button type="primary" preIcon="ant-design:reload-outlined" @click="searchReset" style="margin-left: 8px">重置</a-button>
+                <a @click="toggleSearchStatus = !toggleSearchStatus" style="margin-left: 8px">
+                  {{ toggleSearchStatus ? '收起' : '展开' }}
+                  <Icon :icon="toggleSearchStatus ? 'ant-design:up-outlined' : 'ant-design:down-outlined'" />
+                </a>
+              </a-col>
+            </span>
+          </a-col>
         </a-row>
       </a-form>
     </div>
@@ -48,9 +86,11 @@
   import ElderNursingRecordModal from './components/ElderNursingRecordModal.vue'
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
-   import {useModal} from '/@/components/Modal';
+  import {useModal} from '/@/components/Modal';
+  import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
   import { getDateByPicker } from '/@/utils';
-
+  import { useRoute } from 'vue-router';
+  const route = useRoute()
   const fieldPickers = reactive({
   });
 
@@ -79,6 +119,7 @@
             queryParam[key] = getDateByPicker(queryParam[key], fieldPickers[key]);
           }
         }
+        queryParam.customerId = route.query.id;
         return Object.assign(params, queryParam);
       },
     },
@@ -122,7 +163,11 @@
    */
   function handleAdd() {
     registerModal.value.disableSubmit = false;
-    registerModal.value.add();
+    const pardata = {
+      projectId:route.query.projectId,
+      customerId: route.query.id
+    }
+    registerModal.value.add(pardata);
   }
   
   /**

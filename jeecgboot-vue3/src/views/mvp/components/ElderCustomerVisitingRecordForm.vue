@@ -5,23 +5,13 @@
         <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ElderCustomerVisitingRecordForm">
           <a-row>
 						<a-col :span="24">
-							<a-form-item label="租户ID" v-bind="validateInfos.tenantId" id="ElderCustomerVisitingRecordForm-tenantId" name="tenantId">
-								<a-input v-model:value="formData.tenantId" placeholder="请输入租户ID"  allow-clear ></a-input>
+							<a-form-item label="入住编码" v-bind="validateInfos.checkinId" id="ElderCustomerVisitingRecordForm-checkinId" name="checkinId" v-if="formData.id">
+								<a-input v-model:value="formData.checkinId" disabled ></a-input>
 							</a-form-item>
 						</a-col>
-						<a-col :span="24">
-							<a-form-item label="所属项目ID" v-bind="validateInfos.projectId" id="ElderCustomerVisitingRecordForm-projectId" name="projectId">
-								<a-input v-model:value="formData.projectId" placeholder="请输入所属项目ID"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="客户id" v-bind="validateInfos.customerId" id="ElderCustomerVisitingRecordForm-customerId" name="customerId">
-								<a-input v-model:value="formData.customerId" placeholder="请输入客户id"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="入住id" v-bind="validateInfos.checkinId" id="ElderCustomerVisitingRecordForm-checkinId" name="checkinId">
-								<a-input v-model:value="formData.checkinId" placeholder="请输入入住id"  allow-clear ></a-input>
+            <a-col :span="24">
+							<a-form-item label="访问人名" v-bind="validateInfos.visitName" id="ElderCustomerVisitingRecordForm-visitName" name="visitName">
+								<a-input v-model:value="formData.visitName" placeholder="请输入访问人名"  allow-clear ></a-input>
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
@@ -29,14 +19,14 @@
 								<a-input v-model:value="formData.visitPhone" placeholder="请输入访问人手机号"  allow-clear ></a-input>
 							</a-form-item>
 						</a-col>
-						<a-col :span="24">
-							<a-form-item label="访问人名" v-bind="validateInfos.visitName" id="ElderCustomerVisitingRecordForm-visitName" name="visitName">
-								<a-input v-model:value="formData.visitName" placeholder="请输入访问人名"  allow-clear ></a-input>
+            <a-col :span="24">
+							<a-form-item label="访问时间" v-bind="validateInfos.visitTime" id="ElderCustomerOutingRecordForm-endTime" name="visitTime">
+								<a-date-picker placeholder="请选择访问时间"  v-model:value="formData.visitTime" showTime value-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"  allow-clear />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
 							<a-form-item label="备注" v-bind="validateInfos.remark" id="ElderCustomerVisitingRecordForm-remark" name="remark">
-								<a-input v-model:value="formData.remark" placeholder="请输入备注"  allow-clear ></a-input>
+								<a-textarea v-model:value="formData.remark" placeholder="请输入备注"  allow-clear ></a-textarea>
 							</a-form-item>
 						</a-col>
           </a-row>
@@ -79,8 +69,9 @@
   const confirmLoading = ref<boolean>(false);
   //表单验证
   const validatorRules = reactive({
-    tenantId: [{ required: true, message: '请输入租户ID!'},],
-    projectId: [{ required: true, message: '请输入所属项目ID!'},],
+    visitName: [{ required: true, message: '请输入!'},],
+    visitPhone: [{ required: true, message: '请输入!'},],
+    visitTime:  [{ required: true, message: '请选择!'},],
   });
   const { resetFields, validate, validateInfos } = useForm(formData, validatorRules, { immediate: false });
   //日期个性化选择
@@ -103,8 +94,8 @@
   /**
    * 新增
    */
-  function add() {
-    edit({});
+  function add(initData) {
+    edit(initData);
   }
 
   /**

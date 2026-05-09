@@ -69,10 +69,8 @@ public class ElderNursingRecordController extends JeecgController<ElderNursingRe
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
 
-
-        QueryWrapper<ElderNursingRecord> queryWrapper = QueryGenerator.initQueryWrapper(elderNursingRecord, req.getParameterMap());
 		Page<ElderNursingRecord> page = new Page<ElderNursingRecord>(pageNo, pageSize);
-		IPage<ElderNursingRecord> pageList = elderNursingRecordService.page(page, queryWrapper);
+		IPage<ElderNursingRecord> pageList = elderNursingRecordService.pageList(page, elderNursingRecord);
 		return Result.OK(pageList);
 	}
 	
@@ -87,9 +85,7 @@ public class ElderNursingRecordController extends JeecgController<ElderNursingRe
 	@RequiresPermissions("elder_nursing_record:add")
 	@PostMapping(value = "/add")
 	public Result<String> add(@RequestBody ElderNursingRecord elderNursingRecord) {
-		elderNursingRecordService.save(elderNursingRecord);
-
-		return Result.OK("添加成功！");
+		return elderNursingRecordService.saveInfo(elderNursingRecord);
 	}
 	
 	/**

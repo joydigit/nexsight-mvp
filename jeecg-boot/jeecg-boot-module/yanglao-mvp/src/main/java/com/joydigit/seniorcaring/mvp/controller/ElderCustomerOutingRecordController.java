@@ -68,11 +68,8 @@ public class ElderCustomerOutingRecordController extends JeecgController<ElderCu
 								   @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
-
-
-        QueryWrapper<ElderCustomerOutingRecord> queryWrapper = QueryGenerator.initQueryWrapper(elderCustomerOutingRecord, req.getParameterMap());
 		Page<ElderCustomerOutingRecord> page = new Page<ElderCustomerOutingRecord>(pageNo, pageSize);
-		IPage<ElderCustomerOutingRecord> pageList = elderCustomerOutingRecordService.page(page, queryWrapper);
+		IPage<ElderCustomerOutingRecord> pageList = elderCustomerOutingRecordService.pageList(page, elderCustomerOutingRecord);
 		return Result.OK(pageList);
 	}
 	
@@ -87,9 +84,7 @@ public class ElderCustomerOutingRecordController extends JeecgController<ElderCu
 	@RequiresPermissions("elder_customer_outing_record:add")
 	@PostMapping(value = "/add")
 	public Result<String> add(@RequestBody ElderCustomerOutingRecord elderCustomerOutingRecord) {
-		elderCustomerOutingRecordService.save(elderCustomerOutingRecord);
-
-		return Result.OK("添加成功！");
+		return elderCustomerOutingRecordService.saveInfo(elderCustomerOutingRecord);
 	}
 	
 	/**

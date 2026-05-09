@@ -5,23 +5,8 @@
         <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ElderVitalSignsForm">
           <a-row>
 						<a-col :span="24">
-							<a-form-item label="租户ID" v-bind="validateInfos.tenantId" id="ElderVitalSignsForm-tenantId" name="tenantId">
-								<a-input v-model:value="formData.tenantId" placeholder="请输入租户ID"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="项目ID" v-bind="validateInfos.projectId" id="ElderVitalSignsForm-projectId" name="projectId">
-								<a-input v-model:value="formData.projectId" placeholder="请输入项目ID"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="客户ID" v-bind="validateInfos.customerId" id="ElderVitalSignsForm-customerId" name="customerId">
-								<a-input v-model:value="formData.customerId" placeholder="请输入客户ID"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="入住id" v-bind="validateInfos.checkinId" id="ElderVitalSignsForm-checkinId" name="checkinId">
-								<a-input v-model:value="formData.checkinId" placeholder="请输入入住id"  allow-clear ></a-input>
+							<a-form-item label="入住编码" v-bind="validateInfos.checkinId" id="ElderVitalSignsForm-checkinId" name="checkinId" v-if="formData.id">
+								<a-input v-model:value="formData.checkinId" disabled ></a-input>
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
@@ -30,38 +15,38 @@
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="体温（°C），如37.5" v-bind="validateInfos.temperature" id="ElderVitalSignsForm-temperature" name="temperature">
-								<a-input v-model:value="formData.temperature" placeholder="请输入体温（°C），如37.5"  allow-clear ></a-input>
+							<a-form-item label="体温" v-bind="validateInfos.temperature" id="ElderVitalSignsForm-temperature" name="temperature">
+								<a-input v-model:value="formData.temperature" placeholder="请输入体温"  allow-clear ></a-input>
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="收缩压/高压（mmHg），如140" v-bind="validateInfos.bloodPressureHigh" id="ElderVitalSignsForm-bloodPressureHigh" name="bloodPressureHigh">
-								<a-input v-model:value="formData.bloodPressureHigh" placeholder="请输入收缩压/高压（mmHg），如140"  allow-clear ></a-input>
+							<a-form-item label="收缩压/高压" v-bind="validateInfos.bloodPressureHigh" id="ElderVitalSignsForm-bloodPressureHigh" name="bloodPressureHigh">
+								<a-input v-model:value="formData.bloodPressureHigh" placeholder="请输入"  allow-clear ></a-input>
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="舒张压/低压（mmHg），如90" v-bind="validateInfos.bloodPressureLow" id="ElderVitalSignsForm-bloodPressureLow" name="bloodPressureLow">
-								<a-input v-model:value="formData.bloodPressureLow" placeholder="请输入舒张压/低压（mmHg），如90"  allow-clear ></a-input>
+							<a-form-item label="舒张压/低压" v-bind="validateInfos.bloodPressureLow" id="ElderVitalSignsForm-bloodPressureLow" name="bloodPressureLow">
+								<a-input v-model:value="formData.bloodPressureLow" placeholder="请输入"  allow-clear ></a-input>
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="心率（次/分），如75" v-bind="validateInfos.heartRate" id="ElderVitalSignsForm-heartRate" name="heartRate">
-								<a-input v-model:value="formData.heartRate" placeholder="请输入心率（次/分），如75"  allow-clear ></a-input>
+							<a-form-item label="心率（次/分）" v-bind="validateInfos.heartRate" id="ElderVitalSignsForm-heartRate" name="heartRate">
+								<a-input v-model:value="formData.heartRate" placeholder="请输入心率（次/分）"  allow-clear ></a-input>
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="血糖（mmol/L），如5.8" v-bind="validateInfos.bloodSugar" id="ElderVitalSignsForm-bloodSugar" name="bloodSugar">
-								<a-input v-model:value="formData.bloodSugar" placeholder="请输入血糖（mmol/L），如5.8"  allow-clear ></a-input>
+							<a-form-item label="血糖（mmol/L）" v-bind="validateInfos.bloodSugar" id="ElderVitalSignsForm-bloodSugar" name="bloodSugar">
+								<a-input v-model:value="formData.bloodSugar" placeholder="请输入血糖（mmol/L）"  allow-clear ></a-input>
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="呼吸（次/分），如20" v-bind="validateInfos.respiration" id="ElderVitalSignsForm-respiration" name="respiration">
-								<a-input v-model:value="formData.respiration" placeholder="请输入呼吸（次/分），如20"  allow-clear ></a-input>
+							<a-form-item label="呼吸（次/分）" v-bind="validateInfos.respiration" id="ElderVitalSignsForm-respiration" name="respiration">
+								<a-input v-model:value="formData.respiration" placeholder="请输入呼吸（次/分）"  allow-clear ></a-input>
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
 							<a-form-item label="备注" v-bind="validateInfos.remark" id="ElderVitalSignsForm-remark" name="remark">
-								<a-input v-model:value="formData.remark" placeholder="请输入备注"  allow-clear ></a-input>
+								<a-textarea v-model:value="formData.remark" placeholder="请输入备注"  allow-clear ></a-textarea>
 							</a-form-item>
 						</a-col>
           </a-row>
@@ -109,9 +94,6 @@
   const confirmLoading = ref<boolean>(false);
   //表单验证
   const validatorRules = reactive({
-    tenantId: [{ required: true, message: '请输入租户ID!'},],
-    projectId: [{ required: true, message: '请输入项目ID!'},],
-    customerId: [{ required: true, message: '请输入客户ID!'},],
     recordTime: [{ required: true, message: '请输入记录时间!'},],
   });
   const { resetFields, validate, validateInfos } = useForm(formData, validatorRules, { immediate: false });
@@ -135,8 +117,8 @@
   /**
    * 新增
    */
-  function add() {
-    edit({});
+  function add(initData) {
+    edit(initData);
   }
 
   /**

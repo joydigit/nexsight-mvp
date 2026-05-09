@@ -48,7 +48,9 @@
   import ElderVitalSignsModal from './components/ElderVitalSignsModal.vue'
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
-   import {useModal} from '/@/components/Modal';
+  import {useModal} from '/@/components/Modal';
+  import { useRoute } from 'vue-router';
+  const route = useRoute()
   import { getDateByPicker } from '/@/utils';
 
   const fieldPickers = reactive({
@@ -79,6 +81,7 @@
             queryParam[key] = getDateByPicker(queryParam[key], fieldPickers[key]);
           }
         }
+        queryParam.customerId = route.query.id;
         return Object.assign(params, queryParam);
       },
     },
@@ -122,7 +125,11 @@
    */
   function handleAdd() {
     registerModal.value.disableSubmit = false;
-    registerModal.value.add();
+    const pardata = {
+      projectId:route.query.projectId,
+      customerId: route.query.id
+    }
+    registerModal.value.add(pardata);
   }
   
   /**

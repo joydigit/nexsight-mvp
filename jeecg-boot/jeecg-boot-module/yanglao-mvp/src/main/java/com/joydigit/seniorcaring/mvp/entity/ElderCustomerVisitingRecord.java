@@ -86,4 +86,8 @@ public class ElderCustomerVisitingRecord implements Serializable {
     @Schema(description = "删除状态：0正常，1已删除")
     @TableLogic
     private Integer delFlag;
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @Schema(description = "访问时间")
+    private Date visitTime;
 }

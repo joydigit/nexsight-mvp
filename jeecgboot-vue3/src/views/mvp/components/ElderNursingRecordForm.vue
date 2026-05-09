@@ -5,23 +5,13 @@
         <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ElderNursingRecordForm">
           <a-row>
 						<a-col :span="24">
-							<a-form-item label="租户ID" v-bind="validateInfos.tenantId" id="ElderNursingRecordForm-tenantId" name="tenantId">
-								<a-input v-model:value="formData.tenantId" placeholder="请输入租户ID"  allow-clear ></a-input>
+							<a-form-item label="入住编码" v-bind="validateInfos.checkinId" id="ElderNursingRecordForm-checkinId" name="checkinId" v-if="formData.id">
+								<a-input v-model:value="formData.checkinId"disabled></a-input>
 							</a-form-item>
 						</a-col>
-						<a-col :span="24">
-							<a-form-item label="项目ID" v-bind="validateInfos.projectId" id="ElderNursingRecordForm-projectId" name="projectId">
-								<a-input v-model:value="formData.projectId" placeholder="请输入项目ID"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="客户ID" v-bind="validateInfos.customerId" id="ElderNursingRecordForm-customerId" name="customerId">
-								<a-input v-model:value="formData.customerId" placeholder="请输入客户ID"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="入住id" v-bind="validateInfos.checkinId" id="ElderNursingRecordForm-checkinId" name="checkinId">
-								<a-input v-model:value="formData.checkinId" placeholder="请输入入住id"  allow-clear ></a-input>
+            <a-col :span="24">
+							<a-form-item label="执行人" v-bind="validateInfos.executorId" id="ElderNursingRecordForm-executorId" name="executorId">
+								<JSelectUser v-model:value="formData.executorId" rowKey="id" placeholder="请选择" :isRadioSelection="true"></JSelectUser>
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
@@ -30,43 +20,23 @@
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="护理项目编码（如ORAL_CARE口腔护理）" v-bind="validateInfos.itemCode" id="ElderNursingRecordForm-itemCode" name="itemCode">
-								<a-input v-model:value="formData.itemCode" placeholder="请输入护理项目编码（如ORAL_CARE口腔护理）"  allow-clear ></a-input>
+							<a-form-item label="护理项目" v-bind="validateInfos.itemCode" id="ElderNursingRecordForm-itemCode" name="itemCode">
+								<JDictSelectTag type="select" v-model:value="formData.itemCode" dictCode="nursing_item_type" placeholder="请选择护理项目" />
+							</a-form-item>
+						</a-col>	
+						<a-col :span="24">
+							<a-form-item label="执行状态" v-bind="validateInfos.status" id="ElderNursingRecordForm-status" name="status">
+								<JDictSelectTag type="select" v-model:value="formData.status" dictCode="nursing_record_status" placeholder="请选择状态" />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="护理项目名称" v-bind="validateInfos.itemName" id="ElderNursingRecordForm-itemName" name="itemName">
-								<a-input v-model:value="formData.itemName" placeholder="请输入护理项目名称"  allow-clear ></a-input>
+							<a-form-item label="拍照凭证" v-bind="validateInfos.evidenceUrl" id="ElderNursingRecordForm-evidenceUrl" name="evidenceUrl">
+								<j-upload v-model:value="formData.evidenceUrl"   ></j-upload>
 							</a-form-item>
 						</a-col>
-						<a-col :span="24">
-							<a-form-item label="执行人ID（user_id逻辑外键）" v-bind="validateInfos.executorId" id="ElderNursingRecordForm-executorId" name="executorId">
-								<a-input v-model:value="formData.executorId" placeholder="请输入执行人ID（user_id逻辑外键）"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="执行开始时间" v-bind="validateInfos.executeStartTime" id="ElderNursingRecordForm-executeStartTime" name="executeStartTime">
-								<a-date-picker placeholder="请选择执行开始时间"  v-model:value="formData.executeStartTime" showTime value-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"  allow-clear />
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="执行结束时间" v-bind="validateInfos.executeEndTime" id="ElderNursingRecordForm-executeEndTime" name="executeEndTime">
-								<a-date-picker placeholder="请选择执行结束时间"  v-model:value="formData.executeEndTime" showTime value-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"  allow-clear />
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="执行状态：0-待执行，1-已完成，2-跳过，3-异常" v-bind="validateInfos.status" id="ElderNursingRecordForm-status" name="status">
-								<a-input v-model:value="formData.status" placeholder="请输入执行状态：0-待执行，1-已完成，2-跳过，3-异常"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
+            <a-col :span="24">
 							<a-form-item label="异常情况描述" v-bind="validateInfos.abnormalDesc" id="ElderNursingRecordForm-abnormalDesc" name="abnormalDesc">
-								<a-input v-model:value="formData.abnormalDesc" placeholder="请输入异常情况描述"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="拍照凭证URL（如翻身后的皮肤状况）" v-bind="validateInfos.evidenceUrl" id="ElderNursingRecordForm-evidenceUrl" name="evidenceUrl">
-								<a-input v-model:value="formData.evidenceUrl" placeholder="请输入拍照凭证URL（如翻身后的皮肤状况）"  allow-clear ></a-input>
+								<a-textarea v-model:value="formData.abnormalDesc" placeholder="请输入异常情况描述"  allow-clear ></a-textarea>
 							</a-form-item>
 						</a-col>
           </a-row>
@@ -80,15 +50,21 @@
   import { ref, reactive, defineExpose, nextTick, defineProps, computed, onMounted } from 'vue';
   import { defHttp } from '/@/utils/http/axios';
   import { useMessage } from '/@/hooks/web/useMessage';
+  import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
   import { getDateByPicker, getValueType } from '/@/utils';
+  import JSelectUser from '/@/components/Form/src/jeecg/components/JSelectUser.vue';
   import { saveOrUpdate } from '../ElderNursingRecord.api';
+  import JUpload from '/@/components/Form/src/jeecg/components/JUpload/JUpload.vue';
   import { Form } from 'ant-design-vue';
+  import { useUserStore } from '/@/store/modules/user';
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
   const props = defineProps({
     formDisabled: { type: Boolean, default: false },
     formData: { type: Object, default: () => ({})},
     formBpm: { type: Boolean, default: true }
   });
+  const userStore = useUserStore();
+  const userId = ref<Nullable<number | string>>(0);
   const formRef = ref();
   const useForm = Form.useForm;
   const emit = defineEmits(['register', 'ok']);
@@ -115,20 +91,19 @@
   const confirmLoading = ref<boolean>(false);
   //表单验证
   const validatorRules = reactive({
-    tenantId: [{ required: true, message: '请输入租户ID!'},],
-    projectId: [{ required: true, message: '请输入项目ID!'},],
-    customerId: [{ required: true, message: '请输入客户ID!'},],
-    nursingDate: [{ required: true, message: '请输入护理时间!'},],
-    itemCode: [{ required: true, message: '请输入护理项目编码（如ORAL_CARE口腔护理）!'},],
-    itemName: [{ required: true, message: '请输入护理项目名称!'},],
-    executorId: [{ required: true, message: '请输入执行人ID（user_id逻辑外键）!'},],
-    executeStartTime: [{ required: true, message: '请输入执行开始时间!'},],
+    nursingDate: [{ required: true, message: '请选择!'},],
+    itemCode: [{ required: true, message: '请选择!'},],
+    executorId: [{ required: true, message: '请选择!'},],
+    status:  [{ required: true, message: '请选择!'},],
   });
   const { resetFields, validate, validateInfos } = useForm(formData, validatorRules, { immediate: false });
   //日期个性化选择
   const fieldPickers = reactive({
   });
-
+  onMounted(() => {
+    // 记录当前的UserId
+    userId.value = userStore.getUserInfo?.id;
+  });
   // 表单禁用
   const disabled = computed(()=>{
     if(props.formBpm === true){
@@ -145,8 +120,8 @@
   /**
    * 新增
    */
-  function add() {
-    edit({});
+  function add(initData) {
+    edit({...initData,executorId:userId.value});
   }
 
   /**

@@ -4,10 +4,8 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.math.BigDecimal;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.TableLogic;
+
+import com.baomidou.mybatisplus.annotation.*;
 import org.jeecg.common.constant.ProvinceCityArea;
 import org.jeecg.common.util.SpringContextUtils;
 import lombok.Data;
@@ -63,26 +61,10 @@ public class ElderNursingRecord implements Serializable {
 	@Excel(name = "护理项目编码（如ORAL_CARE口腔护理）", width = 15)
     @Schema(description = "护理项目编码（如ORAL_CARE口腔护理）")
     private String itemCode;
-	/**护理项目名称*/
-	@Excel(name = "护理项目名称", width = 15)
-    @Schema(description = "护理项目名称")
-    private String itemName;
 	/**执行人ID（user_id逻辑外键）*/
 	@Excel(name = "执行人ID（user_id逻辑外键）", width = 15)
     @Schema(description = "执行人ID（user_id逻辑外键）")
     private String executorId;
-	/**执行开始时间*/
-	@Excel(name = "执行开始时间", width = 20, format = "yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
-    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    @Schema(description = "执行开始时间")
-    private Date executeStartTime;
-	/**执行结束时间*/
-	@Excel(name = "执行结束时间", width = 20, format = "yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
-    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    @Schema(description = "执行结束时间")
-    private Date executeEndTime;
 	/**执行状态：0-待执行，1-已完成，2-跳过，3-异常*/
 	@Excel(name = "执行状态：0-待执行，1-已完成，2-跳过，3-异常", width = 15)
     @Schema(description = "执行状态：0-待执行，1-已完成，2-跳过，3-异常")
@@ -116,4 +98,8 @@ public class ElderNursingRecord implements Serializable {
     @Schema(description = "删除状态：0正常，1已删除")
     @TableLogic
     private Integer delFlag;
+
+    @TableField(exist = false)
+    @Schema(description = "执行人")
+    private String executorName;
 }

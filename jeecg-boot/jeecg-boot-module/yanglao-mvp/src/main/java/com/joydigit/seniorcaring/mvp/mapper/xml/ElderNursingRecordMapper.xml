@@ -2,4 +2,28 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.joydigit.seniorcaring.mvp.mapper.ElderNursingRecordMapper">
 
+    <select id="pageList" resultType="com.joydigit.seniorcaring.mvp.entity.ElderNursingRecord">
+        SELECT
+            nr.*, u.realname as executorName
+        FROM
+            elder_nursing_record nr
+                LEFT JOIN sys_user u ON nr.executor_id = u.id
+        WHERE nr.del_flag = 0
+        <if test="data.checkinId != null and data.checkinId != ''">
+            and nr.checkin_id like concat(concat('%',#{data.checkinId}),'%')
+        </if>
+        <if test="data.customerId != null and data.customerId != ''">
+            and nr.customer_id like concat(concat('%',#{data.customerId}),'%')
+        </if>
+        <if test="data.executorName != null and data.executorName != ''">
+            AND u.realname like concat(concat('%',#{data.executorName}),'%')
+        </if>
+        <if test="data.itemCode != null and data.itemCode != ''">
+            AND nr.item_code = #{data.itemCode}
+        </if>
+        <if test="data.status != null and data.status != ''">
+            AND nr.`status` = #{data.status}
+        </if>
+        ORDER BY nr.create_time DESC
+    </select>
 </mapper>

@@ -6,22 +6,7 @@ import { getWeekMonthQuarterYear } from '/@/utils';
 //列表数据
 export const columns: BasicColumn[] = [
   {
-    title: '租户ID',
-    align: "center",
-    dataIndex: 'tenantId'
-  },
-  {
-    title: '项目ID',
-    align: "center",
-    dataIndex: 'projectId'
-  },
-  {
-    title: '客户ID',
-    align: "center",
-    dataIndex: 'customerId'
-  },
-  {
-    title: '入住id',
+    title: '入住编码',
     align: "center",
     dataIndex: 'checkinId'
   },
@@ -31,37 +16,37 @@ export const columns: BasicColumn[] = [
     dataIndex: 'recordTime'
   },
   {
-    title: '体温（°C），如37.5',
+    title: '体温',
     align: "center",
     dataIndex: 'temperature'
   },
   {
-    title: '收缩压/高压（mmHg），如140',
+    title: '收缩压/高压（mmHg）',
     align: "center",
     dataIndex: 'bloodPressureHigh'
   },
   {
-    title: '舒张压/低压（mmHg），如90',
+    title: '舒张压/低压（mmHg）',
     align: "center",
     dataIndex: 'bloodPressureLow'
   },
   {
-    title: '心率（次/分），如75',
+    title: '心率（次/分）',
     align: "center",
     dataIndex: 'heartRate'
   },
   {
-    title: '血糖（mmol/L），如5.8',
+    title: '血糖（mmol/L）',
     align: "center",
     dataIndex: 'bloodSugar'
   },
   {
-    title: '呼吸（次/分），如20',
+    title: '呼吸（次/分）',
     align: "center",
     dataIndex: 'respiration'
   },
   {
-    title: '备注（如"餐后2小时"）',
+    title: '备注',
     align: "center",
     dataIndex: 'remark'
   },
