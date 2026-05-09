@@ -24,11 +24,11 @@
   /**
    * 新增
    */
-  function add() {
+  function add(initData) {
     title.value = '新增';
     visible.value = true;
     nextTick(() => {
-      registerForm.value.add();
+      registerForm.value.add(initData);
     });
   }
   

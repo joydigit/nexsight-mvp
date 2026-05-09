@@ -2,4 +2,23 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.joydigit.seniorcaring.mvp.mapper.ElderVitalSignsMapper">
 
+    <select id="pageList" resultType="com.joydigit.seniorcaring.mvp.entity.ElderVitalSigns">
+        SELECT
+            vs.*
+        FROM
+            elder_vital_signs vs
+        WHERE
+            vs.del_flag = 0
+        <if test="data.recordTimeArr != null and data.recordTimeArr.size() > 0">
+            AND vs.record_time BETWEEN concat(#{data.recordTimeArr[0]},' 00:00:00') AND concat(#{data.recordTimeArr[1]},' 23:59:59')
+        </if>
+        <if test="data.checkinId != null and data.checkinId != ''">
+            and vs.checkin_id like concat(concat('%',#{data.checkinId}),'%')
+        </if>
+        <if test="data.customerId != null and data.customerId != ''">
+            and vs.customer_id = #{data.customerId}
+        </if>
+        ORDER BY
+            vs.create_time DESC
+    </select>
 </mapper>

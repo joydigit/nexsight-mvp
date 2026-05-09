@@ -10,6 +10,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.query.QueryRuleEnum;
@@ -68,11 +69,8 @@ public class ElderVitalSignsController extends JeecgController<ElderVitalSigns, 
 								   @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
-
-
-        QueryWrapper<ElderVitalSigns> queryWrapper = QueryGenerator.initQueryWrapper(elderVitalSigns, req.getParameterMap());
 		Page<ElderVitalSigns> page = new Page<ElderVitalSigns>(pageNo, pageSize);
-		IPage<ElderVitalSigns> pageList = elderVitalSignsService.page(page, queryWrapper);
+		IPage<ElderVitalSigns> pageList = elderVitalSignsService.pageList(page, elderVitalSigns);
 		return Result.OK(pageList);
 	}
 	
@@ -87,9 +85,7 @@ public class ElderVitalSignsController extends JeecgController<ElderVitalSigns, 
 	@RequiresPermissions("elder_vital_signs:add")
 	@PostMapping(value = "/add")
 	public Result<String> add(@RequestBody ElderVitalSigns elderVitalSigns) {
-		elderVitalSignsService.save(elderVitalSigns);
-
-		return Result.OK("添加成功！");
+		return elderVitalSignsService.saveInfo(elderVitalSigns);
 	}
 	
 	/**
@@ -103,6 +99,15 @@ public class ElderVitalSignsController extends JeecgController<ElderVitalSigns, 
 	@RequiresPermissions("elder_vital_signs:edit")
 	@RequestMapping(value = "/edit", method = {RequestMethod.PUT,RequestMethod.POST})
 	public Result<String> edit(@RequestBody ElderVitalSigns elderVitalSigns) {
+		if (StringUtils.isBlank(elderVitalSigns.getBloodPressureHigh()) &&
+				StringUtils.isBlank(elderVitalSigns.getTemperature()) &&
+				StringUtils.isBlank(elderVitalSigns.getBloodPressureLow()) &&
+				StringUtils.isBlank(elderVitalSigns.getHeartRate()) &&
+				StringUtils.isBlank(elderVitalSigns.getBloodSugar()) &&
+				StringUtils.isBlank(elderVitalSigns.getRespiration())
+		){
+			return Result.error("必须填一个指标");
+		}
 		elderVitalSignsService.updateById(elderVitalSigns);
 		return Result.OK("编辑成功!");
 	}

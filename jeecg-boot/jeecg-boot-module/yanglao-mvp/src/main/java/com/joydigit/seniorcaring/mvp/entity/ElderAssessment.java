@@ -49,12 +49,8 @@ public class ElderAssessment implements Serializable {
 	@Excel(name = "入住id", width = 15)
     @Schema(description = "入住id")
     private String checkinId;
-	/**评估类型名称*/
-	@Excel(name = "评估类型名称", width = 15)
-    @Schema(description = "评估类型名称")
-    private String assessmentTypeName;
 	/**评估类型：ADL日常生活能力/FALL跌倒风险/COGNITIVE认知评估*/
-	@Excel(name = "评估类型：ADL日常生活能力/FALL跌倒风险/COGNITIVE认知评估", width = 15)
+	@Excel(name = "评估类型", width = 15)
     @Schema(description = "评估类型：ADL日常生活能力/FALL跌倒风险/COGNITIVE认知评估")
     private String assessmentTypeCode;
 	/**评分（百分制或特定量表分数）*/

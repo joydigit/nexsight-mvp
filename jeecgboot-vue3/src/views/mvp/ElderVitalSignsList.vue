@@ -4,6 +4,26 @@
     <div class="jeecg-basic-table-form-container">
       <a-form ref="formRef" @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol">
         <a-row :gutter="24">
+          <a-col :lg="6">
+            <a-form-item name="checkinId">
+              <template #label><span title="入住编码">入住编码</span></template>
+              <a-input placeholder="请输入入住编码" v-model:value="queryParam.checkinId"></a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :lg="6">
+            <a-form-item name="recordTimeArr">
+              <template #label><span title="记录时间">记录时间</span></template>
+              <a-range-picker value-format="YYYY-MM-DD" v-model:value="queryParam.recordTimeArr" class="query-group-cust"/>
+            </a-form-item>
+          </a-col>
+          <a-col :xl="6" :lg="7" :md="8" :sm="24">
+            <span style="float: left; overflow: hidden" class="table-page-search-submitButtons">
+              <a-col :lg="6">
+                <a-button type="primary" preIcon="ant-design:search-outlined" @click="searchQuery">查询</a-button>
+                <a-button type="primary" preIcon="ant-design:reload-outlined" @click="searchReset" style="margin-left: 8px">重置</a-button>
+              </a-col>
+            </span>
+          </a-col>
         </a-row>
       </a-form>
     </div>

@@ -51,10 +51,8 @@ public class ElderAssessmentController extends JeecgController<ElderAssessment, 
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
 
-
-        QueryWrapper<ElderAssessment> queryWrapper = QueryGenerator.initQueryWrapper(elderAssessment, req.getParameterMap());
 		Page<ElderAssessment> page = new Page<ElderAssessment>(pageNo, pageSize);
-		IPage<ElderAssessment> pageList = elderAssessmentService.page(page, queryWrapper);
+		IPage<ElderAssessment> pageList = elderAssessmentService.pageList(page, elderAssessment);
 		return Result.OK(pageList);
 	}
 	
@@ -69,9 +67,7 @@ public class ElderAssessmentController extends JeecgController<ElderAssessment, 
 	@RequiresPermissions("elder_assessment:add")
 	@PostMapping(value = "/add")
 	public Result<String> add(@RequestBody ElderAssessment elderAssessment) {
-		elderAssessmentService.save(elderAssessment);
-
-		return Result.OK("添加成功！");
+		return elderAssessmentService.saveInfo(elderAssessment);
 	}
 	
 	/**

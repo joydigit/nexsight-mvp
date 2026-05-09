@@ -4,6 +4,26 @@
     <div class="jeecg-basic-table-form-container">
       <a-form ref="formRef" @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol">
         <a-row :gutter="24">
+          <a-col :lg="6">
+            <a-form-item name="checkinId">
+              <template #label><span title="入住编码">入住编码</span></template>
+              <a-input placeholder="请输入入住编码" v-model:value="queryParam.checkinId"></a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :lg="6">
+            <a-form-item name="assessmentTypeCode">
+              <template #label><span title="评估类型">评估类型</span></template>
+              <JDictSelectTag type="select" v-model:value="queryParam.assessmentTypeCode" dictCode="assessment_type" placeholder="请选择评估类型" />
+            </a-form-item>
+          </a-col>
+          <a-col :xl="6" :lg="7" :md="8" :sm="24">
+            <span style="float: left; overflow: hidden" class="table-page-search-submitButtons">
+              <a-col :lg="6">
+                <a-button type="primary" preIcon="ant-design:search-outlined" @click="searchQuery">查询</a-button>
+                <a-button type="primary" preIcon="ant-design:reload-outlined" @click="searchReset" style="margin-left: 8px">重置</a-button>
+              </a-col>
+            </span>
+          </a-col>
         </a-row>
       </a-form>
     </div>
@@ -41,6 +61,7 @@
 <script lang="ts" name="com.joydigit.seniorcaring.mvp-elderAssessment" setup>
   import { ref, reactive } from 'vue';
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
+  import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
   import { useListPage } from '/@/hooks/system/useListPage';
   import { columns, superQuerySchema } from './ElderAssessment.data';
   import { list, deleteOne, batchDelete, getImportUrl, getExportUrl } from './ElderAssessment.api';
@@ -50,6 +71,8 @@
   import { useMessage } from '/@/hooks/web/useMessage';
    import {useModal} from '/@/components/Modal';
   import { getDateByPicker } from '/@/utils';
+  import { useRoute } from 'vue-router';
+  const route = useRoute()
 
   const fieldPickers = reactive({
   });
@@ -79,6 +102,7 @@
             queryParam[key] = getDateByPicker(queryParam[key], fieldPickers[key]);
           }
         }
+        queryParam.customerId = route.query.id;
         return Object.assign(params, queryParam);
       },
     },
@@ -122,7 +146,11 @@
    */
   function handleAdd() {
     registerModal.value.disableSubmit = false;
-    registerModal.value.add();
+    const pardata = {
+      projectId:route.query.projectId,
+      customerId: route.query.id
+    }
+    registerModal.value.add(pardata);
   }
   
   /**
