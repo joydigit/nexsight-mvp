@@ -108,4 +108,9 @@ public class ElderResidenceHistory implements Serializable {
     @Schema(description = "删除状态：0正常，1已删除")
     @TableLogic
     private Integer delFlag;
+    // 退住日期
+    @TableField(exist = false)
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern="yyyy-MM-dd")
+    private Date checkoutTime;
 }

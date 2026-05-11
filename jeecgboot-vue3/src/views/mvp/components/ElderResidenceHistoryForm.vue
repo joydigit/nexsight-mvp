@@ -5,58 +5,71 @@
         <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ElderResidenceHistoryForm">
           <a-row>
 						<a-col :span="24">
-							<a-form-item label="租户ID" v-bind="validateInfos.tenantId" id="ElderResidenceHistoryForm-tenantId" name="tenantId">
-								<a-input v-model:value="formData.tenantId" placeholder="请输入租户ID"  allow-clear ></a-input>
+							<a-form-item label="入住编号" v-bind="validateInfos.checkinId" id="ElderResidenceHistoryForm-checkinId" name="checkinId">
+								<a-input v-model:value="formData.checkinId" disabled></a-input>
+							</a-form-item>
+						</a-col>					
+						<a-col :span="24">
+							<a-form-item label="变更类型" v-bind="validateInfos.changeTypeCode" id="ElderResidenceHistoryForm-changeTypeCode" name="changeTypeCode">
+								<JDictSelectTag type="select" v-model:value="formData.changeTypeCode" dictCode="change_type" placeholder="请选择状态" disabled/>
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="项目ID" v-bind="validateInfos.projectId" id="ElderResidenceHistoryForm-projectId" name="projectId">
-								<a-input v-model:value="formData.projectId" placeholder="请输入项目ID"  allow-clear ></a-input>
+							<a-form-item label="原房间" v-bind="validateInfos.oldRoomId" id="ElderResidenceHistoryForm-oldRoomId" name="oldRoomId">
+								<a-select
+                  v-model:value="formData.oldRoomId"
+                  :options="roomList"
+                  disabled
+                  :fieldNames="{ label: 'roomNo', value: 'roomId' }"
+                  showSearch
+                  placeholder="请选择房间"
+                  @change="handleChangeOldRoomId"
+                />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="客户ID" v-bind="validateInfos.customerId" id="ElderResidenceHistoryForm-customerId" name="customerId">
-								<a-input v-model:value="formData.customerId" placeholder="请输入客户ID"  allow-clear ></a-input>
+							<a-form-item label="原床位" v-bind="validateInfos.oldBedId" id="ElderResidenceHistoryForm-oldBedId" name="oldBedId">
+								<a-select
+                  v-model:value="formData.oldBedId"
+                  :options="bedList"
+                  disabled
+                  :fieldNames="{ label: 'bedNo', value: 'id' }"
+                  showSearch
+                  placeholder="请选择床位"
+                />
+							</a-form-item>
+						</a-col>
+            <a-col :span="24">
+							<a-form-item label="退住日期" v-bind="validateInfos.checkoutTime" id="ElderNursingRecordForm-nursingDate" name="checkoutTime" v-if="optType == 1">
+								<a-date-picker placeholder="请选择退住日期"  v-model:value="formData.checkoutTime" value-format="YYYY-MM-DD" style="width: 100%"  allow-clear />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="入住id" v-bind="validateInfos.checkinId" id="ElderResidenceHistoryForm-checkinId" name="checkinId">
-								<a-input v-model:value="formData.checkinId" placeholder="请输入入住id"  allow-clear ></a-input>
+							<a-form-item label="新房间" v-bind="validateInfos.newRoomId" id="ElderResidenceHistoryForm-newRoomId" name="newRoomId" v-if="optType == 2">
+                <a-select
+                  v-model:value="formData.newRoomId"
+                  :options="roomNewList"
+                  :fieldNames="{ label: 'roomNo', value: 'roomId' }"
+                  showSearch
+                  placeholder="请选择新房间"
+                  @change="handleChangeNewRoomId"
+                />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
-							<a-form-item label="变更类型名称" v-bind="validateInfos.changeTypeName" id="ElderResidenceHistoryForm-changeTypeName" name="changeTypeName">
-								<a-input v-model:value="formData.changeTypeName" placeholder="请输入变更类型名称"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="变更类型编码" v-bind="validateInfos.changeTypeCode" id="ElderResidenceHistoryForm-changeTypeCode" name="changeTypeCode">
-								<a-input v-model:value="formData.changeTypeCode" placeholder="请输入变更类型编码"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="原房间ID（换房/退住时填充）" v-bind="validateInfos.oldRoomId" id="ElderResidenceHistoryForm-oldRoomId" name="oldRoomId">
-								<a-input v-model:value="formData.oldRoomId" placeholder="请输入原房间ID（换房/退住时填充）"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="原床位ID（换房/退住时填充）" v-bind="validateInfos.oldBedId" id="ElderResidenceHistoryForm-oldBedId" name="oldBedId">
-								<a-input v-model:value="formData.oldBedId" placeholder="请输入原床位ID（换房/退住时填充）"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="新房间ID（入住/换房时填充）" v-bind="validateInfos.newRoomId" id="ElderResidenceHistoryForm-newRoomId" name="newRoomId">
-								<a-input v-model:value="formData.newRoomId" placeholder="请输入新房间ID（入住/换房时填充）"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="新床位ID（入住/换房时填充）" v-bind="validateInfos.newBedId" id="ElderResidenceHistoryForm-newBedId" name="newBedId">
-								<a-input v-model:value="formData.newBedId" placeholder="请输入新床位ID（入住/换房时填充）"  allow-clear ></a-input>
+							<a-form-item label="新床位" v-bind="validateInfos.newBedId" id="ElderResidenceHistoryForm-newBedId" name="newBedId" v-if="optType == 2">
+								<a-select
+                  v-model:value="formData.newBedId"
+                  :options="bedNewList"
+                  :fieldNames="{ label: 'bedNo', value: 'id' }"
+                  showSearch
+                  placeholder="请选择新床位"
+                />
 							</a-form-item>
 						</a-col>
 						<a-col :span="24">
 							<a-form-item label="变更原因" v-bind="validateInfos.reason" id="ElderResidenceHistoryForm-reason" name="reason">
-								<a-input v-model:value="formData.reason" placeholder="请输入变更原因"  allow-clear ></a-input>
+								<a-textarea v-model:value="formData.reason" placeholder="请输入变更原因"  allow-clear ></a-textarea>
 							</a-form-item>
 						</a-col>
           </a-row>
@@ -67,19 +80,27 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive, defineExpose, nextTick, defineProps, computed, onMounted } from 'vue';
+  import { ref, reactive, defineExpose, nextTick, defineProps, computed, onMounted,watch } from 'vue';
   import { defHttp } from '/@/utils/http/axios';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { getDateByPicker, getValueType } from '/@/utils';
+  import {getBedListByRoomIdMethod} from './../ElderBed.api';
+  import {getRoomListByProjectIdMethod} from './../ElderRoom.api';
   import { saveOrUpdate } from '../ElderResidenceHistory.api';
   import { Form } from 'ant-design-vue';
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
+  import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
   const props = defineProps({
     formDisabled: { type: Boolean, default: false },
     formData: { type: Object, default: () => ({})},
     formBpm: { type: Boolean, default: true }
   });
+  const roomList = ref([]);
+  const bedList = ref([]);
+  const roomNewList = ref([]);
+  const bedNewList = ref([]);
   const formRef = ref();
+  const optType = ref();
   const useForm = Form.useForm;
   const emit = defineEmits(['register', 'ok']);
   const formData = reactive<Record<string, any>>({
@@ -89,11 +110,12 @@
     customerId: '',   
     checkinId: '',   
     changeTypeName: '',   
-    changeTypeCode: '',   
+    changeTypeCode: '', 
+    checkoutTime: undefined,  
     oldRoomId: '',   
     oldBedId: '',   
-    newRoomId: '',   
-    newBedId: '',   
+    newRoomId: undefined,   
+    newBedId: undefined,   
     reason: '',   
     delFlag: undefined,
   });
@@ -101,13 +123,27 @@
   const labelCol = ref<any>({ xs: { span: 24 }, sm: { span: 5 } });
   const wrapperCol = ref<any>({ xs: { span: 24 }, sm: { span: 16 } });
   const confirmLoading = ref<boolean>(false);
+  watch(() => formData.projectId, async (val) => {
+    if (val) {
+      // 查询客户，查询房间列表
+      roomList.value = await getRoomListByProjectIdMethod({ projectId: val });
+      roomNewList.value = roomList.value
+      // 如果已有 roomId，联动加载床位
+      if (formData.oldRoomId) {
+        await handleChangeOldRoomId(formData.oldRoomId);
+      }
+    } else {
+      roomList.value = [];
+      roomNewList.value = [];
+      bedList.value = [];
+      bedNewList.value = [];
+    }
+  });
   //表单验证
   const validatorRules = reactive({
-    tenantId: [{ required: true, message: '请输入租户ID!'},],
-    projectId: [{ required: true, message: '请输入项目ID!'},],
-    customerId: [{ required: true, message: '请输入客户ID!'},],
-    changeTypeName: [{ required: true, message: '请输入变更类型名称!'},],
-    changeTypeCode: [{ required: true, message: '请输入变更类型编码!'},],
+    checkoutTime: [{ required: true, message: '请选择退住日期!'},],
+    newRoomId: [{ required: false, message: '请选择新房间!'},],
+    newBedId: [{ required: false, message: '请选择新床位!'},],
   });
   const { resetFields, validate, validateInfos } = useForm(formData, validatorRules, { immediate: false });
   //日期个性化选择
@@ -130,10 +166,45 @@
   /**
    * 新增
    */
-  function add() {
-    edit({});
+  function add(initData) {
+    optType.value = initData.optType;
+    if(initData.optType == 1){
+      initData.changeTypeCode = '2'
+      validatorRules.checkoutTime =  [{ required: true, message: '请选择退住日期!'},]
+      validatorRules.newRoomId = [{ required: false, message: '请选择新房间!'},]
+      validatorRules.newBedId = [{ required: false, message: '请选择新床位!'},]
+    } else {
+      initData.changeTypeCode = '3'
+      validatorRules.checkoutTime =  [{ required: false, message: '请选择退住日期!'},]
+      validatorRules.newRoomId = [{ required: true, message: '请选择新房间!'},]
+      validatorRules.newBedId = [{ required: true, message: '请选择新床位!'},]
+    }
+    edit(initData);
   }
 
+  async function handleChangeOldRoomId(value) {
+    if (value) {
+      let beds = await getBedListByRoomIdMethod({ roomId: value });
+      beds.forEach(item=>{
+        item.disabled = item.status == '2';
+      })
+      bedList.value = beds;
+    } else {
+      bedList.value = [];
+    }
+  }
+
+  async function handleChangeNewRoomId(value) {
+    if (value) {
+      let beds = await getBedListByRoomIdMethod({ roomId: value });
+      beds.forEach(item=>{
+        item.disabled = item.status == '2';
+      })
+      bedNewList.value = beds;
+    } else {
+      bedNewList.value = [];
+    }
+  }
   /**
    * 编辑
    */

@@ -62,6 +62,8 @@
     <ElderCustomerCheckinModal ref="registerModal" @success="handleSuccess"></ElderCustomerCheckinModal>
     <!-- 费用配置弹框 -->
     <ElderCustomerCheckinFeeListModal ref="registerFeeModal" />
+    <!-- 退住和换房 -->
+    <ElderResidenceHistoryModal ref="registerHistoryModal" @success="handleSuccess"></ElderResidenceHistoryModal>
   </div>
 </template>
 
@@ -74,6 +76,7 @@
   import { downloadFile } from '/@/utils/common/renderUtils';
   import ElderCustomerCheckinModal from './components/ElderCustomerCheckinModal.vue'
   import ElderCustomerCheckinFeeListModal from './components/ElderCustomerCheckinFeeListModal.vue'
+  import ElderResidenceHistoryModal from './components/ElderResidenceHistoryModal.vue'
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
   import {useModal} from '/@/components/Modal';
@@ -90,6 +93,7 @@
   const toggleSearchStatus = ref<boolean>(false);
   const registerModal = ref();
   const registerFeeModal = ref();
+  const registerHistoryModal = ref();
   const userStore = useUserStore();
   const { createMessage } = useMessage();
   //注册table数据
@@ -150,6 +154,35 @@
     searchQuery();
   }
 
+    /**
+   * 新增事件
+   */
+  function handlecheckout(record: Recordable) {
+    registerHistoryModal.value.disableSubmit = false;
+    const hisData = {
+      checkinId: record.id,
+      optType: 1,
+      projectId: record.projectId,
+      customerId: record.customerId,
+      oldBedId: record.bedId,
+      oldRoomId: record.roomId
+    }
+    registerHistoryModal.value.add(hisData);
+  }
+
+  function handlechangeRoom(record: Recordable) {
+    registerHistoryModal.value.disableSubmit = false;
+    const hisData = {
+      checkinId: record.id,
+      optType: 2,
+      projectId: record.projectId,
+      customerId: record.customerId,
+      oldBedId: record.bedId,
+      oldRoomId: record.roomId
+    }
+    registerHistoryModal.value.add(hisData);
+  }
+  
   /**
    * 新增事件
    */
@@ -236,12 +269,12 @@
       },
       {
         label: '退住',
-        onClick: handleDetail.bind(null, record),
+        onClick: handlecheckout.bind(null, record),
         auth: 'elder_customer_checkin:checkout'
       },
       {
         label: '换房',
-        onClick: handleDetail.bind(null, record),
+        onClick: handlechangeRoom.bind(null, record),
         auth: 'elder_customer_checkin:changeRoom'
       }
     ]

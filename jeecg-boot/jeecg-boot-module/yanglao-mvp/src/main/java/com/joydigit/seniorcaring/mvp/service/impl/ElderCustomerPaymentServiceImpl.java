@@ -160,6 +160,7 @@ public class ElderCustomerPaymentServiceImpl extends ServiceImpl<ElderCustomerPa
                 throw new Exception("账单金额和支付金额不符");
             }
             updateBill.setPaidAmount(elderBill.getPaidAmount().add(payment.getAmount().abs()));
+            updateBill.setUnpaidAmount(elderBill.getUnpaidAmount().subtract(payment.getAmount().abs()));
             updateBill.setId(payment.getBillId());
             elderBillMapper.updateById(updateBill);
         }

@@ -36,6 +36,11 @@ export const columns: BasicColumn[] = [
     dataIndex: 'totalAmount'
   },
   {
+    title: '未缴金额（元）',
+    align: "center",
+    dataIndex: 'unpaidAmount'
+  },
+  {
     title: '实收总额（元）',
     align: "center",
     dataIndex: 'paidAmount'

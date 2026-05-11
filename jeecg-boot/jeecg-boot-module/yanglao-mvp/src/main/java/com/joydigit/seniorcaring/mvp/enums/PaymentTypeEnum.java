@@ -30,4 +30,18 @@ public enum PaymentTypeEnum {
     public String getMsg() {
         return msg;
     }
+
+    /**
+     *
+     * @param key
+     * @return
+     */
+    public static PaymentTypeEnum getInstance(String key){
+        for (PaymentTypeEnum value : values()) {
+            if (value.getKey().equals(key)){
+                return value;
+            }
+        }
+        return null;
+    }
 }

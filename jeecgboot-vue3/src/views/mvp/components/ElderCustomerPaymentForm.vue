@@ -198,7 +198,7 @@
 
   function changeBill(val){
     const bill =  billList.value.filter(s=>s.id == val);
-    formData.amount = bill[0].paidAmount;
+    formData.amount = bill[0].unpaidAmount;
   }
   function changetransactionType(val){
     console.log(val)

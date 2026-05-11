@@ -68,6 +68,11 @@ public class ElderBill implements Serializable {
 	@Excel(name = "实收总额（元）", width = 15)
     @Schema(description = "实收总额（元）")
     private BigDecimal paidAmount;
+	@Excel(name = "未交金额（元）", width = 15)
+    @Schema(description = "未交金额（元）")
+    private BigDecimal unpaidAmount;
+
+
 	/**优惠/减免金额（元）*/
 	@Excel(name = "优惠/减免金额（元）", width = 15)
     @Schema(description = "优惠/减免金额（元）")

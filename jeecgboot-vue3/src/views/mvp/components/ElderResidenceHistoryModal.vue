@@ -24,11 +24,15 @@
   /**
    * 新增
    */
-  function add() {
-    title.value = '新增';
+  function add(initData) {
+    if (initData.optType == 1){
+      title.value = '退住';
+    } else {
+      title.value = '换房';
+    }
     visible.value = true;
     nextTick(() => {
-      registerForm.value.add();
+      registerForm.value.add(initData);
     });
   }
   

@@ -84,7 +84,7 @@ public class ElderCustomerCheckinController extends JeecgController<ElderCustome
 	@Operation(summary="elder_customer_checkin-添加")
 	@RequiresPermissions("elder_customer_checkin:add")
 	@PostMapping(value = "/add")
-	public Result<String> add(@RequestBody ElderCustomerCheckin elderCustomerCheckin) {
+	public Result<String> add(@RequestBody ElderCustomerCheckin elderCustomerCheckin) throws Exception {
 		return elderCustomerCheckinService.saveInfo(elderCustomerCheckin);
 	}
 	

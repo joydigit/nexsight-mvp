@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.joydigit.seniorcaring.mvp.entity.ElderBill;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.joydigit.seniorcaring.mvp.entity.ElderCustomerCheckin;
+import com.joydigit.seniorcaring.mvp.enums.ChangeTypeEnum;
 import org.jeecg.common.api.vo.Result;
 
 import java.util.List;
@@ -27,4 +29,6 @@ public interface IElderBillService extends IService<ElderBill> {
     Result<String> deleteInfos(List<String> list);
 
     Result<List<ElderBill>> getBillListByCustomerId(String customerId);
+
+    void calBillInfo(ElderCustomerCheckin checkin, ChangeTypeEnum checkout) throws Exception;
 }

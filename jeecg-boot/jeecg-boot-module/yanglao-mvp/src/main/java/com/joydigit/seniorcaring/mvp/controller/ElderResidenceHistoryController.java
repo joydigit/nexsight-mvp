@@ -10,6 +10,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.shiro.authz.annotation.Logical;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.query.QueryRuleEnum;
@@ -81,12 +82,10 @@ public class ElderResidenceHistoryController extends JeecgController<ElderReside
 	 */
 	@AutoLog(value = "elder_residence_history-添加")
 	@Operation(summary="elder_residence_history-添加")
-	@RequiresPermissions("elder_residence_history:add")
+	@RequiresPermissions(value = {"elder_residence_history:add","elder_customer_checkin:checkout","elder_customer_checkin:changeRoom"}, logical = Logical.OR)
 	@PostMapping(value = "/add")
-	public Result<String> add(@RequestBody ElderResidenceHistory elderResidenceHistory) {
-		elderResidenceHistoryService.save(elderResidenceHistory);
-
-		return Result.OK("添加成功！");
+	public Result<String> add(@RequestBody ElderResidenceHistory elderResidenceHistory) throws Exception {
+		return elderResidenceHistoryService.saveInfo(elderResidenceHistory);
 	}
 	
 	/**

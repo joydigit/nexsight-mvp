@@ -2,20 +2,18 @@ package com.joydigit.seniorcaring.mvp.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.joydigit.seniorcaring.mvp.entity.ElderBill;
-import com.joydigit.seniorcaring.mvp.entity.ElderCustomer;
-import com.joydigit.seniorcaring.mvp.entity.ElderCustomerCheckin;
-import com.joydigit.seniorcaring.mvp.enums.BillStatusEnum;
-import com.joydigit.seniorcaring.mvp.enums.CheckinStatusEnum;
-import com.joydigit.seniorcaring.mvp.mapper.ElderBillMapper;
-import com.joydigit.seniorcaring.mvp.mapper.ElderCustomerCheckinMapper;
-import com.joydigit.seniorcaring.mvp.mapper.ElderCustomerMapper;
+import com.joydigit.seniorcaring.mvp.entity.*;
+import com.joydigit.seniorcaring.mvp.enums.*;
+import com.joydigit.seniorcaring.mvp.mapper.*;
 import com.joydigit.seniorcaring.mvp.service.IElderBillService;
 import com.joydigit.seniorcaring.mvp.service.IElderProjectService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jeecg.common.api.vo.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +22,11 @@ import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 /**
  * @Description: elder_bill
@@ -34,6 +35,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * @Version: V1.0
  */
 @Service
+@Slf4j
 public class ElderBillServiceImpl extends ServiceImpl<ElderBillMapper, ElderBill> implements IElderBillService {
 
     @Autowired
@@ -41,7 +43,11 @@ public class ElderBillServiceImpl extends ServiceImpl<ElderBillMapper, ElderBill
     @Autowired
     private ElderCustomerCheckinMapper elderCustomerCheckinMapper;
     @Autowired
+    private ElderBillDetailMapper elderBillDetailMapper;
+    @Autowired
     private IElderProjectService elderProjectService;
+    @Autowired
+    private ElderCustomerCheckinFeeMapper elderCustomerCheckinFeeMapper;
     @Override
     public IPage<ElderBill> pageList(Page<ElderBill> page, ElderBill elderBill) {
         List<String> projectIds = elderProjectService.getProjectIdByUserId();
@@ -131,5 +137,106 @@ public class ElderBillServiceImpl extends ServiceImpl<ElderBillMapper, ElderBill
                 .in(ElderBill::getStatus, Arrays.asList(BillStatusEnum.UNPAYMENT.getKey(), BillStatusEnum.PARTIAL_PAYMENT.getKey()))
                 .orderByDesc(ElderBill::getCreateTime));
         return Result.ok(list);
+    }
+
+    /**
+     *
+     * @param date
+     * @return
+     */
+    private int getDaysInMonth(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        return calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+    }
+
+    @Override
+    public void calBillInfo(ElderCustomerCheckin checkin, ChangeTypeEnum checkout) throws Exception {
+        Date endDate = null;
+        if (checkout.getKey().equals(ChangeTypeEnum.CHECKOUT.getKey())){
+            endDate = checkin.getRealCheckoutTime();
+        } else if(checkout.getKey().equals(ChangeTypeEnum.CHANGEROOM.getKey())){
+            endDate = DateUtil.parse(DateUtil.format(new Date(),DatePattern.NORM_DATE_PATTERN),DatePattern.NORM_DATE_PATTERN);
+        } else {
+            return;
+        }
+        Date startDate = checkin.getCheckinTime();
+        Date nowDate = new Date();
+        String nowMM = DateUtil.format(nowDate, DatePattern.NORM_MONTH_PATTERN);
+        String startMM = DateUtil.format(startDate, DatePattern.NORM_MONTH_PATTERN);
+
+        int totalDays = getDaysInMonth(nowDate);
+        if (!startMM.equals(nowMM)){
+            startDate = DateUtil.beginOfMonth(nowDate);
+        }
+        long days = DateUtil.between(startDate, endDate, DateUnit.DAY);
+        if (days <=0){
+            log.error("计算账单日期天数为"+days);
+            return;
+        }
+        List<ElderCustomerCheckinFee> feeList = elderCustomerCheckinFeeMapper.selectList(Wrappers.lambdaQuery(ElderCustomerCheckinFee.class)
+                .eq(ElderCustomerCheckinFee::getCheckinId, checkin.getId()));
+        List<ElderCustomerCheckinFee> monthList = feeList.stream().filter(s -> s.getUnitCode().equals(FeeUnitEnum.MONTH.getKey())).collect(Collectors.toList());
+        List<ElderCustomerCheckinFee> dayList = feeList.stream().filter(s -> s.getUnitCode().equals(FeeUnitEnum.DAY.getKey())).collect(Collectors.toList());
+        if (CollectionUtil.isEmpty(monthList) && CollectionUtil.isEmpty(dayList)){
+            log.error("计算账单没有找到月费");
+            return;
+        }
+
+        List<ElderBillDetail> list = new ArrayList<>();
+        ElderBill bill = new ElderBill();
+        bill.setId(IdWorker.getIdStr());
+        bill.setBillNo(getBillNo());
+        bill.setProjectId(checkin.getProjectId());
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        if (CollectionUtil.isNotEmpty(monthList)){
+            for (ElderCustomerCheckinFee fee : monthList) {
+                ElderBillDetail detail = new ElderBillDetail();
+                PaymentTypeEnum paymentTypeEnum = PaymentTypeEnum.getInstance(fee.getPaymentTypeCode());
+                if (Objects.isNull(paymentTypeEnum)){
+                    throw new Exception("费用类型未配置全");
+                }
+                detail.setItemType(paymentTypeEnum.getKey());
+                detail.setItemName(paymentTypeEnum.getMsg());
+                detail.setProjectId(fee.getProjectId());
+                detail.setQuantity(new BigDecimal("1"));
+                BigDecimal amount = fee.getAmount().multiply(new BigDecimal(days)).divide(new BigDecimal(totalDays),2,RoundingMode.HALF_UP);
+                detail.setUnitPrice(amount);
+                detail.setAmount(amount);
+                detail.setBillId(bill.getId());
+                totalAmount = totalAmount.add(amount);
+                list.add(detail);
+            }
+        }
+        if (CollectionUtil.isNotEmpty(dayList)){
+            for (ElderCustomerCheckinFee fee : dayList) {
+                ElderBillDetail detail = new ElderBillDetail();
+                PaymentTypeEnum paymentTypeEnum = PaymentTypeEnum.getInstance(fee.getPaymentTypeCode());
+                if (Objects.isNull(paymentTypeEnum)){
+                    throw new Exception("费用类型未配置全");
+                }
+                detail.setItemType(paymentTypeEnum.getKey());
+                detail.setItemName(paymentTypeEnum.getMsg());
+                detail.setProjectId(fee.getProjectId());
+                detail.setQuantity(new BigDecimal(days));
+                BigDecimal amount = fee.getAmount().multiply(new BigDecimal(days)).setScale(2, RoundingMode.HALF_UP);
+                detail.setUnitPrice(fee.getAmount());
+                detail.setAmount(amount);
+                detail.setBillId(bill.getId());
+                totalAmount = totalAmount.add(amount);
+                list.add(detail);
+            }
+        }
+        bill.setBillMonth(nowMM);
+        bill.setStatus(BillStatusEnum.UNPAYMENT.getKey());
+        bill.setCheckinId(checkin.getId());
+        bill.setCustomerId(checkin.getCustomerId());
+        bill.setDiscountAmount(BigDecimal.ZERO);
+        bill.setTotalAmount(totalAmount);
+        bill.setPaidAmount(BigDecimal.ZERO);
+        bill.setUnpaidAmount(totalAmount);
+        bill.setDueDate(endDate);
+        save(bill);
+        elderBillDetailMapper.insert(list);
     }
 }

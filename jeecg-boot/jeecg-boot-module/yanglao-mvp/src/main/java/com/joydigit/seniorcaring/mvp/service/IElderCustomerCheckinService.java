@@ -16,7 +16,11 @@ public interface IElderCustomerCheckinService extends IService<ElderCustomerChec
 
     IPage<ElderCustomerCheckin> pageList(Page<ElderCustomerCheckin> page, ElderCustomerCheckin elderCustomerCheckin);
 
-    Result<String> saveInfo(ElderCustomerCheckin elderCustomerCheckin);
+    Result<String> saveInfo(ElderCustomerCheckin elderCustomerCheckin) throws Exception;
 
     Result<String> updateInfo(ElderCustomerCheckin elderCustomerCheckin);
+
+    void checkOut(ElderCustomerCheckin checkin) throws Exception;
+
+    void changeRoom(ElderCustomerCheckin checkin, String newRoomId, String newBedId) throws Exception;
 }

@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.joydigit.seniorcaring.mvp.entity.*;
 import com.joydigit.seniorcaring.mvp.enums.*;
 import com.joydigit.seniorcaring.mvp.mapper.*;
+import com.joydigit.seniorcaring.mvp.service.IElderBillService;
 import com.joydigit.seniorcaring.mvp.service.IElderCustomerCheckinFeeService;
 import com.joydigit.seniorcaring.mvp.service.IElderCustomerCheckinService;
 import org.apache.commons.lang3.StringUtils;
@@ -39,6 +40,8 @@ public class ElderCustomerCheckinServiceImpl extends ServiceImpl<ElderCustomerCh
     @Autowired
     private ElderBedMapper elderBedMapper;
     @Autowired
+    private ElderRoomMapper elderRoomMapper;
+    @Autowired
     private ElderProjectFeeConfigMapper elderProjectFeeConfigMapper;
     @Autowired
     private IElderCustomerCheckinFeeService elderCustomerCheckinFeeService;
@@ -46,13 +49,15 @@ public class ElderCustomerCheckinServiceImpl extends ServiceImpl<ElderCustomerCh
     private ElderRoomFeeConfigMapper elderRoomFeeConfigMapper;
     @Autowired
     private ElderResidenceHistoryMapper elderResidenceHistoryMapper;
+    @Autowired
+    private IElderBillService elderBillService;
     @Override
     public IPage<ElderCustomerCheckin> pageList(Page<ElderCustomerCheckin> page, ElderCustomerCheckin elderCustomerCheckin) {
         return this.baseMapper.pageList(page,elderCustomerCheckin);
     }
 
     @Override
-    public Result<String> saveInfo(ElderCustomerCheckin elderCustomerCheckin) {
+    public Result<String> saveInfo(ElderCustomerCheckin elderCustomerCheckin) throws Exception {
         ElderCustomer elderCustomer = elderCustomerMapper.selectById(elderCustomerCheckin.getCustomerId());
         if (Objects.isNull(elderCustomer)){
             return Result.error("客户不存在");
@@ -87,10 +92,8 @@ public class ElderCustomerCheckinServiceImpl extends ServiceImpl<ElderCustomerCh
         }
         elderCustomerCheckin.setId(IdWorker.getIdStr());
         save(elderCustomerCheckin);
-        ElderBed bed = new ElderBed();
-        bed.setId(elderCustomerCheckin.getBedId());
-        bed.setStatus(RoomStatusEnum.OCCUPIED.getKey());
-        elderBedMapper.updateById(bed);
+        // 更新房间状态
+        checkinUpdateRoomStatus(elderCustomerCheckin.getRoomId(),elderCustomerCheckin.getBedId());
 
         List<ElderRoomFeeConfig> elderRoomFeeConfigs = elderRoomFeeConfigMapper.selectList(Wrappers.lambdaQuery(ElderRoomFeeConfig.class)
                 .eq(ElderRoomFeeConfig::getItemType, "2")
@@ -157,5 +160,71 @@ public class ElderCustomerCheckinServiceImpl extends ServiceImpl<ElderCustomerCh
         checkinQuery.setExpectCheckoutTime(elderCustomerCheckin.getExpectCheckoutTime());
         updateById(checkinQuery);
         return Result.OK("修改成功");
+    }
+
+    @Override
+    public void checkOut(ElderCustomerCheckin checkin) throws Exception {
+        // 修改状态
+        updateById(checkin);
+        // 修改房间状态
+        checkoutUpdateRoomStatus(checkin.getRoomId(),checkin.getBedId());
+        // 计算账单
+        elderBillService.calBillInfo(checkin,ChangeTypeEnum.CHECKOUT);
+    }
+
+    /**
+     *
+     * @param roomId
+     * @param bedId
+     */
+    private void checkoutUpdateRoomStatus(String roomId,String bedId) {
+        Long bedCount = elderBedMapper.selectCount(Wrappers.lambdaQuery(ElderBed.class)
+                .eq(ElderBed::getRoomId,roomId).eq(ElderBed::getStatus, RoomStatusEnum.OCCUPIED.getKey()));
+        if (bedCount == 1){
+             elderRoomMapper.update(Wrappers.lambdaUpdate(ElderRoom.class)
+                    .eq(ElderRoom::getId, roomId)
+                    .eq(ElderRoom::getStatus, RoomStatusEnum.OCCUPIED.getKey())
+                    .set(ElderRoom::getStatus, RoomStatusEnum.FREE.getKey()));
+
+        }
+        ElderBed updateBed = new ElderBed();
+        updateBed.setStatus(RoomStatusEnum.FREE.getKey());
+        updateBed.setId(bedId);
+        elderBedMapper.updateById(updateBed);
+    }
+
+    @Override
+    public void changeRoom(ElderCustomerCheckin checkin, String newRoomId, String newBedId) throws Exception {
+
+        // 修改原房间状态
+        checkoutUpdateRoomStatus(checkin.getRoomId(),checkin.getBedId());
+        // 修改新房间状态
+        checkinUpdateRoomStatus(newRoomId, newBedId);
+        // 修改房间/床位
+        checkin.setBedId(newBedId);
+        checkin.setRoomId(newRoomId);
+        updateById(checkin);
+        // 计算账单
+        elderBillService.calBillInfo(checkin,ChangeTypeEnum.CHANGEROOM);
+    }
+
+    /**
+     *
+     * @param newRoomId
+     * @param newBedId
+     * @throws Exception
+     */
+    private void checkinUpdateRoomStatus(String newRoomId, String newBedId) throws Exception {
+        int update = elderBedMapper.update(Wrappers.lambdaUpdate(ElderBed.class)
+                .eq(ElderBed::getId, newBedId)
+                .eq(ElderBed::getStatus, RoomStatusEnum.FREE.getKey())
+                .set(ElderBed::getStatus, RoomStatusEnum.OCCUPIED.getKey()));
+        if (update == 0){
+            throw new Exception("新床位被占用");
+        }
+        elderRoomMapper.update(Wrappers.lambdaUpdate(ElderRoom.class)
+                .eq(ElderRoom::getId, newRoomId)
+                .eq(ElderRoom::getStatus, RoomStatusEnum.FREE.getKey())
+                .set(ElderRoom::getStatus, RoomStatusEnum.OCCUPIED.getKey()));
     }
 }

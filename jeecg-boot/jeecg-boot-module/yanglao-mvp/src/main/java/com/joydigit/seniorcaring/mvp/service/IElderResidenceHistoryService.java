@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.joydigit.seniorcaring.mvp.entity.ElderResidenceHistory;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.jeecg.common.api.vo.Result;
 
 /**
  * @Description: elder_residence_history
@@ -15,4 +16,5 @@ public interface IElderResidenceHistoryService extends IService<ElderResidenceHi
 
     IPage<ElderResidenceHistory> pageList(Page<ElderResidenceHistory> page, ElderResidenceHistory elderResidenceHistory);
 
+    Result<String> saveInfo(ElderResidenceHistory elderResidenceHistory) throws Exception;
 }
