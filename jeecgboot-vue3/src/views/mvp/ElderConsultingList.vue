@@ -98,7 +98,6 @@
       :width="1200"
       :visible="followVisible"
       @cancel="cancelFollow"
-      :destroyOnClose="true"
     >
       <template #footer></template>
       <ElderConsultingFollowRecordList :consulting="currentConsulting" />
@@ -224,8 +223,9 @@
    * 跟踪记录
    */
   function handleFollowRecord(record: Recordable) {
-    currentConsulting.value = record;
+    console.log('111111111')
     followVisible.value = true;
+    currentConsulting.value = record;
   }
 
   /**
@@ -243,6 +243,7 @@
   }
    
   function cancelFollow() {
+    followVisible.value = false;
     handleSuccess();
   }
   /**

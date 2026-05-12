@@ -22,6 +22,9 @@
         <if test="data.projectId != null and data.projectId != ''">
             AND bi.project_id = #{data.projectId}
         </if>
+        <if test="data.customerId != null and data.customerId != ''">
+            AND bi.`customer_id` = #{data.customerId}
+        </if>
         <if test="data.customerName != null and data.customerName != ''">
             AND c.`name` LIKE concat(concat('%',#{data.customerName}),'%')
         </if>

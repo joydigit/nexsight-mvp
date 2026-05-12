@@ -8,6 +8,7 @@ import com.joydigit.seniorcaring.mvp.entity.ElderCustomerCheckin;
 import com.joydigit.seniorcaring.mvp.enums.ChangeTypeEnum;
 import org.jeecg.common.api.vo.Result;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -32,5 +33,5 @@ public interface IElderBillService extends IService<ElderBill> {
 
     void calBillInfo(ElderCustomerCheckin checkin, ChangeTypeEnum checkout) throws Exception;
 
-    void calMothBillList();
+    void calMothBillList(Date calDate) throws Exception;
 }

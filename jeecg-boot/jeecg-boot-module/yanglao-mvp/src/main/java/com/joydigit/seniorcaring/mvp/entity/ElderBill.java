@@ -102,6 +102,8 @@ public class ElderBill implements Serializable {
 	/**更新人*/
     @Schema(description = "更新人")
     private String updateBy;
+    @Schema(description = "是否计算过了，避免重复计算")
+    private String calculateFlag;
 	/**更新时间*/
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
@@ -121,4 +123,6 @@ public class ElderBill implements Serializable {
     private String projectName;
     @TableField(exist = false)
     private List<String> projectIds;
+
+
 }

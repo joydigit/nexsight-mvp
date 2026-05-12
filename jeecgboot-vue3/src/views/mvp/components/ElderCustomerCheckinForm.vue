@@ -137,11 +137,11 @@
   const wrapperCol = ref<any>({ xs: { span: 24 }, sm: { span: 16 } });
   const confirmLoading = ref<boolean>(false);
   //表单验证
-  watch(() => formData.projectId, async (val) => {
-    if (val) {
+  watch([() => formData.projectId,() => formData.roomId,() => formData.customerId], async ([newProjectId, newRoomId, newCustomerId], [oProjectId, oRoomId, oCustomerId]) => {
+    if (newProjectId) {
       // 查询客户，查询房间列表
-      roomList.value = await getRoomListByProjectIdMethod({ projectId: val });
-      customerList.value = await getCustomerListByProjectIdMethod({ projectId: val });
+      roomList.value = await getRoomListByProjectIdMethod({ projectId: newProjectId });
+      customerList.value = await getCustomerListByProjectIdMethod({ projectId: newProjectId });
       // 如果已有 roomId，联动加载床位
       if (formData.roomId) {
         await handleChangeRoomId(formData.roomId);

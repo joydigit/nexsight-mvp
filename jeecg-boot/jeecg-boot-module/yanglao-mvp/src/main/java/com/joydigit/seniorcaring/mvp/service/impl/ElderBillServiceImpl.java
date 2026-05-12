@@ -16,6 +16,7 @@ import com.joydigit.seniorcaring.mvp.service.IElderProjectService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.config.TenantContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -183,6 +184,18 @@ public class ElderBillServiceImpl extends ServiceImpl<ElderBillMapper, ElderBill
             return;
         }
 
+        saveBill(checkin, monthList, days, totalDays, dayList, nowMM, endDate);
+    }
+
+    private void saveBill(ElderCustomerCheckin checkin, List<ElderCustomerCheckinFee> monthList, long days, int totalDays, List<ElderCustomerCheckinFee> dayList, String nowMM, Date endDate) throws Exception {
+        // 校验账单是否已经添加过了，添加过了需要修改账单，或者删除原账单
+        long count = count(Wrappers.lambdaQuery(ElderBill.class).eq(ElderBill::getCheckinId, checkin.getId())
+                .eq(ElderBill::getBillMonth, nowMM)
+                .eq(ElderBill::getCalculateFlag, StatusEnum.YES.getKey()));
+        if (count > 0){
+            log.error("账单"+checkin.getId()+";月份"+nowMM+"已经计算过了");
+            return;
+        }
         List<ElderBillDetail> list = new ArrayList<>();
         ElderBill bill = new ElderBill();
         bill.setId(IdWorker.getIdStr());
@@ -236,17 +249,58 @@ public class ElderBillServiceImpl extends ServiceImpl<ElderBillMapper, ElderBill
         bill.setPaidAmount(BigDecimal.ZERO);
         bill.setUnpaidAmount(totalAmount);
         bill.setDueDate(endDate);
+        bill.setCalculateFlag(StatusEnum.YES.getKey());
         save(bill);
         elderBillDetailMapper.insert(list);
     }
 
     @Override
-    public void calMothBillList() {
-        // 入住列表
-        List<ElderCustomerCheckin> elderCustomerCheckins = elderCustomerCheckinMapper.selectList(Wrappers.lambdaQuery(ElderCustomerCheckin.class)
-                .eq(ElderCustomerCheckin::getStatus, CheckinStatusEnum.CHECKIN.getKey()));
-        // 每一条入住再计算账单
+    public void calMothBillList(Date calDate) {
+        List<Integer> tenantIdList = elderCustomerCheckinMapper.getTenantIdList();
+        if (CollectionUtil.isEmpty(tenantIdList)){
+            return;
+        }
+        for (Integer tenantId : tenantIdList) {
+            TenantContext.setTenant(String.valueOf(tenantId));
+            // 入住列表
+            List<ElderCustomerCheckin> elderCustomerCheckins = elderCustomerCheckinMapper.selectList(Wrappers.lambdaQuery(ElderCustomerCheckin.class)
+                    .eq(ElderCustomerCheckin::getStatus, CheckinStatusEnum.CHECKIN.getKey()));
+            for (ElderCustomerCheckin elderCustomerCheckin : elderCustomerCheckins) {
+                // 每一条入住再计算账单
+                try {
+                    calMothBillItem(elderCustomerCheckin,calDate);
+                } catch (Exception e){
+                    log.error("计算月费账单失败:"+elderCustomerCheckin.getId(),e);
+                }
 
+            }
+        }
 
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public void calMothBillItem(ElderCustomerCheckin checkin, Date calDate) throws Exception {
+        Date startDate = checkin.getCheckinTime();
+        calDate = DateUtil.parse(DateUtil.format(calDate,DatePattern.NORM_DATE_PATTERN),DatePattern.NORM_DATE_PATTERN);
+        String calMM = DateUtil.format(calDate, DatePattern.NORM_MONTH_PATTERN);
+        String startMM = DateUtil.format(startDate, DatePattern.NORM_MONTH_PATTERN);
+        // 不用判断结束时间，因为这个是计算上个月的账单，并且这个月没有退住的记录
+        if (!calMM.equals(startMM)){
+            startDate = DateUtil.beginOfMonth(calDate);
+        }
+        int totalDays = getDaysInMonth(calDate);
+        long days = DateUtil.between(startDate, calDate, DateUnit.DAY);
+        if (days <=0){
+            log.error("计算账单日期天数为"+days);
+            return;
+        }
+        List<ElderCustomerCheckinFee> feeList = elderCustomerCheckinFeeMapper.selectList(Wrappers.lambdaQuery(ElderCustomerCheckinFee.class)
+                .eq(ElderCustomerCheckinFee::getCheckinId, checkin.getId()));
+        List<ElderCustomerCheckinFee> monthList = feeList.stream().filter(s -> s.getUnitCode().equals(FeeUnitEnum.MONTH.getKey())).collect(Collectors.toList());
+        List<ElderCustomerCheckinFee> dayList = feeList.stream().filter(s -> s.getUnitCode().equals(FeeUnitEnum.DAY.getKey())).collect(Collectors.toList());
+        if (CollectionUtil.isEmpty(monthList) && CollectionUtil.isEmpty(dayList)){
+            log.error("计算账单没有找到月费");
+            return;
+        }
+        saveBill(checkin, monthList, days, totalDays, dayList, calMM, DateUtil.offsetDay(new Date(),3));
     }
 }

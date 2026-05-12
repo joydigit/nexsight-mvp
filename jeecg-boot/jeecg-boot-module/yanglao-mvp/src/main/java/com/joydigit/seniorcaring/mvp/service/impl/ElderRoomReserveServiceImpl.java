@@ -5,10 +5,12 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.joydigit.seniorcaring.mvp.entity.ElderBed;
 import com.joydigit.seniorcaring.mvp.entity.ElderCustomer;
+import com.joydigit.seniorcaring.mvp.entity.ElderRoom;
 import com.joydigit.seniorcaring.mvp.entity.ElderRoomReserve;
 import com.joydigit.seniorcaring.mvp.enums.RoomStatusEnum;
 import com.joydigit.seniorcaring.mvp.mapper.ElderBedMapper;
 import com.joydigit.seniorcaring.mvp.mapper.ElderCustomerMapper;
+import com.joydigit.seniorcaring.mvp.mapper.ElderRoomMapper;
 import com.joydigit.seniorcaring.mvp.mapper.ElderRoomReserveMapper;
 import com.joydigit.seniorcaring.mvp.service.IElderRoomReserveService;
 import org.jeecg.common.api.vo.Result;
@@ -33,6 +35,8 @@ public class ElderRoomReserveServiceImpl extends ServiceImpl<ElderRoomReserveMap
     private ElderCustomerMapper elderCustomerMapper;
     @Autowired
     private ElderBedMapper elderBedMapper;
+    @Autowired
+    private ElderRoomMapper elderRoomMapper;
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Result<String> saveInfo(ElderRoomReserve elderRoomReserve) {
@@ -60,6 +64,11 @@ public class ElderRoomReserveServiceImpl extends ServiceImpl<ElderRoomReserveMap
         elderBed.setId(elderRoomReserve.getBedId());
         elderBed.setStatus(RoomStatusEnum.RESERVED.getKey());
         elderBedMapper.updateById(elderBed);
+
+        elderRoomMapper.update(Wrappers.lambdaUpdate(ElderRoom.class)
+                .eq(ElderRoom::getId,elderRoomReserve.getRoomId())
+                .eq(ElderRoom::getStatus,RoomStatusEnum.FREE.getKey())
+                .set(ElderRoom::getStatus,RoomStatusEnum.RESERVED.getKey()));
         return Result.ok("添加成功");
     }
 
@@ -78,6 +87,10 @@ public class ElderRoomReserveServiceImpl extends ServiceImpl<ElderRoomReserveMap
         elderBed.setId(elderRoomReserve.getBedId());
         elderBed.setStatus(RoomStatusEnum.FREE.getKey());
         elderBedMapper.updateById(elderBed);
+        elderRoomMapper.update(Wrappers.lambdaUpdate(ElderRoom.class)
+                .eq(ElderRoom::getId,elderRoomReserve.getRoomId())
+                .eq(ElderRoom::getStatus,RoomStatusEnum.RESERVED.getKey())
+                .set(ElderRoom::getStatus,RoomStatusEnum.FREE.getKey()));
         return Result.OK("取消预定成功");
     }
 

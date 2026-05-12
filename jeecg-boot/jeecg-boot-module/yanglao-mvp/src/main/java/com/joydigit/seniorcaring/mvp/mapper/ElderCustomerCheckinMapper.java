@@ -2,6 +2,7 @@ package com.joydigit.seniorcaring.mvp.mapper;
 
 import java.util.List;
 
+import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
@@ -21,4 +22,6 @@ public interface ElderCustomerCheckinMapper extends BaseMapper<ElderCustomerChec
     int checkBedStatusByBedId(@Param("customerId") String customerId, @Param("bedId") String bedId);
 
     IPage<ElderCustomerCheckin> pageList(Page<ElderCustomerCheckin> page,@Param("data") ElderCustomerCheckin elderCustomerCheckin);
+    @InterceptorIgnore(tenantLine = "true")
+    List<Integer> getTenantIdList();
 }

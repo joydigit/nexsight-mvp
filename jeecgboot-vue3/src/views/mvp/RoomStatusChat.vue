@@ -99,7 +99,7 @@
                     <Icon icon="ant-design:bed-outline" />
                   </span>
                   <span class="bed-label">{{ bed.bedNo }}</span>
-                  <span v-if="bed.customerName" class="bed-elder">
+                  <span v-if="bed.customerName" class="bed-elder" @click="goCustomerPage(bed,floor.projectId)">
                     <span class="bed-elder-avatar">{{ bed.customerName.charAt(0) }}</span>
                     <span class="bed-elder-name">{{ bed.customerName }}</span>
                   </span>
@@ -110,20 +110,21 @@
             </div>
             <div class="room-card-actions">
               <template v-if="room.statusText === 'free' && room.beds">
-                <a-button size="small" type="primary" @click.stop="handleCheckIn(room)">入住</a-button>
-                <a-button size="small" @click.stop="handleReserve(room)">预定</a-button>
+                <a-button size="small" type="primary" @click.stop="handleCheckIn(room,floor.projectId)">入住</a-button>
+                <a-button size="small" @click.stop="handleReserve(room,floor.projectId)">预定</a-button>
               </template>
               <template v-else-if="room.statusText === 'occupied' && room.beds">
                 <a-button
-                  v-if="room.beds.some(b => b.statusText === 'free')"
+                  v-if="room.beds.some(b => b.statusText == 'free' || b.statusText == 'reserved')"
                   size="small"
                   type="primary"
-                  @click.stop="handleCheckIn(room)"
+                  @click.stop="handleCheckIn(room,floor.projectId)"
                 >入住</a-button>
+                <a-button size="small" @click.stop="handleReserve(room,floor.projectId)" v-if="room.beds.some(b => b.statusText === 'free')">预定</a-button>
               </template>
               <template v-else-if="room.statusText === 'reserved' && room.beds">
-                <a-button size="small" type="primary" @click.stop="handleCheckIn(room)">入住</a-button>
-                <a-button size="small" @click.stop="handleCancelReserve(room)">取消预定</a-button>
+                <a-button size="small" type="primary" @click.stop="handleCheckIn(room,floor.projectId)">入住</a-button>
+                <a-button size="small" @click.stop="handleReserve(room,floor.projectId)" v-if="room.beds.some(b => b.statusText === 'free')">预定</a-button>
               </template>             
             </div>
             <div class="room-card-footer">
@@ -147,6 +148,11 @@
         @change="handlePageChange"
       />
     </div>
+
+     <!-- 预定 -->
+     <ElderRoomReserveModal ref="registerReserveModal" @success="handleSuccess"></ElderRoomReserveModal>
+     <!-- 表单区域 -->
+    <ElderCustomerCheckinModal ref="registerCheckinModal" @success="handleSuccess"></ElderCustomerCheckinModal>
   </div>
 </template>
 
@@ -161,13 +167,19 @@ import { getFloorListByBuildingIdMethod } from './ElderFloor.api';
 import { getRoomStatusPageListMethod } from './ElderRoom.api';
 import { Pagination } from 'ant-design-vue';
 import { render } from '/@/utils/common/renderUtils';
+import { useRouter } from 'vue-router';
+import ElderRoomReserveModal from './components/ElderRoomReserveModal.vue';
+import ElderCustomerCheckinModal from './components/ElderCustomerCheckinModal.vue';
+const router = useRouter();
+
 const APagination = Pagination;
 const projectList = ref([]);
 const buildingList = ref([]);
 const floorList = ref([]);
 const formRef = ref();
 const queryParam = reactive<any>({});
-
+const registerReserveModal = ref();
+const registerCheckinModal = ref();
 // 分页
 const paginationInfo = reactive({
   pageNo: 1,
@@ -218,11 +230,22 @@ function handleRoomClick(room: any) {
 }
 
 // 操作按钮
-function handleCheckIn(room: any) {
+function handleCheckIn(room: any, projectId) {
   console.log('入住:', room.roomNo);
+  registerCheckinModal.value.disableSubmit = false;
+  const pardata = {
+    projectId: projectId,
+    roomId: room.roomId
+  }
+  registerCheckinModal.value.add(pardata);
 }
-function handleReserve(room: any) {
-  console.log('预定:', room.roomNo);
+function handleReserve(room: any, projectId) {
+  registerReserveModal.value.disableSubmit = false;
+  const pardata = {
+    projectId: projectId,
+    roomId: room.roomId
+  }
+  registerReserveModal.value.add(pardata);
 }
 
 function handleCancelReserve(room: any) {
@@ -238,6 +261,15 @@ onMounted(async () => {
   projectList.value = await getProjectListAllM();
   await searchQuery();
 });
+
+  
+/**
+ * 成功回调
+ */
+function handleSuccess() {
+  searchQuery();
+}
+   
 
 // 查询楼栋
 async function handleChangeProjectId(value) {
@@ -276,7 +308,9 @@ function handleSuperQuery(params) {
   });
   searchQuery();
 }
-
+function goCustomerPage(bed,projectId){
+  router.push({ path: '/customer/detail', query: {id: bed.customerId,projectId: projectId} });
+}
 /**
  * 查询
  */

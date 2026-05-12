@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -41,6 +42,7 @@ public class ElderAssessmentServiceImpl extends ServiceImpl<ElderAssessmentMappe
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Result<String> saveInfo(ElderAssessment elderAssessment) {
         ElderCustomer elderCustomer = elderCustomerMapper.selectById(elderAssessment.getCustomerId());
         if (Objects.isNull(elderCustomer)){

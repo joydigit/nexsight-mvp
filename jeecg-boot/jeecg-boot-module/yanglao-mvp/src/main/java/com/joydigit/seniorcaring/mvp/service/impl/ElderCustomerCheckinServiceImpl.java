@@ -19,8 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -59,6 +61,7 @@ public class ElderCustomerCheckinServiceImpl extends ServiceImpl<ElderCustomerCh
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Result<String> saveInfo(ElderCustomerCheckin elderCustomerCheckin) throws Exception {
         ElderCustomer elderCustomer = elderCustomerMapper.selectById(elderCustomerCheckin.getCustomerId());
         if (Objects.isNull(elderCustomer)){
@@ -78,6 +81,13 @@ public class ElderCustomerCheckinServiceImpl extends ServiceImpl<ElderCustomerCh
                 .eq(ElderCustomerCheckin::getStatus, CheckinStatusEnum.CHECKIN.getKey()));
         if (existCount > 0){
             return Result.error("不可重复入住");
+        }
+        Long checkRes = elderRoomReserveMapper.selectCount(Wrappers.lambdaQuery(ElderRoomReserve.class)
+                .eq(ElderRoomReserve::getCustomerId, elderCustomerCheckin.getCustomerId())
+                .eq(ElderRoomReserve::getStatus, ReserveStatusEnum.RESERVE.getKey())
+                .ne(ElderRoomReserve::getBedId, elderCustomerCheckin.getBedId()));
+        if (checkRes > 0){
+            return Result.error("预定和入住不符");
         }
         // 查询 床位 是否空闲 或者 是本人预定状态 ，否则不可以入住
         int checkBed = this.baseMapper.checkBedStatusByBedId(elderCustomerCheckin.getCustomerId(), elderCustomerCheckin.getBedId());
@@ -105,7 +115,7 @@ public class ElderCustomerCheckinServiceImpl extends ServiceImpl<ElderCustomerCh
                 .eq(ElderRoomFeeConfig::getItemType, "2")
                 .eq(ElderRoomFeeConfig::getCheckinType,elderCustomerCheckin.getCheckinType())
                 .eq(ElderRoomFeeConfig::getItemId, elderCustomerCheckin.getBedId()));
-
+        ElderRoom room = elderRoomMapper.selectById(elderCustomerCheckin.getRoomId());
         List<ElderCustomerCheckinFee> feeList = new ArrayList<>();
         for (ElderProjectFeeConfig projectFeeConfig : projectFeeConfigs) {
             ElderCustomerCheckinFee fee = new ElderCustomerCheckinFee();
@@ -118,6 +128,10 @@ public class ElderCustomerCheckinServiceImpl extends ServiceImpl<ElderCustomerCh
                 if (CollectionUtil.isNotEmpty(elderRoomFeeConfigs)){
                     ElderRoomFeeConfig elderRoomFeeConfig = elderRoomFeeConfigs.get(0);
                     fee.setAmount(elderRoomFeeConfig.getPrice());
+                }
+            } else if (projectFeeConfig.getPaymentTypeCode().equals(PaymentTypeEnum.ROOM.getKey())){
+                if (StringUtils.isBlank(projectFeeConfig.getRoomType()) || !projectFeeConfig.getRoomType().equals(room.getRoomType())){
+                    continue;
                 }
             } else {
                 fee.setFeeType(FeeTypeEnum.OTHER.getKey());
@@ -143,6 +157,7 @@ public class ElderCustomerCheckinServiceImpl extends ServiceImpl<ElderCustomerCh
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Result<String> updateInfo(ElderCustomerCheckin elderCustomerCheckin) {
         ElderCustomerCheckin checkinQuery = getById(elderCustomerCheckin.getId());
         if (Objects.isNull(checkinQuery)){
@@ -169,6 +184,7 @@ public class ElderCustomerCheckinServiceImpl extends ServiceImpl<ElderCustomerCh
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void checkOut(ElderCustomerCheckin checkin) throws Exception {
         // 修改状态
         updateById(checkin);
@@ -200,6 +216,7 @@ public class ElderCustomerCheckinServiceImpl extends ServiceImpl<ElderCustomerCh
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void changeRoom(ElderCustomerCheckin checkin, String newRoomId, String newBedId) throws Exception {
 
         // 修改原房间状态
@@ -223,14 +240,14 @@ public class ElderCustomerCheckinServiceImpl extends ServiceImpl<ElderCustomerCh
     private void checkinUpdateRoomStatus(String newRoomId, String newBedId) throws Exception {
         int update = elderBedMapper.update(Wrappers.lambdaUpdate(ElderBed.class)
                 .eq(ElderBed::getId, newBedId)
-                .eq(ElderBed::getStatus, RoomStatusEnum.FREE.getKey())
+                .in(ElderBed::getStatus, Arrays.asList(RoomStatusEnum.FREE.getKey(),RoomStatusEnum.RESERVED.getKey()))
                 .set(ElderBed::getStatus, RoomStatusEnum.OCCUPIED.getKey()));
         if (update == 0){
             throw new Exception("新床位被占用");
         }
         elderRoomMapper.update(Wrappers.lambdaUpdate(ElderRoom.class)
                 .eq(ElderRoom::getId, newRoomId)
-                .eq(ElderRoom::getStatus, RoomStatusEnum.FREE.getKey())
+                .in(ElderRoom::getStatus, Arrays.asList(RoomStatusEnum.FREE.getKey(),RoomStatusEnum.RESERVED.getKey()))
                 .set(ElderRoom::getStatus, RoomStatusEnum.OCCUPIED.getKey()));
     }
 }
