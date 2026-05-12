@@ -20,6 +20,7 @@ public class BedStatusVo {
     private String status;
     private String roomId;
     private BigDecimal price;
+    private BigDecimal dprice;
     private String customerId;
     private String customerName;
 

@@ -104,7 +104,7 @@
                     <span class="bed-elder-name">{{ bed.customerName }}</span>
                   </span>
                   <span class="bed-status" :class="bed.statusText">{{ getBedStatusText(bed.statusText) }}</span>
-                  <span class="bed-price" v-if="bed.price">¥{{ bed.price }}</span>
+                  <span class="bed-price" v-if="bed.price">¥{{ bed.price }}/¥{{ bed.dprice }}</span>
                 </div>
               </div>
             </div>
@@ -143,9 +143,8 @@
         :total="paginationInfo.total"
         :pageSizeOptions="['8', '12', '16', '24', '48']"
         showSizeChanger
-        showQuickJumper
+        :show-total="(total, range) => `共 ${total} 条`"
         @change="handlePageChange"
-        @showSizeChange="handlePageChange"
       />
     </div>
   </div>
@@ -230,8 +229,9 @@ function handleCancelReserve(room: any) {
   console.log('取消预定:', room.roomNo);
 }
 
-function handlePageChange() {
-  // 分页变化时，Vue 的响应式会自动触发 floorDataList 重新计算
+function handlePageChange(pageNumber) {
+  paginationInfo.pageNo = pageNumber;
+  searchQuery();
 }
 
 onMounted(async () => {
@@ -281,6 +281,8 @@ function handleSuperQuery(params) {
  * 查询
  */
 async function searchQuery() {
+  queryParam.pageNo = paginationInfo.pageNo;
+  queryParam.pageSize = paginationInfo.pageSize;
   let dataResult = await getRoomStatusPageListMethod(queryParam);
   dataResult.records.forEach(item => {
     item?.rooms.forEach(room => {
@@ -569,7 +571,7 @@ function searchReset() {
 /* 房间卡片 */
 .room-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
 }
 
@@ -803,7 +805,7 @@ function searchReset() {
 /* 响应式 */
 @media (max-width: 768px) {
   .room-cards {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
   }
 
   .status-statistics {

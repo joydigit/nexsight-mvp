@@ -239,4 +239,14 @@ public class ElderBillServiceImpl extends ServiceImpl<ElderBillMapper, ElderBill
         save(bill);
         elderBillDetailMapper.insert(list);
     }
+
+    @Override
+    public void calMothBillList() {
+        // 入住列表
+        List<ElderCustomerCheckin> elderCustomerCheckins = elderCustomerCheckinMapper.selectList(Wrappers.lambdaQuery(ElderCustomerCheckin.class)
+                .eq(ElderCustomerCheckin::getStatus, CheckinStatusEnum.CHECKIN.getKey()));
+        // 每一条入住再计算账单
+
+
+    }
 }

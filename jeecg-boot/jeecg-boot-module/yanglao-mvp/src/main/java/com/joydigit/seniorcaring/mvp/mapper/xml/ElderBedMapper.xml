@@ -46,26 +46,29 @@
 
     <select id="getBedStatusListByParams" resultType="com.joydigit.seniorcaring.mvp.vo.BedStatusVo">
         SELECT
-            tt.*,c.`name` as customerName
+        tt.*,c.`name` as customerName
         FROM
         (
         SELECT
-            be.id as bedId,
-            be.bed_no as bedNo,
-            be.`status`,
-            be.room_id as roomId,
-            IFNULL( cc.customer_id, rr.customer_id ) as customerId,
-            IFNULL(fc.price,pfc.price) as price
+        be.id as bedId,
+        be.bed_no as bedNo,
+        be.`status`,
+        be.room_id as roomId,
+        IFNULL( cc.customer_id, rr.customer_id ) as customerId,
+        IFNULL(fc.price,pfc.price) as price,
+        IFNULL(fcd.price,pfcd.price) as dprice
         FROM
-            elder_bed be
-            LEFT JOIN elder_room_reserve rr ON rr.bed_id = be.id
-            AND rr.STATUS = '1'
-            LEFT JOIN elder_customer_checkin cc ON cc.bed_id = be.id
-            AND cc.STATUS = '1'
-            LEFT JOIN elder_room_fee_config fc on fc.item_id = be.id AND fc.item_type = '2'
-            LEFT JOIN elder_project_fee_config pfc on pfc.project_id = be.project_id AND pfc.payment_type_code = '1'
+        elder_bed be
+        LEFT JOIN elder_room_reserve rr ON rr.bed_id = be.id
+        AND rr.STATUS = '1' AND rr.del_flag = 0
+        LEFT JOIN elder_customer_checkin cc ON cc.bed_id = be.id
+        AND cc.STATUS = '1' AND cc.del_flag = 0
+        LEFT JOIN elder_room_fee_config fc on FIND_IN_SET(be.id,fc.item_id) AND fc.item_type = '2' AND fc.checkin_type='1' AND fc.del_flag = 0
+        LEFT JOIN elder_project_fee_config pfc on pfc.project_id = be.project_id AND pfc.payment_type_code = '1' AND pfc.checkin_type = '1' AND pfc.del_flag = 0
+        LEFT JOIN elder_room_fee_config fcd on FIND_IN_SET(be.id,fcd.item_id) AND fcd.item_type = '2' AND fcd.checkin_type='2' AND fcd.del_flag = 0
+        LEFT JOIN elder_project_fee_config pfcd on pfcd.project_id = be.project_id AND pfcd.payment_type_code = '1' AND pfcd.checkin_type = '2' AND pfcd.del_flag = 0
         WHERE
-            be.del_flag = 0
+        be.del_flag = 0
         ) tt
             LEFT JOIN elder_customer c ON tt.customerId = c.id
         WHERE 1=1

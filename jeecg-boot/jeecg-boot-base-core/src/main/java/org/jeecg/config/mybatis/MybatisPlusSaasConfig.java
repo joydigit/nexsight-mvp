@@ -99,9 +99,11 @@ public class MybatisPlusSaasConfig {
             TENANT_TABLE.add("elder_floor");
             TENANT_TABLE.add("elder_nursing_record");
             TENANT_TABLE.add("elder_project");
+            TENANT_TABLE.add("elder_project_account");
             TENANT_TABLE.add("elder_project_fee_config");
             TENANT_TABLE.add("elder_project_user");
             TENANT_TABLE.add("elder_residence_history");
+            TENANT_TABLE.add("elder_room_reserve");
             TENANT_TABLE.add("elder_room");
             TENANT_TABLE.add("elder_room_fee_config");
             TENANT_TABLE.add("elder_vital_signs");

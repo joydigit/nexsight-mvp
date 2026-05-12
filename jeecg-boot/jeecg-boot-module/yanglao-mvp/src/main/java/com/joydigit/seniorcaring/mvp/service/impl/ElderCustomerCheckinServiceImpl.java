@@ -51,6 +51,8 @@ public class ElderCustomerCheckinServiceImpl extends ServiceImpl<ElderCustomerCh
     private ElderResidenceHistoryMapper elderResidenceHistoryMapper;
     @Autowired
     private IElderBillService elderBillService;
+    @Autowired
+    private ElderRoomReserveMapper elderRoomReserveMapper;
     @Override
     public IPage<ElderCustomerCheckin> pageList(Page<ElderCustomerCheckin> page, ElderCustomerCheckin elderCustomerCheckin) {
         return this.baseMapper.pageList(page,elderCustomerCheckin);
@@ -82,6 +84,10 @@ public class ElderCustomerCheckinServiceImpl extends ServiceImpl<ElderCustomerCh
         if (checkBed != 1){
             return Result.error("床位不可用，检查床位状态");
         }
+        // 入住后，取消预定
+        elderRoomReserveMapper.update(Wrappers.lambdaUpdate(ElderRoomReserve.class)
+                .eq(ElderRoomReserve::getId,elderCustomerCheckin.getBedId())
+                .eq(ElderRoomReserve::getStatus,"1").set(ElderRoomReserve::getStatus,"0"));
         // 添加费用配置
         List<ElderProjectFeeConfig> projectFeeConfigs = elderProjectFeeConfigMapper.selectList(Wrappers.lambdaQuery(ElderProjectFeeConfig.class)
                 .eq(ElderProjectFeeConfig::getProjectId, elderCustomerCheckin.getProjectId())

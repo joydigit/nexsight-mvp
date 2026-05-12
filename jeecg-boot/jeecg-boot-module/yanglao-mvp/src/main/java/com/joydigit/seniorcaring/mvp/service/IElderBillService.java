@@ -31,4 +31,6 @@ public interface IElderBillService extends IService<ElderBill> {
     Result<List<ElderBill>> getBillListByCustomerId(String customerId);
 
     void calBillInfo(ElderCustomerCheckin checkin, ChangeTypeEnum checkout) throws Exception;
+
+    void calMothBillList();
 }
