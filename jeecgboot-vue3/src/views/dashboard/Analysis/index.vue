@@ -1,24 +1,58 @@
 <template>
-  <IndexChart v-if="indexStyle === 0"></IndexChart>
-  <IndexDef v-if="indexStyle === 1"></IndexDef>
-  <IndexBdc v-if="indexStyle == 2"></IndexBdc>
-  <IndexTask v-if="indexStyle == 3"></IndexTask>
-  <div style="width: 100%; text-align: right; margin-top: 20px">
-    首页主题：
-    <a-radio-group v-model:value="indexStyle">
-      <a-radio :value="0">默认</a-radio>
-      <a-radio :value="1">销量统计</a-radio>
-      <a-radio :value="2">业务统计</a-radio>
-      <a-radio :value="3">我的任务</a-radio>
-    </a-radio-group>
+  <div class="elder-dashboard">
+    <!-- KPI 指标卡片 -->
+    <ElderKpiCards />
+
+    <!-- 图表区域 -->
+    <a-row :gutter="16" class="charts-row">
+      <a-col :xl="12" :lg="12" :md="24" :sm="24" class="chart-col">
+        <ElderRoomPie />
+      </a-col>
+      <a-col :xl="12" :lg="12" :md="24" :sm="24" class="chart-col">
+        <ElderProjectBar />
+      </a-col>
+    </a-row>
+
+    <!-- 底部：快捷入口 + 待办列表 -->
+    <a-row :gutter="16" class="bottom-row">
+      <a-col :xl="12" :lg="12" :md="24" :sm="24" class="bottom-col">
+        <ElderQuickEntries />
+      </a-col>
+      <a-col :xl="12" :lg="12" :md="24" :sm="24" class="bottom-col">
+        <ElderRecentTodos />
+      </a-col>
+    </a-row>
   </div>
 </template>
-<script lang="ts" setup>
-  import { ref } from 'vue';
-  import IndexDef from './homePage/IndexDef.vue';
-  import IndexChart from './homePage/IndexChart.vue';
-  import IndexBdc from './homePage/IndexBdc.vue';
-  import IndexTask from './homePage/IndexTask.vue';
 
-  const indexStyle = ref(0);
+<script lang="ts" setup>
+import ElderKpiCards from './components/ElderKpiCards.vue';
+import ElderRoomPie from './components/ElderRoomPie.vue';
+import ElderProjectBar from './components/ElderProjectBar.vue';
+import ElderQuickEntries from './components/ElderQuickEntries.vue';
+import ElderRecentTodos from './components/ElderRecentTodos.vue';
 </script>
+
+<style lang="less" scoped>
+.elder-dashboard {
+  padding: 16px;
+  background: #f0f2f5;
+  min-height: 100vh;
+}
+
+.charts-row {
+  margin-bottom: 16px;
+}
+
+.chart-col {
+  margin-bottom: 16px;
+}
+
+.bottom-row {
+  margin-bottom: 16px;
+}
+
+.bottom-col {
+  margin-bottom: 16px;
+}
+</style>
