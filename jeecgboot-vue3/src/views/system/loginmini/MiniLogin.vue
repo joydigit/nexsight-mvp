@@ -18,7 +18,7 @@
           <div class="aui-form">
             <div class="aui-image">
               <div class="aui-image-text">
-                <img :src="adTextImg" />
+                <!-- <img :src="adTextImg" /> -->
               </div>
             </div>
             <div class="aui-formBox">
@@ -27,9 +27,9 @@
                   <div class="aui-flex-box" :class="activeIndex === 'accountLogin' ? 'activeNav on' : ''" @click="loginClick('accountLogin')"
                     >{{ t('sys.login.signInFormTitle') }}
                   </div>
-                  <div class="aui-flex-box" :class="activeIndex === 'phoneLogin' ? 'activeNav on' : ''" @click="loginClick('phoneLogin')"
+                  <!-- <div class="aui-flex-box" :class="activeIndex === 'phoneLogin' ? 'activeNav on' : ''" @click="loginClick('phoneLogin')"
                     >{{ t('sys.login.mobileSignInFormTitle') }}
-                  </div>
+                  </div> -->
                 </div>
                 <div class="aui-form-box" style="height: 180px">
                   <a-form ref="loginRef" :model="formData" v-if="activeIndex === 'accountLogin'" @keyup.enter.native="loginHandleClick">
@@ -91,15 +91,15 @@
                     <a-button :loading="loginLoading" class="aui-link-login" type="primary" @click="loginHandleClick">
                       {{ t('sys.login.loginButton') }}</a-button>
                   </div>
-                  <div class="aui-flex">
+                  <!-- <div class="aui-flex">
                     <a class="aui-linek-code aui-flex-box" @click="codeHandleClick">{{ t('sys.login.qrSignInFormTitle') }}</a>
                   </div>
                   <div class="aui-flex">
                     <a class="aui-linek-code aui-flex-box" @click="registerHandleClick">{{ t('sys.login.registerButton') }}</a>
-                  </div>
+                  </div> -->
                 </div>
               </div>
-              <a-form @keyup.enter.native="loginHandleClick">
+              <!-- <a-form @keyup.enter.native="loginHandleClick">
                 <div class="aui-flex aui-third-text">
                   <div class="aui-flex-box aui-third-border">
                     <span>{{ t('sys.login.otherSignIn') }}</span>
@@ -127,7 +127,7 @@
                     </div>
                   </div>
                 </div>
-              </a-form>
+              </a-form> -->
             </div>
           </div>
         </div>
@@ -194,8 +194,8 @@
   //账号登录表单字段
   const formData = reactive<any>({
     inputCode: '',
-    username: 'admin',
-    password: '123456',
+    username: '',
+    password: '',
   });
   //手机登录表单字段
   const phoneFormData = reactive<any>({
